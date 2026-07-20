@@ -5,5 +5,8 @@
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <h2>Số sách hiện có: @ViewBag.SoSach</h2>
+    <h2>Xin chào @User.Identity?.Name</h2>
+
+<p>Vai trò: @User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value</p>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>

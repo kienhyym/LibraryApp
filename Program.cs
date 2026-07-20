@@ -3,12 +3,15 @@ using LibraryApp.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
+using LibraryApp.Data;
+using LibraryApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<LibDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("LibraryConnection")));
+        builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -38,6 +41,13 @@ builder.Services.AddDbContext<LibDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<LibDbContext>();
+
+    DbInitializer.Seed(context);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

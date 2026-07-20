@@ -228,3 +228,4 @@
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/bin/Debug/net9.0/runtimes/win/lib/net6.0/System.Windows.Extensions.dll
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/LibraryApp.csproj.AssemblyReference.cache
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/LibraryApp.csproj.Up2Date
+/Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/LibraryApp.sourcelink.json
