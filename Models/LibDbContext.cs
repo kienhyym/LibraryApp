@@ -15,21 +15,21 @@ public partial class LibDbContext : DbContext
     {
     }
 
-    public virtual DbSet<Chitietphieumuon> Chitietphieumuons { get; set; }
+    public virtual DbSet<Account> Accounts { get; set; }
 
-    public virtual DbSet<Cudan> Cudans { get; set; }
+    public virtual DbSet<Author> Authors { get; set; }
 
-    public virtual DbSet<Nhanvien> Nhanviens { get; set; }
+    public virtual DbSet<Book> Books { get; set; }
 
-    public virtual DbSet<Phieumuon> Phieumuons { get; set; }
+    public virtual DbSet<Borrowrecord> Borrowrecords { get; set; }
 
-    public virtual DbSet<Sach> Saches { get; set; }
+    public virtual DbSet<Borrowrecorddetail> Borrowrecorddetails { get; set; }
 
-    public virtual DbSet<Tacgium> Tacgia { get; set; }
+    public virtual DbSet<Category> Categories { get; set; }
 
-    public virtual DbSet<Taikhoan> Taikhoans { get; set; }
+    public virtual DbSet<Personnel> Personnel { get; set; }
 
-    public virtual DbSet<Theloai> Theloais { get; set; }
+    public virtual DbSet<Resident> Residents { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -37,156 +37,151 @@ public partial class LibDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Chitietphieumuon>(entity =>
+        modelBuilder.Entity<Account>(entity =>
         {
-            entity.HasKey(e => e.MaCtpm).HasName("PK__CHITIETP__1E4E6072790A4602");
+            entity.ToTable("ACCOUNTS");
 
-            entity.ToTable("CHITIETPHIEUMUON");
+            entity.HasIndex(e => e.Email, "UQ_ACCOUNTS_Email").IsUnique();
 
-            entity.Property(e => e.MaCtpm).HasColumnName("MaCTPM");
-            entity.Property(e => e.NgayTraThucTe).HasColumnType("datetime");
-            entity.Property(e => e.SoLuong).HasDefaultValue(1);
-            entity.Property(e => e.TinhTrangTra).HasMaxLength(100);
-
-            entity.HasOne(d => d.MaPhieuMuonNavigation).WithMany(p => p.Chitietphieumuons)
-                .HasForeignKey(d => d.MaPhieuMuon)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_CTPM_PHIEUMUON");
-
-            entity.HasOne(d => d.MaSachNavigation).WithMany(p => p.Chitietphieumuons)
-                .HasForeignKey(d => d.MaSach)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_CTPM_SACH");
-        });
-
-        modelBuilder.Entity<Cudan>(entity =>
-        {
-            entity.HasKey(e => e.MaCuDan).HasName("PK__CUDAN__080D9BC613B0563C");
-
-            entity.ToTable("CUDAN");
-
-            entity.HasIndex(e => e.MaTaiKhoan, "UQ__CUDAN__AD7C6528FDE719B5").IsUnique();
-
-            entity.Property(e => e.DiaChiCanHo).HasMaxLength(100);
-            entity.Property(e => e.Email)
-                .HasMaxLength(100)
-                .IsUnicode(false);
-            entity.Property(e => e.GioiTinh).HasMaxLength(10);
-            entity.Property(e => e.HoTen).HasMaxLength(100);
-            entity.Property(e => e.SoDienThoai)
-                .HasMaxLength(15)
-                .IsUnicode(false);
-
-            entity.HasOne(d => d.MaTaiKhoanNavigation).WithOne(p => p.Cudan)
-                .HasForeignKey<Cudan>(d => d.MaTaiKhoan)
-                .HasConstraintName("FK_CUDAN_TAIKHOAN");
-        });
-
-        modelBuilder.Entity<Nhanvien>(entity =>
-        {
-            entity.HasKey(e => e.MaNhanVien).HasName("PK__NHANVIEN__77B2CA47F5E79D6F");
-
-            entity.ToTable("NHANVIEN");
-
-            entity.HasIndex(e => e.MaTaiKhoan, "UQ__NHANVIEN__AD7C6528C32FFA93").IsUnique();
-
-            entity.Property(e => e.ChucVu).HasMaxLength(50);
-            entity.Property(e => e.Email)
-                .HasMaxLength(100)
-                .IsUnicode(false);
-            entity.Property(e => e.GioiTinh).HasMaxLength(10);
-            entity.Property(e => e.HoTen).HasMaxLength(100);
-            entity.Property(e => e.SoDienThoai)
-                .HasMaxLength(15)
-                .IsUnicode(false);
-
-            entity.HasOne(d => d.MaTaiKhoanNavigation).WithOne(p => p.Nhanvien)
-                .HasForeignKey<Nhanvien>(d => d.MaTaiKhoan)
-                .HasConstraintName("FK_NHANVIEN_TAIKHOAN");
-        });
-
-        modelBuilder.Entity<Phieumuon>(entity =>
-        {
-            entity.HasKey(e => e.MaPhieuMuon).HasName("PK__PHIEUMUO__C4C8222230D1947B");
-
-            entity.ToTable("PHIEUMUON");
-
-            entity.Property(e => e.GhiChu).HasMaxLength(250);
-            entity.Property(e => e.HanTra).HasColumnType("datetime");
-            entity.Property(e => e.NgayMuon)
+            entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.TrangThai)
-                .HasMaxLength(50)
-                .HasDefaultValue("Đang mượn");
-
-            entity.HasOne(d => d.MaCuDanNavigation).WithMany(p => p.Phieumuons)
-                .HasForeignKey(d => d.MaCuDan)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_PHIEUMUON_CUDAN");
-
-            entity.HasOne(d => d.MaNhanVienNavigation).WithMany(p => p.Phieumuons)
-                .HasForeignKey(d => d.MaNhanVien)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_PHIEUMUON_NHANVIEN");
+            entity.Property(e => e.Email)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.PasswordHash).HasMaxLength(500);
         });
 
-        modelBuilder.Entity<Sach>(entity =>
+        modelBuilder.Entity<Author>(entity =>
         {
-            entity.HasKey(e => e.MaSach).HasName("PK__SACH__B235742D0C2A68C6");
+            entity.ToTable("AUTHORS");
 
-            entity.ToTable("SACH");
+            entity.HasIndex(e => e.AuthorName, "UQ_AUTHORS_AuthorName").IsUnique();
 
-            entity.Property(e => e.AnhBia).HasMaxLength(255);
-            entity.Property(e => e.NhaXuatBan).HasMaxLength(150);
-            entity.Property(e => e.TenSach).HasMaxLength(200);
-            entity.Property(e => e.TrangThai).HasDefaultValue(true);
-            entity.Property(e => e.ViTriKe).HasMaxLength(50);
+            entity.Property(e => e.AuthorName).HasMaxLength(100);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Nationality).HasMaxLength(50);
+            entity.Property(e => e.Notes).HasMaxLength(255);
+        });
 
-            entity.HasOne(d => d.MaTacGiaNavigation).WithMany(p => p.Saches)
-                .HasForeignKey(d => d.MaTacGia)
+        modelBuilder.Entity<Book>(entity =>
+        {
+            entity.ToTable("BOOKS");
+
+            entity.Property(e => e.CoverImage).HasMaxLength(255);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IsAvailable).HasDefaultValue(true);
+            entity.Property(e => e.Publisher).HasMaxLength(150);
+            entity.Property(e => e.Title).HasMaxLength(200);
+
+            entity.HasOne(d => d.Author).WithMany(p => p.Books)
+                .HasForeignKey(d => d.AuthorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_SACH_TACGIA");
+                .HasConstraintName("FK_BOOKS_AUTHORS");
 
-            entity.HasOne(d => d.MaTheLoaiNavigation).WithMany(p => p.Saches)
-                .HasForeignKey(d => d.MaTheLoai)
+            entity.HasOne(d => d.Category).WithMany(p => p.Books)
+                .HasForeignKey(d => d.CategoryId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_SACH_THELOAI");
+                .HasConstraintName("FK_BOOKS_CATEGORIES");
         });
 
-        modelBuilder.Entity<Tacgium>(entity =>
+        modelBuilder.Entity<Borrowrecord>(entity =>
         {
-            entity.HasKey(e => e.MaTacGia).HasName("PK__TACGIA__F24E6756DF7B4EB8");
+            entity.ToTable("BORROWRECORDS");
 
-            entity.ToTable("TACGIA");
+            entity.Property(e => e.BorrowDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.BorrowRecordStatus).HasDefaultValue(1);
+            entity.Property(e => e.DueDate).HasColumnType("datetime");
+            entity.Property(e => e.Notes).HasMaxLength(250);
 
-            entity.Property(e => e.GhiChu).HasMaxLength(255);
-            entity.Property(e => e.QuocTich).HasMaxLength(50);
-            entity.Property(e => e.TenTacGia).HasMaxLength(100);
+            entity.HasOne(d => d.Personnel).WithMany(p => p.Borrowrecords)
+                .HasForeignKey(d => d.PersonnelId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_BORROWRECORDS_PERSONNEL");
+
+            entity.HasOne(d => d.Resident).WithMany(p => p.Borrowrecords)
+                .HasForeignKey(d => d.ResidentId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_BORROWRECORDS_RESIDENTS");
         });
 
-        modelBuilder.Entity<Taikhoan>(entity =>
+        modelBuilder.Entity<Borrowrecorddetail>(entity =>
         {
-            entity.HasKey(e => e.MaTaiKhoan).HasName("PK__TAIKHOAN__AD7C652956C5E59A");
+            entity.ToTable("BORROWRECORDDETAILS");
 
-            entity.ToTable("TAIKHOAN");
+            entity.HasIndex(e => new { e.BorrowRecordId, e.BookId }, "UQ_BORROWRECORDDETAILS_BorrowRecordId_BookId").IsUnique();
 
-            entity.HasIndex(e => e.TenDangNhap, "UQ__TAIKHOAN__55F68FC043686F04").IsUnique();
+            entity.Property(e => e.Quantity).HasDefaultValue(1);
+            entity.Property(e => e.ReturnCondition).HasMaxLength(100);
+            entity.Property(e => e.ReturnDate).HasColumnType("datetime");
 
-            entity.Property(e => e.MatKhau).HasMaxLength(500);
-            entity.Property(e => e.TenDangNhap).HasMaxLength(50);
-            entity.Property(e => e.TrangThai).HasDefaultValue(true);
-            entity.Property(e => e.VaiTro).HasMaxLength(20);
+            entity.HasOne(d => d.Book).WithMany(p => p.Borrowrecorddetails)
+                .HasForeignKey(d => d.BookId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_BORROWRECORDDETAILS_BOOKS");
+
+            entity.HasOne(d => d.BorrowRecord).WithMany(p => p.Borrowrecorddetails)
+                .HasForeignKey(d => d.BorrowRecordId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_BORROWRECORDDETAILS_BORROWRECORDS");
         });
 
-        modelBuilder.Entity<Theloai>(entity =>
+        modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(e => e.MaTheLoai).HasName("PK__THELOAI__D73FF34ADAAC7F4C");
+            entity.ToTable("CATEGORIES");
 
-            entity.ToTable("THELOAI");
+            entity.HasIndex(e => e.CategoryName, "UQ_CATEGORIES_CategoryName").IsUnique();
 
-            entity.Property(e => e.MoTa).HasMaxLength(255);
-            entity.Property(e => e.TenTheLoai).HasMaxLength(100);
+            entity.Property(e => e.CategoryDescription).HasMaxLength(255);
+            entity.Property(e => e.CategoryName).HasMaxLength(100);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<Personnel>(entity =>
+        {
+            entity.ToTable("PERSONNEL");
+
+            entity.HasIndex(e => e.AccountId, "UQ_PERSONNEL_AccountId").IsUnique();
+
+            entity.Property(e => e.FullName).HasMaxLength(100);
+            entity.Property(e => e.PersonnelAddress).HasMaxLength(255);
+            entity.Property(e => e.PhoneNumber)
+                .HasMaxLength(15)
+                .IsUnicode(false);
+            entity.Property(e => e.Position).HasMaxLength(50);
+
+            entity.HasOne(d => d.Account).WithOne(p => p.Personnel)
+                .HasForeignKey<Personnel>(d => d.AccountId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PERSONNEL_ACCOUNTS");
+        });
+
+        modelBuilder.Entity<Resident>(entity =>
+        {
+            entity.ToTable("RESIDENTS");
+
+            entity.HasIndex(e => e.AccountId, "UQ_RESIDENTS_AccountId").IsUnique();
+
+            entity.Property(e => e.ApartmentNumber).HasMaxLength(20);
+            entity.Property(e => e.FullName).HasMaxLength(100);
+            entity.Property(e => e.PermanentAddress).HasMaxLength(255);
+            entity.Property(e => e.PhoneNumber)
+                .HasMaxLength(15)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.Account).WithOne(p => p.Resident)
+                .HasForeignKey<Resident>(d => d.AccountId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_RESIDENTS_ACCOUNTS");
         });
 
         OnModelCreatingPartial(modelBuilder);

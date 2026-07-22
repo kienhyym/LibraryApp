@@ -25,18 +25,18 @@ public class AuthService : IAuthService
         HttpContext httpContext,
         LoginViewModel model)
     {
-        var taiKhoan = await GetTaiKhoanAsync(model.TenDangNhap);
+        var account = await GetAccountAsync(model.email);
 
-        if (taiKhoan == null)
+        if (account == null)
         {
             return new LoginResult
             {
                 Success = false,
-                ErrorMessage = "Tên đăng nhập hoặc mật khẩu không đúng."
+                ErrorMessage = "Email hoặc mật khẩu không đúng."
             };
         }
 
-        if (!taiKhoan.TrangThai)
+        if (!account.IsActive)
         {
             return new LoginResult
             {
@@ -45,16 +45,16 @@ public class AuthService : IAuthService
             };
         }
 
-        if (!VerifyPassword(taiKhoan, model.MatKhau))
+        if (!VerifyPassword(account, model.MatKhau))
         {
             return new LoginResult
             {
                 Success = false,
-                ErrorMessage = "Tên đăng nhập hoặc mật khẩu không đúng."
+                ErrorMessage = "Email hoặc mật khẩu không đúng."
             };
         }
 
-        var claims = CreateClaims(taiKhoan);
+        var claims = CreateClaims(account);
 
         await SignInAsync(
             httpContext,
@@ -64,9 +64,9 @@ public class AuthService : IAuthService
         return new LoginResult
         {
             Success = true,
-            MaTaiKhoan = taiKhoan.MaTaiKhoan,
-            TenDangNhap = taiKhoan.TenDangNhap,
-            VaiTro = taiKhoan.VaiTro
+            AccountId = account.AccountId,
+            Email = account.Email,
+            Role = account.AccountRole.ToString()
         };
     }
 
@@ -75,41 +75,41 @@ public class AuthService : IAuthService
         await httpContext.SignOutAsync(
             CookieAuthenticationDefaults.AuthenticationScheme);
     }
-    private async Task<Taikhoan?> GetTaiKhoanAsync(string tenDangNhap)
+    private async Task<Account?> GetAccountAsync(string email)
     {
-        return await _context.Taikhoans
-            .FirstOrDefaultAsync(x => x.TenDangNhap == tenDangNhap);
+        return await _context.Accounts
+            .FirstOrDefaultAsync(x => x.Email == email);
     }
 
     private bool VerifyPassword(
-    Taikhoan taiKhoan,
-    string matKhauNhap)
-    {
-        var passwordHasher = new PasswordHasher<Taikhoan>();
+    Account account,
+    string password)
+{
+    var passwordHasher = new PasswordHasher<Account>();
 
-        var result = passwordHasher.VerifyHashedPassword(
-            taiKhoan,
-            taiKhoan.MatKhau,
-            matKhauNhap);
+    var result = passwordHasher.VerifyHashedPassword(
+        account,
+        account.PasswordHash,
+        password);
 
-        return result != PasswordVerificationResult.Failed;
-    }
+    return result != PasswordVerificationResult.Failed;
+}
 
-    private List<Claim> CreateClaims(Taikhoan taiKhoan)
+    private List<Claim> CreateClaims(Account account)
     {
         return new List<Claim>
     {
         new Claim(
             ClaimTypes.NameIdentifier,
-            taiKhoan.MaTaiKhoan.ToString()),
+            account.AccountId.ToString()),
 
         new Claim(
             ClaimTypes.Name,
-            taiKhoan.TenDangNhap),
+            account.Email),
 
         new Claim(
             ClaimTypes.Role,
-            taiKhoan.VaiTro)
+            account.AccountRole.ToString())
     };
     }
 

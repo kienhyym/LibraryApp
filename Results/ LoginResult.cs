@@ -6,9 +6,9 @@ public class LoginResult
 
     public string? ErrorMessage { get; set; }
 
-    public int? MaTaiKhoan { get; set; }
+    public int? AccountId { get; set; }
 
-    public string? TenDangNhap { get; set; }
+    public string? Email { get; set; }
 
-    public string? VaiTro { get; set; }
+    public string? Role { get; set; }
 }

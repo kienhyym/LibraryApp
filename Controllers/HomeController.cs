@@ -16,7 +16,7 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {   
-        ViewBag.SoSach = _context.Saches.Count();
+        ViewBag.SoSach = _context.Books.Count();
         return View();
     }
 
