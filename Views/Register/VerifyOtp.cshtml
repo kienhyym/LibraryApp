@@ -1,0 +1,71 @@
+@model LibraryApp.ViewModels.VerifyOtpViewModel
+
+@{
+    ViewData["Title"] = "Verify OTP";
+}
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-5">
+
+            <div class="card shadow">
+
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">Email Verification</h3>
+                </div>
+
+                <div class="card-body">
+
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">
+                            @TempData["Success"]
+                        </div>
+                    }
+
+                    <form asp-action="VerifyOtp" method="post">
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="text-danger mb-3"></div>
+
+                        <input asp-for="Email" type="hidden"/>
+
+                        <div class="mb-3">
+
+                            <label asp-for="OtpCode"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="OtpCode"
+                                   class="form-control"
+                                   placeholder="Enter 6-digit OTP"/>
+
+                            <span asp-validation-for="OtpCode"
+                                  class="text-danger"></span>
+
+                        </div>
+
+                        <button class="btn btn-success w-100">
+                            Verify OTP
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

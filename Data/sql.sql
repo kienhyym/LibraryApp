@@ -431,3 +431,30 @@ CREATE TABLE BORROWRECORDDETAILS
 
 );
 GO
+
+-- =============================================
+-- BẢNG EMAIL_VERIFICATIONS
+-- =============================================
+CREATE TABLE EMAIL_VERIFICATIONS
+(
+    EmailVerificationId INT IDENTITY(1,1),
+
+    Email VARCHAR(100) NOT NULL,
+
+    OtpCode CHAR(6) NOT NULL,
+
+    ExpiredAt DATETIME NOT NULL,
+
+    IsVerified BIT NOT NULL
+        CONSTRAINT DF_EMAIL_VERIFICATIONS_IsVerified DEFAULT (0),
+
+    CreatedAt DATETIME NOT NULL
+        CONSTRAINT DF_EMAIL_VERIFICATIONS_CreatedAt DEFAULT (GETDATE()),
+
+    -- =========================
+    -- PRIMARY KEY
+    -- =========================
+    CONSTRAINT PK_EMAIL_VERIFICATIONS
+        PRIMARY KEY (EmailVerificationId)
+);
+GO

@@ -229,3 +229,6 @@
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/LibraryApp.csproj.AssemblyReference.cache
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/LibraryApp.csproj.Up2Date
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/LibraryApp.sourcelink.json
+/Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/bin/Debug/net9.0/BouncyCastle.Cryptography.dll
+/Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/bin/Debug/net9.0/MailKit.dll
+/Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/bin/Debug/net9.0/MimeKit.dll

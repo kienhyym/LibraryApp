@@ -27,13 +27,15 @@ public partial class LibDbContext : DbContext
 
     public virtual DbSet<Category> Categories { get; set; }
 
+    public virtual DbSet<EmailVerification> EmailVerifications { get; set; }
+
     public virtual DbSet<Personnel> Personnel { get; set; }
 
     public virtual DbSet<Resident> Residents { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=localhost,1433;Database=LibDB;User Id=sa;Password=YourStrong@Pass123;TrustServerCertificate=True;");
+//     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+// #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+//         => optionsBuilder.UseSqlServer("Server=localhost,1433;Database=LibDB;User Id=sa;Password=YourStrong@Pass123;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -144,6 +146,23 @@ public partial class LibDbContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<EmailVerification>(entity =>
+        {
+            entity.ToTable("EMAIL_VERIFICATIONS");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Email)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.ExpiredAt).HasColumnType("datetime");
+            entity.Property(e => e.OtpCode)
+                .HasMaxLength(6)
+                .IsUnicode(false)
+                .IsFixedLength();
         });
 
         modelBuilder.Entity<Personnel>(entity =>

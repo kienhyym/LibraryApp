@@ -1,65 +1,87 @@
-using Microsoft.EntityFrameworkCore;
-using LibraryApp.Models;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
-using System.Security.Claims;
+using LibraryApp.Configurations;
 using LibraryApp.Data;
+using LibraryApp.Models;
 using LibraryApp.Services;
+using LibraryApp.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+#region MVC
 builder.Services.AddControllersWithViews();
+#endregion
+
+#region Database
 builder.Services.AddDbContext<LibDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("LibraryConnection")));
-        builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Configuration.GetConnectionString("DefaultConnection")));
+#endregion
 
+#region Email Settings
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
+#endregion
+
+#region Authentication & Authorization
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
         options.LoginPath = "/Login";
-
+        options.LogoutPath = "/Login/Logout";
         options.AccessDeniedPath = "/Login/AccessDenied";
 
-        options.LogoutPath = "/Login/Logout";
-
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
-
         options.SlidingExpiration = true;
     });
 
 builder.Services.AddAuthorization();
+#endregion
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+#region Session
+builder.Services.AddDistributedMemoryCache();
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(10);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+#endregion
 
-builder.Services.AddDbContext<LibDbContext>(options =>
-
-    options.UseSqlServer(
-
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+#region Dependency Injection
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddScoped<IRegisterService, RegisterService>();
+#endregion
 
 var app = builder.Build();
 
+#region Seed Database
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<LibDbContext>();
-
     DbInitializer.Seed(context);
 }
+#endregion
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+
 app.UseRouting();
+
+app.UseSession();
+
 app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapStaticAssets();
@@ -68,6 +90,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();
