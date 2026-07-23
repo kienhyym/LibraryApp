@@ -29,3 +29,9 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+.navbar-scrolled {
+    background: rgba(255,255,255,.96) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 25px rgba(0,0,0,.08) !important;
+}

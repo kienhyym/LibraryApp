@@ -1,48 +1,62 @@
-﻿/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-for details on configuring this project to bundle and minify static web assets. */
+﻿.navbar {
 
-a.navbar-brand {
-  white-space: normal;
-  text-align: center;
-  word-break: break-all;
+    min-height: 72px;
+
+    transition: all .3s ease;
+
+    z-index: 1030;
+
 }
 
-a {
-  color: #0077cc;
+.navbar-brand {
+
+    font-size: 1.6rem;
+
+    font-weight: 700;
+
 }
 
-.btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+.navbar-nav .nav-link {
+
+    color: #343a40 !important;
+
+    font-weight: 600;
+
+    padding: .75rem 1rem;
+
+    transition: .25s;
+
 }
 
-.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+.navbar .nav-link {
+    color: #343a40 !important;
+    transition: color .25s ease;
+    margin: 0 6px;
 }
 
-.border-top {
-  border-top: 1px solid #e5e5e5;
-}
-.border-bottom {
-  border-bottom: 1px solid #e5e5e5;
+.navbar .nav-link:hover {
+    color: #0d6efd !important;
 }
 
-.box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+.navbar .nav-link.active {
+    color: #0d6efd !important;
+    font-weight: 600;
+}
+.navbar-nav .nav-link:hover {
+    color: #0d6efd !important;
+}
+.navbar-nav .nav-link.active {
+    color: #0d6efd !important;
+    position: relative;
 }
 
-button.accept-policy {
-  font-size: 1rem;
-  line-height: inherit;
-}
-
-.footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px;
+.navbar-nav .nav-link.active::after {
+    content: "";
+    position: absolute;
+    left: 15%;
+    bottom: 8px;
+    width: 70%;
+    height: 3px;
+    border-radius: 10px;
+    background: #0d6efd;
 }

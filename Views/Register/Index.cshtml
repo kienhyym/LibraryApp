@@ -13,7 +13,7 @@
             <div class="card shadow">
 
                 <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Resident Registration</h3>
+                    <h3 class="mb-0">Đăng ký tài khoản</h3>
                 </div>
 
                 <div class="card-body">
@@ -25,7 +25,7 @@
                         <div class="row">
 
                             <div class="col-md-6 mb-3">
-                                <label asp-for="FullName" class="form-label"></label>
+                                <label asp-for="FullName" class="form-label">Họ tên</label>
                                 <input asp-for="FullName" class="form-control"/>
                                 <span asp-validation-for="FullName" class="text-danger"></span>
                             </div>
@@ -37,19 +37,19 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label asp-for="Password" class="form-label"></label>
+                                <label asp-for="Password" class="form-label">Mật khẩu</label>
                                 <input asp-for="Password" class="form-control"/>
                                 <span asp-validation-for="Password" class="text-danger"></span>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label asp-for="ConfirmPassword" class="form-label"></label>
+                                <label asp-for="ConfirmPassword" class="form-label">Xác nhận mật khẩu</label>
                                 <input asp-for="ConfirmPassword" class="form-control"/>
                                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label asp-for="DateOfBirth" class="form-label"></label>
+                                <label asp-for="DateOfBirth" class="form-label">Ngày sinh</label>
                                 <input asp-for="DateOfBirth"
                                        type="date"
                                        class="form-control"/>
@@ -57,7 +57,7 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label asp-for="Gender" class="form-label"></label>
+                                <label asp-for="Gender" class="form-label">Giới tính</label>
 
                                 <select asp-for="Gender" class="form-select">
 
@@ -76,22 +76,22 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label asp-for="PhoneNumber" class="form-label"></label>
+                                <label asp-for="PhoneNumber" class="form-label">Số điện thoại</label>
                                 <input asp-for="PhoneNumber" class="form-control"/>
                                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label asp-for="ApartmentNumber" class="form-label"></label>
+                                <label asp-for="ApartmentNumber" class="form-label">Số căn hộ</label>
                                 <input asp-for="ApartmentNumber" class="form-control"/>
                                 <span asp-validation-for="ApartmentNumber" class="text-danger"></span>
                             </div>
 
                             <div class="col-12 mb-3">
-                                <label asp-for="PermanentAddress" class="form-label"></label>
+                                <label asp-for="PermanentAddress" class="form-label">Địa chỉ thường trú</label>
 
                                 <textarea asp-for="PermanentAddress"
-                                          rows="3"
+                                          rows="2"
                                           class="form-control"></textarea>
 
                                 <span asp-validation-for="PermanentAddress" class="text-danger"></span>

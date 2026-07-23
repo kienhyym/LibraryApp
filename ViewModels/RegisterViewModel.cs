@@ -26,14 +26,18 @@ public class RegisterViewModel
     public string FullName { get; set; } = string.Empty;
 
     [DataType(DataType.Date)]
-    public DateOnly? DateOfBirth { get; set; }
+    public DateOnly? DateOfBirth { get; set; } = new DateOnly(2000, 1, 1);
 
-    public int? Gender { get; set; }
+    [Required(ErrorMessage = "Vui lòng chọn giới tính")]
+    public int Gender { get; set; }
 
     [Phone(ErrorMessage = "Invalid phone number.")]
+    [Required(ErrorMessage = "Vui lòng nhập số điện thoại")]
+
     [StringLength(15)]
     public string? PhoneNumber { get; set; }
 
+    [Required(ErrorMessage = "Vui lòng nhập số căn hộ")]
     [StringLength(20)]
     public string? ApartmentNumber { get; set; }
 

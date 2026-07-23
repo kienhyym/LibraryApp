@@ -21,9 +21,7 @@
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/scopedcss/Views/Shared/_Layout.cshtml.rz.scp.css
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/scopedcss/bundle/LibraryApp.styles.css
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/scopedcss/projectbundle/LibraryApp.bundle.scp.css
-/Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/qatvkfreei-b9sayid5wm.gz
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/9axcs9hsuc-61n19gt1b8.gz
-/Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/lszylnqqph-xtxxf3hu2r.gz
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/ecs22akar7-bqjiyaj88i.gz
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/wzzc69d1kr-c2jlpeoesf.gz
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/6s13xffaio-erw9l3u2r3.gz
@@ -83,8 +81,6 @@
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/s02mrvk1qo-muycvpuwrr.gz
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/esyjdbs07r-87fc7y1x7t.gz
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/uov9fkcqg5-mlv21k5csn.gz
-/Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/9wz9pw0x8w-qhf533pe2r.gz
-/Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/yiuza6kohw-qhf533pe2r.gz
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/staticwebassets.build.json
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/staticwebassets.build.json.cache
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/staticwebassets.development.json
@@ -232,3 +228,7 @@
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/bin/Debug/net9.0/BouncyCastle.Cryptography.dll
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/bin/Debug/net9.0/MailKit.dll
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/bin/Debug/net9.0/MimeKit.dll
+/Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/qatvkfreei-u6o0531m3r.gz
+/Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/lszylnqqph-ix4nttv09i.gz
+/Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/9wz9pw0x8w-7g9dlhacns.gz
+/Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/yiuza6kohw-7g9dlhacns.gz

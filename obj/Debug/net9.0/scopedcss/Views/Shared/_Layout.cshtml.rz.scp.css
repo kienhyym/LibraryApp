@@ -1,48 +1,62 @@
-/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-for details on configuring this project to bundle and minify static web assets. */
+.navbar[b-b3vcjlfyeh] {
 
-a.navbar-brand[b-b3vcjlfyeh] {
-  white-space: normal;
-  text-align: center;
-  word-break: break-all;
+    min-height: 72px;
+
+    transition: all .3s ease;
+
+    z-index: 1030;
+
 }
 
-a[b-b3vcjlfyeh] {
-  color: #0077cc;
+.navbar-brand[b-b3vcjlfyeh] {
+
+    font-size: 1.6rem;
+
+    font-weight: 700;
+
 }
 
-.btn-primary[b-b3vcjlfyeh] {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+.navbar-nav .nav-link[b-b3vcjlfyeh] {
+
+    color: #343a40 !important;
+
+    font-weight: 600;
+
+    padding: .75rem 1rem;
+
+    transition: .25s;
+
 }
 
-.nav-pills .nav-link.active[b-b3vcjlfyeh], .nav-pills .show > .nav-link[b-b3vcjlfyeh] {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+.navbar .nav-link[b-b3vcjlfyeh] {
+    color: #343a40 !important;
+    transition: color .25s ease;
+    margin: 0 6px;
 }
 
-.border-top[b-b3vcjlfyeh] {
-  border-top: 1px solid #e5e5e5;
-}
-.border-bottom[b-b3vcjlfyeh] {
-  border-bottom: 1px solid #e5e5e5;
+.navbar .nav-link:hover[b-b3vcjlfyeh] {
+    color: #0d6efd !important;
 }
 
-.box-shadow[b-b3vcjlfyeh] {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+.navbar .nav-link.active[b-b3vcjlfyeh] {
+    color: #0d6efd !important;
+    font-weight: 600;
+}
+.navbar-nav .nav-link:hover[b-b3vcjlfyeh] {
+    color: #0d6efd !important;
+}
+.navbar-nav .nav-link.active[b-b3vcjlfyeh] {
+    color: #0d6efd !important;
+    position: relative;
 }
 
-button.accept-policy[b-b3vcjlfyeh] {
-  font-size: 1rem;
-  line-height: inherit;
-}
-
-.footer[b-b3vcjlfyeh] {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px;
+.navbar-nav .nav-link.active[b-b3vcjlfyeh]::after {
+    content: "";
+    position: absolute;
+    left: 15%;
+    bottom: 8px;
+    width: 70%;
+    height: 3px;
+    border-radius: 10px;
+    background: #0d6efd;
 }
