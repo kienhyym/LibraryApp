@@ -32,8 +32,16 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvRGFzaGJvYXJkL0luZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/Areas/Admin/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvU2hhcmVkL19MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/Areas/Admin/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/Areas/Admin/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/Views/Home/Index.cshtml]
