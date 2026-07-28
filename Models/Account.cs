@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using LibraryApp.Enums;
 
 namespace LibraryApp.Models;
 
@@ -11,7 +12,7 @@ public partial class Account
 
     public string PasswordHash { get; set; } = null!;
 
-    public int AccountRole { get; set; }
+    public AccountRole AccountRole { get; set; }
 
     public bool IsActive { get; set; }
 

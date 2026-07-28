@@ -16,7 +16,7 @@ public static class DbInitializer
         var admin = new Account
         {
             Email = "admin@example.com",
-            AccountRole = 1,
+            AccountRole = Enums.AccountRole.Admin,
             IsActive = true
         };
 

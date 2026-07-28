@@ -1,12 +1,21 @@
+using LibraryApp.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryApp.Areas.Admin.Controllers;
 
-[Area("Admin")]
-public class DashboardController : Controller
+public class DashboardController : AdminBaseController
 {
-    public IActionResult Index()
+    private readonly IDashboardService _dashboardService;
+
+    public DashboardController(IDashboardService dashboardService)
     {
-        return View();
+        _dashboardService = dashboardService;
+    }
+
+    public async Task<IActionResult> Index()
+    {
+        var vm = await _dashboardService.GetDashboardAsync();
+
+        return View(vm);
     }
 }

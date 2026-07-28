@@ -50,7 +50,7 @@ CREATE TABLE ACCOUNTS
     PasswordHash NVARCHAR(500) NOT NULL,
 
     -- 1 = Admin
-    -- 2 = Staff(NhanVien)
+    -- 2 = Personnel(NhanVien)
     -- 3 = Resident(CuDan)
     AccountRole INT NOT NULL,
 

@@ -233,3 +233,5 @@
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/9wz9pw0x8w-7g9dlhacns.gz
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/yiuza6kohw-7g9dlhacns.gz
 /Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/54vdsv7lot-za5d7mwf4z.gz
+/Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/ia93gmdauy-zcnn8fnvg4.gz
+/Users/nguyendinhkien/Ehou/kỳ 10/IT63-Khoá luận tốt nghiệp/LibraryApp/LibraryApp/obj/Debug/net9.0/compressed/1eqrxcswyn-b9hbilijyh.gz

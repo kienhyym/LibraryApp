@@ -41,7 +41,18 @@ public class LoginController : Controller
             return View(model);
         }
 
-        return RedirectToAction("Index", "Home");
+        if (result.Role == "Admin" ||
+      result.Role == "Personnel")
+        {
+            return RedirectToAction(
+                "Index",
+                "Dashboard",
+                new { area = "Admin" });
+        }
+
+        return RedirectToAction(
+            "Index",
+            "Home");
     }
 
     public async Task<IActionResult> Logout()
@@ -49,5 +60,11 @@ public class LoginController : Controller
         await _authService.LogoutAsync(HttpContext);
 
         return RedirectToAction(nameof(Index));
+    }
+    
+    [AllowAnonymous]
+    public IActionResult AccessDenied()
+    {
+        return View();
     }
 }

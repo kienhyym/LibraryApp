@@ -116,7 +116,7 @@ public class RegisterService : IRegisterService
             var account = new Account
             {
                 Email = registerInfo.Email,
-                AccountRole = (int)AccountRole.Resident,
+                AccountRole = AccountRole.Resident,
                 IsActive = true,
                 IsEmailVerified = true
             };

@@ -1,0 +1,95 @@
+@model LibraryApp.Areas.Admin.ViewModels.AuthorViewModel
+
+@{
+    ViewData["Title"] = "Cập nhật tác giả";
+}
+
+<form asp-action="Edit" method="post">
+
+    <input asp-for="AuthorId" type="hidden" />
+
+    <div class="mb-3">
+
+        <label asp-for="AuthorName">Tên tác giả</label>
+
+        <input asp-for="AuthorName" class="form-control" />
+
+        <span asp-validation-for="AuthorName" class="text-danger"></span>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label asp-for="Nationality" class="form-label">Quốc tịch</label>
+
+        <select asp-for="Nationality"
+                id="Nationality"
+                class="form-select">
+
+            <option value="">-- Chọn quốc tịch --</option>
+
+        </select>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label asp-for="Notes" class="form-label">Ghi chú</label>
+
+        <textarea asp-for="Notes"
+                  class="form-control"></textarea>
+
+    </div>
+
+    <button class="btn btn-success">
+
+        <i class="bi bi-save"></i>
+
+        Cập nhật
+
+    </button>
+
+    <a asp-action="Index"
+       class="btn btn-secondary">
+
+        Quay lại
+
+    </a>
+
+</form>
+
+<style>
+    .select2-container .select2-selection--single {
+        height: 38px;
+        padding: 6px 12px;
+        border: 1px solid #ced4da;
+        border-radius: .25rem;
+    }
+
+    .select2-container--default
+    .select2-selection--single
+    .select2-selection__rendered{
+        line-height:24px;
+    }
+
+    .select2-container--default
+    .select2-selection--single
+    .select2-selection__arrow{
+        height:36px;
+    }
+</style>
+@section Scripts
+{
+    <script>
+
+       document.addEventListener("DOMContentLoaded", function () {
+
+    initCountrySelect("Nationality", "@Model.Nationality");
+
+});
+
+    </script>
+
+    <partial name="_ValidationScriptsPartial" />
+
+}

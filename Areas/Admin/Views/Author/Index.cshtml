@@ -1,0 +1,296 @@
+@using LibraryApp.Common
+
+@model PaginatedList<LibraryApp.Areas.Admin.ViewModels.AuthorViewModel>
+
+@{
+    ViewData["Title"] = "Quản lý tác giả";
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+    <h2></h2>
+
+    <a asp-action="Create" class="btn btn-primary">
+
+        <i class="bi bi-plus-circle"></i>
+
+        Thêm tác giả
+
+    </a>
+
+</div>
+<div class="row mb-3">
+
+    <div class="col-md-6">
+
+        <form method="get">
+
+            <div class="input-group">
+
+                <input
+                    type="text"
+                    name="keyword"
+                    value="@ViewBag.Keyword"
+                    class="form-control"
+                    placeholder="Nhập tên tác giả..." />
+
+                <button
+                    class="btn btn-primary">
+
+                    <i class="bi bi-search"></i>
+
+                    Tìm kiếm
+
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-secondary">
+
+                    Làm mới
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+<table class="table table-bordered table-hover">
+
+    <thead class="table-dark">
+
+        <tr>
+
+            <th style="width:70px;">STT</th>
+
+
+            <th>Tên tác giả</th>
+
+            <th>Quốc tịch</th>
+
+            <th>Ghi chú</th>
+            <th>Ngày tạo</th>
+
+            <th style="width:180px;">Thao tác</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+@{
+    int stt =
+        (Model.PageIndex - 1)
+        * Model.PageSize
+        + 1;
+}
+
+        @foreach (var item in Model)
+        {
+            <tr>
+
+                <td>@stt</td>
+
+                <td>@item.AuthorName</td>
+
+                <td>@item.Nationality</td>
+
+                <td>@item.Notes</td>
+    <td>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>
+
+                    <a asp-action="Edit" asp-route-id="@item.AuthorId" class="btn btn-warning btn-sm">
+
+                        <i class="bi bi-pencil-square"></i>
+
+                    </a>
+
+                   <button class="btn btn-danger btn-sm"
+
+        onclick="confirmDelete(@item.AuthorId,'@item.AuthorName')">
+
+    <i class="bi bi-trash"></i>
+
+</button>
+
+                </td>
+
+            </tr>
+
+            stt++;
+        }
+
+    </tbody>
+
+</table>
+<nav>
+
+<ul class="pagination justify-content-center">
+
+@if(Model.HasPreviousPage)
+{
+    <li class="page-item">
+
+        <a class="page-link"
+
+           asp-action="Index"
+
+           asp-route-page="@(Model.PageIndex-1)"
+
+           asp-route-keyword="@ViewBag.Keyword">
+
+            «
+
+        </a>
+
+    </li>
+}
+
+@for(int i=1;i<=Model.TotalPages;i++)
+{
+    <li class="page-item @(i==Model.PageIndex?"active":"")">
+
+        <a class="page-link"
+
+           asp-action="Index"
+
+           asp-route-page="@i"
+
+           asp-route-keyword="@ViewBag.Keyword">
+
+            @i
+
+        </a>
+
+    </li>
+}
+
+@if(Model.HasNextPage)
+{
+    <li class="page-item">
+
+        <a class="page-link"
+
+           asp-action="Index"
+
+           asp-route-page="@(Model.PageIndex+1)"
+
+           asp-route-keyword="@ViewBag.Keyword">
+
+            »
+
+        </a>
+
+    </li>
+}
+
+</ul>
+
+</nav>
+<div class="text-muted">
+
+    Tổng cộng
+
+    <strong>
+
+        @Model.TotalItems
+
+    </strong>
+
+    tác giả
+
+</div>
+<div class="modal fade"
+     id="deleteModal"
+     tabindex="-1">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header bg-danger text-white">
+
+                <h5 class="modal-title">
+
+                    Xác nhận xóa
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                Bạn có chắc muốn xóa tác giả
+
+                <strong id="authorName"></strong>
+
+                ?
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
+                    Hủy
+
+                </button>
+
+                <form id="deleteForm"
+                      asp-action="Delete"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           id="deleteId"
+                           name="id"/>
+
+                    <button class="btn btn-danger">
+
+                        <i class="bi bi-trash"></i>
+
+                        Xóa
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+@section Scripts {
+
+    <script>
+
+        function confirmDelete(id, name) {
+            document.getElementById("deleteId").value = id;
+
+            document.getElementById("authorName").innerText = name;
+
+            var modal = new bootstrap.Modal(
+                document.getElementById("deleteModal"));
+
+            modal.show();
+        }
+
+    </script>
+
+}

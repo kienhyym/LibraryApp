@@ -1,71 +1,45 @@
+@model LibraryApp.Areas.Admin.ViewModels.DashboardViewModel
+
 @{
     ViewData["Title"] = "Dashboard";
 }
 
-<div class="row">
+<div class="row g-4">
 
     <div class="col-md-3">
-
         <div class="card shadow-sm">
-
-            <div class="card-body">
-
-                <h5>Tổng số sách</h5>
-
-                <h2>0</h2>
-
+            <div class="card-body text-center">
+                <h2>@Model.TotalBooks</h2>
+                <p>Tổng sách</p>
             </div>
-
         </div>
-
     </div>
 
     <div class="col-md-3">
-
         <div class="card shadow-sm">
-
-            <div class="card-body">
-
-                <h5>Tác giả</h5>
-
-                <h2>0</h2>
-
+            <div class="card-body text-center">
+                <h2>@Model.TotalAuthors</h2>
+                <p>Tác giả</p>
             </div>
-
         </div>
-
     </div>
 
     <div class="col-md-3">
-
         <div class="card shadow-sm">
-
-            <div class="card-body">
-
-                <h5>Thể loại</h5>
-
-                <h2>0</h2>
-
+            <div class="card-body text-center">
+                <h2>@Model.TotalResidents</h2>
+                <p>Cư dân</p>
             </div>
-
         </div>
-
     </div>
 
     <div class="col-md-3">
-
         <div class="card shadow-sm">
-
-            <div class="card-body">
-
-                <h5>Phiếu mượn</h5>
-
-                <h2>0</h2>
-
+            <div class="card-body text-center">
+                <h2>@Model.OverdueBooks</h2>
+                <p>Sách quá hạn</p>
             </div>
-
         </div>
-
     </div>
 
 </div>
