@@ -57,6 +57,7 @@ builder.Services.AddScoped<IOtpService, OtpService>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 #endregion
 
 var app = builder.Build();

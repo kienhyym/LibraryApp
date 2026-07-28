@@ -1,0 +1,354 @@
+@using LibraryApp.Common
+@model PaginatedList<LibraryApp.Areas.Admin.ViewModels.CategoryViewModel>
+
+@{
+    ViewData["Title"] = "Quản lý thể loại";
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+
+        @TempData["Success"]
+
+        <button class="btn-close"
+                data-bs-dismiss="alert"></button>
+
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+
+        @TempData["Error"]
+
+        <button class="btn-close"
+                data-bs-dismiss="alert"></button>
+
+    </div>
+}
+
+<div class="card shadow-sm">
+
+    <div class="card-header bg-white">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <h4 class="mb-0">
+
+                <i class="bi bi-tags"></i>
+
+                Quản lý thể loại
+
+            </h4>
+
+            <a asp-action="Create"
+               class="btn btn-primary">
+
+                <i class="bi bi-plus-circle"></i>
+
+                Thêm thể loại
+
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="card-body">
+
+        <!-- Search -->
+
+        <form method="get"
+              class="row g-3 mb-3">
+
+            <div class="col-md-4">
+
+                <input
+                    type="text"
+                    name="keyword"
+                    value="@ViewBag.Keyword"
+                    class="form-control"
+                    placeholder="Nhập tên thể loại..." />
+
+            </div>
+
+            <div class="col-auto">
+
+                <button class="btn btn-primary">
+
+                    <i class="bi bi-search"></i>
+
+                    Tìm kiếm
+
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-secondary">
+
+                    Làm mới
+
+                </a>
+
+            </div>
+
+        </form>
+
+        <!-- Table -->
+
+        <table class="table table-hover table-bordered align-middle">
+
+            <thead class="table-dark">
+
+                <tr>
+
+                    <th width="80">STT</th>
+
+                    <th>Tên thể loại</th>
+
+                    <th>Mô tả</th>
+
+                    <th width="180">Ngày tạo</th>
+
+                    <th width="140">Thao tác</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+@{
+    int stt =
+        (Model.PageIndex - 1)
+        * Model.PageSize + 1;
+}
+
+@if (Model.Any())
+{
+    foreach (var item in Model)
+    {
+        <tr>
+
+            <td>@stt</td>
+
+            <td>@item.CategoryName</td>
+
+            <td>@item.CategoryDescription</td>
+
+            <td>
+                @item.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+            </td>
+
+            <td>
+
+                <a asp-action="Edit"
+                   asp-route-id="@item.CategoryId"
+                   class="btn btn-warning btn-sm">
+
+                    <i class="bi bi-pencil-square"></i>
+
+                </a>
+
+                <button
+                    type="button"
+                    class="btn btn-danger btn-sm"
+                    onclick="confirmDelete(
+                        @item.CategoryId,
+                        '@item.CategoryName')">
+
+                    <i class="bi bi-trash"></i>
+
+                </button>
+
+            </td>
+
+        </tr>
+
+        stt++;
+    }
+}
+else
+{
+    <tr>
+
+        <td colspan="5"
+            class="text-center text-muted">
+
+            Không có dữ liệu.
+
+        </td>
+
+    </tr>
+}
+
+            </tbody>
+
+        </table>
+
+        <!-- Footer -->
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <div class="text-muted">
+
+                Tổng cộng
+
+                <strong>@Model.TotalItems</strong>
+
+                thể loại
+
+            </div>
+
+            <nav>
+
+                <ul class="pagination mb-0">
+
+@if(Model.HasPreviousPage)
+{
+<li class="page-item">
+
+<a class="page-link"
+   asp-route-page="@(Model.PageIndex-1)"
+   asp-route-keyword="@ViewBag.Keyword">
+
+«
+
+</a>
+
+</li>
+}
+
+@for(int i=1;i<=Model.TotalPages;i++)
+{
+<li class="page-item @(i==Model.PageIndex?"active":"")">
+
+<a class="page-link"
+   asp-route-page="@i"
+   asp-route-keyword="@ViewBag.Keyword">
+
+@i
+
+</a>
+
+</li>
+}
+
+@if(Model.HasNextPage)
+{
+<li class="page-item">
+
+<a class="page-link"
+   asp-route-page="@(Model.PageIndex+1)"
+   asp-route-keyword="@ViewBag.Keyword">
+
+»
+
+</a>
+
+</li>
+}
+
+                </ul>
+
+            </nav>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Delete Modal -->
+
+<div class="modal fade"
+     id="deleteModal"
+     tabindex="-1">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header bg-danger text-white">
+
+                <h5 class="modal-title">
+
+                    Xác nhận xóa
+
+                </h5>
+
+                <button
+                    class="btn-close btn-close-white"
+                    data-bs-dismiss="modal"></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                Bạn có chắc muốn xóa thể loại
+
+                <strong id="categoryName"></strong>
+
+                ?
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
+
+                    Hủy
+
+                </button>
+
+                <form
+                    asp-action="Delete"
+                    method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <input
+                        type="hidden"
+                        id="deleteId"
+                        name="id" />
+
+                    <button class="btn btn-danger">
+
+                        <i class="bi bi-trash"></i>
+
+                        Xóa
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts{
+
+<script>
+
+function confirmDelete(id,name){
+
+    document.getElementById("deleteId").value=id;
+
+    document.getElementById("categoryName").innerText=name;
+
+    new bootstrap.Modal(
+        document.getElementById("deleteModal")
+    ).show();
+
+}
+
+</script>
+
+}
