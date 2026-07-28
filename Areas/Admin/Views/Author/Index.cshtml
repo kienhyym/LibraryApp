@@ -1,5 +1,4 @@
 @using LibraryApp.Common
-
 @model PaginatedList<LibraryApp.Areas.Admin.ViewModels.AuthorViewModel>
 
 @{
@@ -8,40 +7,66 @@
 
 @if (TempData["Success"] != null)
 {
-    <div class="alert alert-success">
+    <div class="alert alert-success alert-dismissible fade show">
         @TempData["Success"]
+        <button class="btn-close"
+                data-bs-dismiss="alert"></button>
     </div>
 }
-<div class="d-flex justify-content-between align-items-center mb-3">
 
-    <h2></h2>
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        @TempData["Error"]
+        <button class="btn-close"
+                data-bs-dismiss="alert"></button>
+    </div>
+}
 
-    <a asp-action="Create" class="btn btn-primary">
+<div class="card shadow-sm">
 
-        <i class="bi bi-plus-circle"></i>
+    <div class="card-header bg-white">
 
-        Thêm tác giả
+        <div class="d-flex justify-content-between align-items-center">
 
-    </a>
+            <h4 class="mb-0">
+                <i class="bi bi-person-lines-fill"></i>
+                Quản lý tác giả
+            </h4>
 
-</div>
-<div class="row mb-3">
+            <a asp-action="Create"
+               class="btn btn-primary">
 
-    <div class="col-md-6">
+                <i class="bi bi-plus-circle"></i>
 
-        <form method="get">
+                Thêm tác giả
 
-            <div class="input-group">
+            </a>
 
-                <input
-                    type="text"
-                    name="keyword"
-                    value="@ViewBag.Keyword"
-                    class="form-control"
-                    placeholder="Nhập tên tác giả..." />
+        </div>
 
-                <button
-                    class="btn btn-primary">
+    </div>
+
+    <div class="card-body">
+
+        <!-- Search -->
+
+        <form method="get"
+              class="row g-3 mb-3">
+
+            <div class="col-md-4">
+
+                <input type="text"
+                       name="keyword"
+                       value="@ViewBag.Keyword"
+                       class="form-control"
+                       placeholder="Nhập tên tác giả..." />
+
+            </div>
+
+            <div class="col-auto">
+
+                <button class="btn btn-primary">
 
                     <i class="bi bi-search"></i>
 
@@ -60,154 +85,176 @@
 
         </form>
 
-    </div>
+        <!-- Table -->
 
-</div>
-<table class="table table-bordered table-hover">
+        <table class="table table-hover table-bordered align-middle">
 
-    <thead class="table-dark">
+            <thead class="table-dark">
 
-        <tr>
+                <tr>
 
-            <th style="width:70px;">STT</th>
+                    <th width="80">STT</th>
 
+                    <th>Tên tác giả</th>
 
-            <th>Tên tác giả</th>
+                    <th>Quốc tịch</th>
 
-            <th>Quốc tịch</th>
+                    <th>Ghi chú</th>
 
-            <th>Ghi chú</th>
-            <th>Ngày tạo</th>
+                    <th width="180">Ngày tạo</th>
 
-            <th style="width:180px;">Thao tác</th>
+                    <th width="140">Thao tác</th>
 
-        </tr>
+                </tr>
 
-    </thead>
+            </thead>
 
-    <tbody>
+            <tbody>
+
 @{
     int stt =
         (Model.PageIndex - 1)
-        * Model.PageSize
-        + 1;
+        * Model.PageSize + 1;
 }
 
-        @foreach (var item in Model)
-        {
-            <tr>
+@if (Model.Any())
+{
+    foreach (var item in Model)
+    {
+        <tr>
 
-                <td>@stt</td>
+            <td>@stt</td>
 
-                <td>@item.AuthorName</td>
+            <td>@item.AuthorName</td>
 
-                <td>@item.Nationality</td>
+            <td>@item.Nationality</td>
 
-                <td>@item.Notes</td>
-    <td>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                <td>
+            <td>@item.Notes</td>
 
-                    <a asp-action="Edit" asp-route-id="@item.AuthorId" class="btn btn-warning btn-sm">
+            <td>
+                @item.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+            </td>
 
-                        <i class="bi bi-pencil-square"></i>
+            <td>
 
-                    </a>
+                <a asp-action="Edit"
+                   asp-route-id="@item.AuthorId"
+                   class="btn btn-warning btn-sm">
 
-                   <button class="btn btn-danger btn-sm"
+                    <i class="bi bi-pencil-square"></i>
 
-        onclick="confirmDelete(@item.AuthorId,'@item.AuthorName')">
+                </a>
 
-    <i class="bi bi-trash"></i>
+                <button type="button"
+                        class="btn btn-danger btn-sm"
+                        onclick="confirmDelete(
+                            @item.AuthorId,
+                            '@item.AuthorName')">
 
-</button>
+                    <i class="bi bi-trash"></i>
 
-                </td>
+                </button>
 
-            </tr>
+            </td>
 
-            stt++;
-        }
+        </tr>
 
-    </tbody>
+        stt++;
+    }
+}
+else
+{
+    <tr>
 
-</table>
-<nav>
+        <td colspan="6"
+            class="text-center text-muted">
 
-<ul class="pagination justify-content-center">
+            Không có dữ liệu.
+
+        </td>
+
+    </tr>
+}
+
+            </tbody>
+
+        </table>
+
+        <!-- Footer -->
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <div class="text-muted">
+
+                Tổng cộng
+
+                <strong>@Model.TotalItems</strong>
+
+                tác giả
+
+            </div>
+
+            <nav>
+
+                <ul class="pagination mb-0">
 
 @if(Model.HasPreviousPage)
 {
-    <li class="page-item">
+<li class="page-item">
 
-        <a class="page-link"
+<a class="page-link"
+   asp-route-page="@(Model.PageIndex-1)"
+   asp-route-keyword="@ViewBag.Keyword">
 
-           asp-action="Index"
+«
 
-           asp-route-page="@(Model.PageIndex-1)"
+</a>
 
-           asp-route-keyword="@ViewBag.Keyword">
-
-            «
-
-        </a>
-
-    </li>
+</li>
 }
 
 @for(int i=1;i<=Model.TotalPages;i++)
 {
-    <li class="page-item @(i==Model.PageIndex?"active":"")">
+<li class="page-item @(i==Model.PageIndex?"active":"")">
 
-        <a class="page-link"
+<a class="page-link"
+   asp-route-page="@i"
+   asp-route-keyword="@ViewBag.Keyword">
 
-           asp-action="Index"
+@i
 
-           asp-route-page="@i"
+</a>
 
-           asp-route-keyword="@ViewBag.Keyword">
-
-            @i
-
-        </a>
-
-    </li>
+</li>
 }
 
 @if(Model.HasNextPage)
 {
-    <li class="page-item">
+<li class="page-item">
 
-        <a class="page-link"
+<a class="page-link"
+   asp-route-page="@(Model.PageIndex+1)"
+   asp-route-keyword="@ViewBag.Keyword">
 
-           asp-action="Index"
+»
 
-           asp-route-page="@(Model.PageIndex+1)"
+</a>
 
-           asp-route-keyword="@ViewBag.Keyword">
-
-            »
-
-        </a>
-
-    </li>
+</li>
 }
 
-</ul>
+                </ul>
 
-</nav>
-<div class="text-muted">
+            </nav>
 
-    Tổng cộng
+        </div>
 
-    <strong>
-
-        @Model.TotalItems
-
-    </strong>
-
-    tác giả
+    </div>
 
 </div>
+
+<!-- Delete Modal -->
+
 <div class="modal fade"
      id="deleteModal"
      tabindex="-1">
@@ -224,8 +271,7 @@
 
                 </h5>
 
-                <button type="button"
-                        class="btn-close btn-close-white"
+                <button class="btn-close btn-close-white"
                         data-bs-dismiss="modal"></button>
 
             </div>
@@ -249,15 +295,14 @@
 
                 </button>
 
-                <form id="deleteForm"
-                      asp-action="Delete"
+                <form asp-action="Delete"
                       method="post">
 
                     @Html.AntiForgeryToken()
 
                     <input type="hidden"
                            id="deleteId"
-                           name="id"/>
+                           name="id" />
 
                     <button class="btn btn-danger">
 
@@ -276,21 +321,23 @@
     </div>
 
 </div>
-@section Scripts {
 
-    <script>
+@section Scripts{
 
-        function confirmDelete(id, name) {
-            document.getElementById("deleteId").value = id;
+<script>
 
-            document.getElementById("authorName").innerText = name;
+function confirmDelete(id,name){
 
-            var modal = new bootstrap.Modal(
-                document.getElementById("deleteModal"));
+    document.getElementById("deleteId").value=id;
 
-            modal.show();
-        }
+    document.getElementById("authorName").innerText=name;
 
-    </script>
+    new bootstrap.Modal(
+        document.getElementById("deleteModal")
+    ).show();
+
+}
+
+</script>
 
 }

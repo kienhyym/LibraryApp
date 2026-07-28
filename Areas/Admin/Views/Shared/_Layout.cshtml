@@ -16,7 +16,11 @@
 </head>
 
 <body>
-
+    @{
+        var currentArea = ViewContext.RouteData.Values["area"]?.ToString();
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+        var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    }
     <div class="admin-wrapper">
 
         <!-- Sidebar -->
@@ -33,7 +37,8 @@
             <ul class="sidebar-menu">
 
                 <li>
-                    <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                    <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
+                       class="@(currentController == "Dashboard" ? "active" : "")">
 
                         <i class="bi bi-speedometer2"></i>
 
@@ -43,55 +48,82 @@
                 </li>
 
                 <li>
-                    <a href="#">
+                    <a asp-area="Admin" asp-controller="Book" asp-action="Index"
+                       class="@(currentController == "Book" ? "active" : "")">
+
                         <i class="bi bi-book"></i>
+
                         Quản lý sách
+
                     </a>
                 </li>
 
                 <li>
-                    <a asp-area="Admin" asp-controller="Author" asp-action="Index">
+                    <a asp-area="Admin" asp-controller="Author" asp-action="Index"
+                       class="@(currentController == "Author" ? "active" : "")">
+
                         <i class="bi bi-person-badge"></i>
+
                         Tác giả
+
                     </a>
                 </li>
                 <li>
-                    <a asp-area="Admin" asp-controller="Category" asp-action="Index">
+
+                    <a asp-area="Admin" asp-controller="Category" asp-action="Index"
+                       class="@(currentController == "Category" ? "active" : "")">
 
                         <i class="bi bi-tags"></i>
 
                         Thể loại
 
                     </a>
+
                 </li>
                 <li>
-                    <a href="#">
+                    <a asp-area="Admin" asp-controller="Resident" asp-action="Index"
+                       class="@(currentController == "Resident" ? "active" : "")">
+
                         <i class="bi bi-people"></i>
+
                         Cư dân
+
                     </a>
                 </li>
 
                 @if (User.IsInRole("Admin"))
                 {
                     <li>
-                        <a asp-area="Admin" asp-controller="Personnel" asp-action="Index">
+                        <a asp-area="Admin" asp-controller="Personnel" asp-action="Index"
+                           class="@(currentController == "Personnel" ? "active" : "")">
+
                             <i class="bi bi-person-workspace"></i>
+
                             Nhân viên
+
                         </a>
                     </li>
 
                     <li>
-                        <a asp-area="Admin" asp-controller="Account" asp-action="Index">
+                        <a asp-area="Admin" asp-controller="Account" asp-action="Index"
+                           class="@(currentController == "Account" ? "active" : "")">
+
                             <i class="bi bi-person-gear"></i>
+
                             Tài khoản
+
                         </a>
                     </li>
                 }
 
                 <li>
-                    <a href="#">
+                    <a asp-area="Admin" asp-controller="BorrowRecord" asp-action="Index"
+                       class="@(currentController == "BorrowRecord" ? "active" : "")">
+
                         <i class="bi bi-journal-text"></i>
+
                         Phiếu mượn
+
                     </a>
                 </li>
 
