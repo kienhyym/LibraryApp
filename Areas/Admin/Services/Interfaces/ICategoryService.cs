@@ -24,10 +24,10 @@ public interface ICategoryService
     Task DeleteAsync(int id);
 
     // Kiểm tra trùng tên khi thêm
-    Task<bool> CategoryNameExistsAsync(string categoryName);
+    Task<bool> CategoryExistsByNameAsync(string categoryName);
 
     // Kiểm tra trùng tên khi sửa
-    Task<bool> CategoryNameExistsForUpdateAsync(
+    Task<bool> CategoryExistsByNameForUpdateAsync(
         string categoryName,
         int categoryId);
 }

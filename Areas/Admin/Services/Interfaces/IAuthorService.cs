@@ -19,7 +19,10 @@ public interface IAuthorService
 
     Task UpdateAsync(AuthorViewModel model);
 
-    Task<bool> AuthorNameExistsAsync(string authorName);
-    Task<bool> AuthorNameExistsForUpdateAsync(string authorName, int excludeId);
+    Task<bool> AuthorExistsByNameAsync(string authorName);
+
+    Task<bool> AuthorExistsByNameForUpdateAsync(
+        string authorName,
+        int authorId);
     Task<bool> DeleteAsync(int authorId);
 }

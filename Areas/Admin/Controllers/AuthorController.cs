@@ -44,7 +44,7 @@ public class AuthorController : AdminBaseController
         if (!ModelState.IsValid)
             return View(model);
 
-        if (await _authorService.AuthorNameExistsAsync(model.AuthorName))
+        if (await _authorService.AuthorExistsByNameAsync(model.AuthorName))
         {
             ModelState.AddModelError(nameof(model.AuthorName),
                 "Tên tác giả đã tồn tại.");
@@ -76,7 +76,7 @@ public class AuthorController : AdminBaseController
         if (!ModelState.IsValid)
             return View(model);
 
-        if (await _authorService.AuthorNameExistsForUpdateAsync(model.AuthorName, model.AuthorId))
+        if (await _authorService.AuthorExistsByNameForUpdateAsync(model.AuthorName, model.AuthorId))
         {
             ModelState.AddModelError(nameof(model.AuthorName),
                 "Tên tác giả đã tồn tại.");

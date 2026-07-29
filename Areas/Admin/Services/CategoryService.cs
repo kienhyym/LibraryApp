@@ -135,7 +135,7 @@ public class CategoryService : ICategoryService
 
     #region Validation
 
-    public async Task<bool> CategoryNameExistsAsync(
+    public async Task<bool> CategoryExistsByNameAsync(
         string categoryName)
     {
         categoryName = categoryName.Trim();
@@ -145,7 +145,7 @@ public class CategoryService : ICategoryService
                 x.CategoryName == categoryName);
     }
 
-    public async Task<bool> CategoryNameExistsForUpdateAsync(
+    public async Task<bool> CategoryExistsByNameForUpdateAsync(
         string categoryName,
         int categoryId)
     {

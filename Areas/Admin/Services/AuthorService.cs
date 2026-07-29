@@ -108,7 +108,7 @@ public class AuthorService : IAuthorService
 
         return true;
     }
-    public async Task<bool> AuthorNameExistsAsync(string authorName)
+    public async Task<bool> AuthorExistsByNameAsync(string authorName)
 
     {
 
@@ -117,7 +117,7 @@ public class AuthorService : IAuthorService
             x.AuthorName == authorName);
 
     }
-    public async Task<bool> AuthorNameExistsForUpdateAsync(
+    public async Task<bool> AuthorExistsByNameForUpdateAsync(
 
     string authorName,
 

@@ -5,14 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryApp.Areas.Admin.Controllers;
 
-public class CategoryController : AdminBaseController
+public class BookController : AdminBaseController
 {
-    private readonly ICategoryService _categoryService;
+    private readonly IBookService _bookService;
 
-    public CategoryController(
-        ICategoryService categoryService)
+    public BookController(
+        IBookService bookService)
     {
-        _categoryService = categoryService;
+        _bookService = bookService;
     }
 
     #region Index
@@ -23,7 +23,7 @@ public class CategoryController : AdminBaseController
     {
         const int pageSize = 10;
 
-        var model = await _categoryService.GetPagedAsync(
+        var model = await _bookService.GetPagedAsync(
             keyword,
             page,
             pageSize);
@@ -38,33 +38,43 @@ public class CategoryController : AdminBaseController
     #region Create
 
     [HttpGet]
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
     {
-        return View();
+        var model = await _bookService
+            .GetCreateModelAsync();
+
+        return View(model);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-        CategoryViewModel model)
+        BookViewModel model)
     {
         if (!ModelState.IsValid)
-            return View(model);
-
-        if (await _categoryService
-            .CategoryExistsByNameAsync(model.CategoryName))
         {
-            ModelState.AddModelError(
-                nameof(model.CategoryName),
-                "Tên thể loại đã tồn tại.");
+            model = await _bookService
+                .GetCreateModelAsync();
 
             return View(model);
         }
 
-        await _categoryService.CreateAsync(model);
+        if (await _bookService
+            .BookExistsByTitleAsync(model.Title))
+        {
+            ModelState.AddModelError(
+                nameof(model.Title),
+                "Tên sách đã tồn tại.");
+
+            await _bookService.LoadDropdownDataAsync(model);
+
+            return View(model);
+        }
+
+        await _bookService.CreateAsync(model);
 
         TempData["Success"] =
-            "Thêm thể loại thành công.";
+            "Thêm sách thành công.";
 
         return RedirectToAction(nameof(Index));
     }
@@ -76,8 +86,8 @@ public class CategoryController : AdminBaseController
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
-        var model =
-            await _categoryService.GetByIdAsync(id);
+        var model = await _bookService
+            .GetEditModelAsync(id);
 
         if (model == null)
             return NotFound();
@@ -88,27 +98,33 @@ public class CategoryController : AdminBaseController
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
-        CategoryViewModel model)
+        BookViewModel model)
     {
         if (!ModelState.IsValid)
-            return View(model);
-
-        if (await _categoryService
-            .CategoryExistsByNameForUpdateAsync(
-                model.CategoryName,
-                model.CategoryId))
         {
-            ModelState.AddModelError(
-                nameof(model.CategoryName),
-                "Tên thể loại đã tồn tại.");
+            await _bookService.LoadDropdownDataAsync(model);
 
             return View(model);
         }
 
-        await _categoryService.UpdateAsync(model);
+        if (await _bookService
+            .BookExistsByTitleForUpdateAsync(
+                model.Title,
+                model.BookId))
+        {
+            ModelState.AddModelError(
+                nameof(model.Title),
+                "Tên sách đã tồn tại.");
+
+            await _bookService.LoadDropdownDataAsync(model);
+
+            return View(model);
+        }
+
+        await _bookService.UpdateAsync(model);
 
         TempData["Success"] =
-            "Cập nhật thể loại thành công.";
+            "Cập nhật sách thành công.";
 
         return RedirectToAction(nameof(Index));
     }
@@ -123,10 +139,10 @@ public class CategoryController : AdminBaseController
     {
         try
         {
-            await _categoryService.DeleteAsync(id);
+            await _bookService.DeleteAsync(id);
 
             TempData["Success"] =
-                "Xóa thể loại thành công.";
+                "Xóa sách thành công.";
         }
         catch (Exception ex)
         {
