@@ -59,6 +59,8 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IResidentService, ResidentService>();
+
 #endregion
 
 var app = builder.Build();

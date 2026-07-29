@@ -3,22 +3,29 @@ namespace LibraryApp.Services.Interfaces;
 public interface IOtpService
 {
     /// <summary>
-    /// Generate a new OTP and save/update it in database.
+    /// Generate OTP, lưu vào database và gửi email.
+    /// </summary>
+    Task SendOtpAsync(string email);
+
+    /// <summary>
+    /// Generate OTP và lưu vào database.
     /// </summary>
     Task<string> GenerateOtpAsync(string email);
 
     /// <summary>
-    /// Verify OTP.
+    /// Xác thực OTP.
     /// </summary>
-    Task<bool> VerifyOtpAsync(string email, string otpCode);
+    Task<bool> VerifyOtpAsync(
+        string email,
+        string otpCode);
 
     /// <summary>
-    /// Check whether an email has been verified.
+    /// Kiểm tra email đã xác thực OTP hay chưa.
     /// </summary>
     Task<bool> IsEmailVerifiedAsync(string email);
 
     /// <summary>
-    /// Remove OTP information after registration completes.
+    /// Xóa OTP sau khi hoàn thành.
     /// </summary>
     Task DeleteOtpAsync(string email);
 }

@@ -1,0 +1,208 @@
+@model LibraryApp.Areas.Admin.ViewModels.ResidentViewModel
+
+@using LibraryApp.Enums
+
+@{
+    ViewData["Title"] = "Thêm cư dân";
+}
+
+<div class="card shadow-sm">
+
+    <div class="card-header bg-white">
+
+        <h4 class="mb-0">
+
+            <i class="bi bi-person-plus"></i>
+
+            Thêm cư dân
+
+        </h4>
+
+    </div>
+
+    <div class="card-body">
+
+        <form id="residentForm" data-sendotp-url="@Url.Action("Create", "Resident", new { area = "Admin" })"
+              data-verifyotp-url="@Url.Action("VerifyOtp", "Resident", new { area = "Admin" })"
+              data-resendotp-url="@Url.Action("ResendOtp", "Resident", new { area = "Admin" })">
+
+            @Html.AntiForgeryToken()
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+
+                    <label asp-for="FullName" class="form-label"></label>
+
+                    <input asp-for="FullName" class="form-control" />
+
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label asp-for="Email" class="form-label"></label>
+
+                    <input asp-for="Email" class="form-control" />
+
+                    <span asp-validation-for="Email" class="text-danger"></span>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label asp-for="Password" class="form-label"></label>
+
+                    <input asp-for="Password" class="form-control" />
+
+                    <span asp-validation-for="Password" class="text-danger"></span>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label asp-for="ConfirmPassword" class="form-label"></label>
+
+                    <input asp-for="ConfirmPassword" class="form-control" />
+
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label asp-for="DateOfBirth" class="form-label"></label>
+
+                    <input asp-for="DateOfBirth" class="form-control" />
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label asp-for="Gender" class="form-label"></label>
+
+                    <select asp-for="Gender" asp-items="Html.GetEnumSelectList<Gender>()" class="form-select">
+
+                        <option value="">
+                            -- Chọn giới tính --
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label asp-for="PhoneNumber" class="form-label"></label>
+
+                    <input asp-for="PhoneNumber" class="form-control" />
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label asp-for="ApartmentNumber" class="form-label"></label>
+
+                    <input asp-for="ApartmentNumber" class="form-control" />
+
+                </div>
+
+                <div class="col-12 mb-3">
+
+                    <label asp-for="PermanentAddress" class="form-label"></label>
+
+                    <textarea asp-for="PermanentAddress" rows="3" class="form-control"></textarea>
+
+                </div>
+
+            </div>
+
+            <button type="button" id="btnSendOtp" class="btn btn-primary">
+
+                <i class="bi bi-envelope-check"></i>
+
+                Gửi OTP
+
+            </button>
+
+            <a asp-action="Index" class="btn btn-secondary">
+
+                Quay lại
+
+            </a>
+
+        </form>
+        <div class="modal fade" id="otpModal" tabindex="-1">
+
+            <div class="modal-dialog">
+
+                <div class="modal-content">
+
+                    <div class="modal-header">
+
+                        <h5 class="modal-title">
+
+                            Xác thực Email
+
+                        </h5>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        <p>
+
+                            Đã gửi mã OTP tới
+
+                            <strong id="emailDisplay"></strong>
+
+                        </p>
+
+                        <input id="OtpCode" class="form-control text-center" maxlength="6" placeholder="Nhập OTP" />
+
+                        <div class="text-center mt-3">
+
+                            <span id="countdown">
+
+                                05:00
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button id="btnVerifyOtp" class="btn btn-success">
+
+                            Xác nhận
+
+                        </button>
+
+                        <button id="btnResendOtp" class="btn btn-warning" disabled>
+
+                            Gửi lại OTP
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="~/js/resident-create.js" asp-append-version="true"></script>
+}

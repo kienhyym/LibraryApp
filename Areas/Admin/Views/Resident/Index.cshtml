@@ -1,0 +1,403 @@
+@using LibraryApp.Common
+@model PaginatedList<LibraryApp.Areas.Admin.ViewModels.ResidentViewModel>
+
+@{
+    ViewData["Title"] = "Quản lý cư dân";
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+
+        @TempData["Success"]
+
+        <button class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+
+        @TempData["Error"]
+
+        <button class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+
+    </div>
+}
+
+<div class="card shadow-sm">
+
+    <div class="card-header bg-white">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <h4 class="mb-0">
+
+                <i class="bi bi-people"></i>
+
+                Quản lý cư dân
+
+            </h4>
+
+            <a asp-action="Create"
+               class="btn btn-primary">
+
+                <i class="bi bi-person-plus"></i>
+
+                Thêm cư dân
+
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="card-body">
+
+        <form method="get"
+              class="row g-3 mb-4">
+
+            <div class="col-md-4">
+
+                <input
+                    type="text"
+                    class="form-control"
+                    name="keyword"
+                    value="@ViewBag.Keyword"
+                    placeholder="Tên, Email, SĐT, Căn hộ..." />
+
+            </div>
+
+            <div class="col-auto">
+
+                <button class="btn btn-primary">
+
+                    <i class="bi bi-search"></i>
+
+                    Tìm
+
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-secondary">
+
+                    Làm mới
+
+                </a>
+
+            </div>
+
+        </form>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead class="table-dark">
+
+                    <tr>
+
+                        <th>Họ tên</th>
+
+                        <th>Email</th>
+
+                        <th>Điện thoại</th>
+
+                        <th>Số căn hộ</th>
+
+                        <th>Trạng thái</th>
+
+                        <th width="140">Thao tác</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+@if (Model.Any())
+{
+    foreach (var item in Model)
+    {
+        <tr>
+
+            <td>
+
+                <div class="fw-bold">
+
+                    @item.FullName
+
+                </div>
+
+            </td>
+
+            <td>
+
+                @item.Email
+
+            </td>
+
+            <td>
+
+                @(string.IsNullOrWhiteSpace(item.PhoneNumber)
+                    ? "-"
+                    : item.PhoneNumber)
+
+            </td>
+
+            <td>
+
+                @(string.IsNullOrWhiteSpace(item.ApartmentNumber)
+                    ? "-"
+                    : item.ApartmentNumber)
+
+            </td>
+
+            <td>
+
+@if(item.IsActive)
+{
+    <span class="badge bg-success">
+
+        Hoạt động
+
+    </span>
+}
+else
+{
+    <span class="badge bg-danger">
+
+        Đã khóa
+
+    </span>
+}
+
+            </td>
+
+            <td>
+
+                <a asp-action="Edit"
+                   asp-route-id="@item.ResidentId"
+                   class="btn btn-warning btn-sm">
+
+                    <i class="bi bi-pencil-square"></i>
+
+                </a>
+
+                <button class="btn btn-outline-secondary btn-sm"
+        onclick="confirmToggle(
+            @item.ResidentId,
+            '@item.FullName',
+            @(item.IsActive.ToString().ToLower()))">
+
+    @if(item.IsActive)
+    {
+        <i class="bi bi-lock"></i>
+    }
+    else
+    {
+        <i class="bi bi-unlock"></i>
+    }
+
+</button>
+
+            </td>
+
+        </tr>
+    }
+}
+else
+{
+    <tr>
+
+        <td colspan="6"
+            class="text-center text-muted">
+
+            Chưa có dữ liệu.
+
+        </td>
+
+    </tr>
+}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <div class="text-muted">
+
+                Tổng cộng
+
+                <strong>
+
+                    @Model.TotalItems
+
+                </strong>
+
+                cư dân
+
+            </div>
+
+            <nav>
+
+                <ul class="pagination mb-0">
+
+@if(Model.HasPreviousPage)
+{
+<li class="page-item">
+
+<a class="page-link"
+   asp-route-page="@(Model.PageIndex-1)"
+   asp-route-keyword="@ViewBag.Keyword">
+
+«
+
+</a>
+
+</li>
+}
+
+@for(int i=1;i<=Model.TotalPages;i++)
+{
+<li class="page-item @(i==Model.PageIndex?"active":"")">
+
+<a class="page-link"
+   asp-route-page="@i"
+   asp-route-keyword="@ViewBag.Keyword">
+
+@i
+
+</a>
+
+</li>
+}
+
+@if(Model.HasNextPage)
+{
+<li class="page-item">
+
+<a class="page-link"
+   asp-route-page="@(Model.PageIndex+1)"
+   asp-route-keyword="@ViewBag.Keyword">
+
+»
+
+</a>
+
+</li>
+}
+
+                </ul>
+
+            </nav>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="modal fade"
+     id="toggleModal"
+     tabindex="-1">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header bg-danger text-white">
+
+                <h5 class="modal-title">
+
+                    Xác nhận thay đổi trạng thái
+
+                </h5>
+
+                <button class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                Bạn có chắc muốn
+                    <strong id="actionText"></strong>
+
+                    tài khoản của
+
+                    <strong id="residentName"></strong>
+                    ?
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
+
+                    Hủy
+
+                </button>
+
+               <form asp-action="ToggleActive"
+
+      method="post">
+
+    @Html.AntiForgeryToken()
+
+    <input type="hidden"
+
+           id="toggleId"
+
+           name="id"/>
+
+    <button class="btn btn-warning">
+
+        Xác nhận
+
+    </button>
+
+</form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts{
+
+<script>
+
+function confirmToggle(id, name, isActive) {
+
+    document.getElementById("toggleId").value = id;
+
+    document.getElementById("residentName").innerText = name;
+
+    document.getElementById("actionText").innerText =
+        isActive ? "khóa" : "mở khóa";
+
+    new bootstrap.Modal(
+        document.getElementById("toggleModal")
+    ).show();
+}
+
+</script>
+
+}

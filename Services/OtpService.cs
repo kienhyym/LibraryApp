@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using LibraryApp.Models;
 using LibraryApp.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -8,16 +9,36 @@ public class OtpService : IOtpService
 {
     private readonly LibDbContext _context;
 
-    public OtpService(LibDbContext context)
+    private readonly IEmailService _emailService;
+
+    public OtpService(
+        LibDbContext context,
+        IEmailService emailService)
     {
         _context = context;
+        _emailService = emailService;
     }
+
+    #region Send OTP
+
+    public async Task SendOtpAsync(string email)
+    {
+        var otp = await GenerateOtpAsync(email);
+
+        await _emailService.SendOtpAsync(
+            email,
+            otp);
+    }
+
+    #endregion
+
+    #region Generate OTP
 
     public async Task<string> GenerateOtpAsync(string email)
     {
-        // Generate random 6-digit OTP
-        var random = new Random();
-        var otp = random.Next(100000, 999999).ToString();
+        var otp = RandomNumberGenerator
+            .GetInt32(100000, 1000000)
+            .ToString();
 
         var existingOtp = await _context.EmailVerifications
             .FirstOrDefaultAsync(x => x.Email == email);
@@ -46,7 +67,13 @@ public class OtpService : IOtpService
         return otp;
     }
 
-    public async Task<bool> VerifyOtpAsync(string email, string otpCode)
+    #endregion
+
+    #region Verify OTP
+
+    public async Task<bool> VerifyOtpAsync(
+        string email,
+        string otpCode)
     {
         var otp = await _context.EmailVerifications
             .FirstOrDefaultAsync(x => x.Email == email);
@@ -70,20 +97,34 @@ public class OtpService : IOtpService
         return true;
     }
 
+    #endregion
+
+    #region Check Verify
+
     public async Task<bool> IsEmailVerifiedAsync(string email)
     {
         return await _context.EmailVerifications
-            .AnyAsync(x => x.Email == email && x.IsVerified);
+            .AnyAsync(x =>
+                x.Email == email &&
+                x.IsVerified);
     }
+
+    #endregion
+
+    #region Delete OTP
 
     public async Task DeleteOtpAsync(string email)
-{
-    var otp = await _context.EmailVerifications
-        .FirstOrDefaultAsync(x => x.Email == email);
-
-    if (otp != null)
     {
+        var otp = await _context.EmailVerifications
+            .FirstOrDefaultAsync(x => x.Email == email);
+
+        if (otp == null)
+            return;
+
         _context.EmailVerifications.Remove(otp);
+
+        await _context.SaveChangesAsync();
     }
-}
+
+    #endregion
 }
