@@ -60,7 +60,7 @@ builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IResidentService, ResidentService>();
-
+builder.Services.AddScoped<IPersonnelService, PersonnelService>();
 #endregion
 
 var app = builder.Build();
