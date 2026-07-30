@@ -1,63 +1,55 @@
-using LibraryApp.Areas.Admin.ViewModels;
+using LibraryApp.Areas.Admin.ViewModels.Resident;
 using LibraryApp.Common;
 using LibraryApp.Enums;
 using LibraryApp.Models;
 using LibraryApp.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace LibraryApp.Services;
 
 public class ResidentService : IResidentService
 {
     private readonly LibDbContext _context;
-
     private readonly IOtpService _otpService;
-
-    private readonly IWebHostEnvironment _environment;
+    private readonly IEmailService _emailService;
 
     public ResidentService(
         LibDbContext context,
         IOtpService otpService,
-        IWebHostEnvironment environment)
+        IEmailService emailService)
     {
         _context = context;
         _otpService = otpService;
-        _environment = environment;
+        _emailService = emailService;
     }
 
-    public async Task<PaginatedList<ResidentViewModel>> GetPagedAsync(
-    string? keyword,
-    int page,
-    int pageSize)
+    #region Query
+
+    public async Task<PaginatedList<ResidentListViewModel>> GetPagedAsync(
+        string? keyword,
+        int page,
+        int pageSize)
     {
-        var query =
-            from resident in _context.Residents
-            join account in _context.Accounts
-                on resident.AccountId equals account.AccountId
-            orderby resident.ResidentId descending
-            select new ResidentViewModel
+        var query = _context.Residents
+            .Include(x => x.Account)
+            .OrderByDescending(x => x.ResidentId)
+            .Select(x => new ResidentListViewModel
             {
-                ResidentId = resident.ResidentId,
-                AccountId = account.AccountId,
+                ResidentId = x.ResidentId,
 
-                FullName = resident.FullName,
-                Email = account.Email,
+                FullName = x.FullName,
 
-                PhoneNumber = resident.PhoneNumber,
-                ApartmentNumber = resident.ApartmentNumber,
+                Email = x.Account.Email,
 
-                DateOfBirth = resident.DateOfBirth,
-                Gender = resident.Gender,
+                PhoneNumber = x.PhoneNumber,
 
-                PermanentAddress = resident.PermanentAddress,
+                ApartmentNumber = x.ApartmentNumber,
 
-                IsActive = account.IsActive,
-                IsEmailVerified = account.IsEmailVerified,
+                IsActive = x.Account.IsActive,
 
-                CreatedAt = account.CreatedAt
-            };
+                CreatedAt = x.Account.CreatedAt
+            });
 
         if (!string.IsNullOrWhiteSpace(keyword))
         {
@@ -76,91 +68,89 @@ public class ResidentService : IResidentService
                     x.ApartmentNumber.Contains(keyword)));
         }
 
-        return await PaginatedList<ResidentViewModel>
+        return await PaginatedList<ResidentListViewModel>
             .CreateAsync(query, page, pageSize);
     }
-    public Task<ResidentViewModel> GetCreateModelAsync()
+
+    public Task<ResidentCreateViewModel> GetCreateModelAsync()
     {
-        return Task.FromResult(new ResidentViewModel());
+        return Task.FromResult(
+            new ResidentCreateViewModel());
     }
-    public async Task<ResidentViewModel?> GetEditModelAsync(int id)
+
+    public async Task<ResidentEditViewModel?> GetEditModelAsync(int id)
     {
-        return await (
-            from resident in _context.Residents
-            join account in _context.Accounts
-                on resident.AccountId equals account.AccountId
-
-            where resident.ResidentId == id
-
-            select new ResidentViewModel
+        return await _context.Residents
+            .Include(x => x.Account)
+            .Where(x => x.ResidentId == id)
+            .Select(x => new ResidentEditViewModel
             {
-                ResidentId = resident.ResidentId,
+                ResidentId = x.ResidentId,
 
-                AccountId = account.AccountId,
+                AccountId = x.AccountId,
 
-                FullName = resident.FullName,
+                FullName = x.FullName,
 
-                Email = account.Email,
+                Email = x.Account.Email,
 
-                PhoneNumber = resident.PhoneNumber,
+                PhoneNumber = x.PhoneNumber,
 
-                ApartmentNumber = resident.ApartmentNumber,
+                ApartmentNumber = x.ApartmentNumber,
 
-                PermanentAddress = resident.PermanentAddress,
+                PermanentAddress = x.PermanentAddress,
 
-                DateOfBirth = resident.DateOfBirth,
+                DateOfBirth = x.DateOfBirth,
 
-                Gender = resident.Gender,
+                Gender = x.Gender,
 
-                IsActive = account.IsActive,
-
-                IsEmailVerified = account.IsEmailVerified
+                IsActive = x.Account.IsActive
             })
             .FirstOrDefaultAsync();
     }
-    public async Task<ResidentViewModel?> GetByIdAsync(int id)
+
+    public async Task<ResidentDetailViewModel?> GetByIdAsync(int id)
     {
-        return await (
-            from resident in _context.Residents
-            join account in _context.Accounts
-                on resident.AccountId equals account.AccountId
-
-            where resident.ResidentId == id
-
-            select new ResidentViewModel
+        return await _context.Residents
+            .Include(x => x.Account)
+            .Where(x => x.ResidentId == id)
+            .Select(x => new ResidentDetailViewModel
             {
-                ResidentId = resident.ResidentId,
+                ResidentId = x.ResidentId,
 
-                AccountId = account.AccountId,
+                FullName = x.FullName,
 
-                FullName = resident.FullName,
+                Email = x.Account.Email,
 
-                Email = account.Email,
+                PhoneNumber = x.PhoneNumber,
 
-                PhoneNumber = resident.PhoneNumber,
+                ApartmentNumber = x.ApartmentNumber,
 
-                ApartmentNumber = resident.ApartmentNumber,
+                PermanentAddress = x.PermanentAddress,
 
-                PermanentAddress = resident.PermanentAddress,
+                DateOfBirth = x.DateOfBirth,
 
-                DateOfBirth = resident.DateOfBirth,
+                Gender = x.Gender,
 
-                Gender = resident.Gender,
+                IsActive = x.Account.IsActive,
 
-                IsActive = account.IsActive,
-
-                IsEmailVerified = account.IsEmailVerified,
-
-                CreatedAt = account.CreatedAt
+                CreatedAt = x.Account.CreatedAt
             })
             .FirstOrDefaultAsync();
     }
-    public async Task<bool> ResidentExistsByEmailAsync(string email)
+
+    #endregion
+
+    #region Validation
+
+    public async Task<bool> ResidentExistsByEmailAsync(
+        string email)
     {
         return await _context.Accounts
             .AnyAsync(x => x.Email == email);
     }
-    public async Task<bool> ResidentExistsByPhoneAsync(string phoneNumber)
+
+    public async Task<bool> ResidentExistsByPhoneAsync(
+        string? phoneNumber)
     {
         if (string.IsNullOrWhiteSpace(phoneNumber))
             return false;
@@ -168,12 +158,12 @@ public class ResidentService : IResidentService
         return await _context.Residents
             .AnyAsync(x => x.PhoneNumber == phoneNumber);
     }
+
     public async Task<bool> ResidentExistsByEmailForUpdateAsync(
         string email,
         int residentId)
     {
         var resident = await _context.Residents
-            .Include(x => x.Account)
             .FirstOrDefaultAsync(x => x.ResidentId == residentId);
 
         if (resident == null)
@@ -184,8 +174,9 @@ public class ResidentService : IResidentService
                 x.AccountId != resident.AccountId &&
                 x.Email == email);
     }
+
     public async Task<bool> ResidentExistsByPhoneForUpdateAsync(
-        string phoneNumber,
+        string? phoneNumber,
         int residentId)
     {
         if (string.IsNullOrWhiteSpace(phoneNumber))
@@ -197,82 +188,86 @@ public class ResidentService : IResidentService
                 x.PhoneNumber == phoneNumber);
     }
 
-    public async Task SendOtpAsync(ResidentViewModel model)
+    #endregion
+    #region Registration
+
+    public async Task SendOtpAsync(
+    ResidentCreateViewModel model)
     {
+        model.Email = model.Email.Trim();
+
         if (await ResidentExistsByEmailAsync(model.Email))
         {
             throw new InvalidOperationException(
                 "Email đã tồn tại.");
         }
-
-        if (!string.IsNullOrWhiteSpace(model.PhoneNumber))
+        if (await ResidentExistsByPhoneAsync(model.PhoneNumber))
         {
-            if (await ResidentExistsByPhoneAsync(model.PhoneNumber))
-            {
-                throw new InvalidOperationException(
-                    "Số điện thoại đã tồn tại.");
-            }
+            throw new InvalidOperationException(
+                "Số điện thoại đã tồn tại.");
         }
 
-        await _otpService.SendOtpAsync(model.Email);
+        var otp =
+            await _otpService.GenerateOtpAsync(model.Email);
+
+        await _emailService.SendOtpAsync(
+            model.Email,
+            otp);
     }
+
     public async Task ResendOtpAsync(string email)
     {
-        await _otpService.SendOtpAsync(email);
+        email = email.Trim();
+
+        var otp = await _otpService.GenerateOtpAsync(email);
+
+        await _emailService.SendOtpAsync(
+            email,
+            otp);
     }
-    public async Task<bool> IsOtpVerifiedAsync(string email)
-    {
-        return await _otpService.IsEmailVerifiedAsync(email);
-    }
+
     public async Task VerifyOtpAndCreateAsync(
-    ResidentViewModel model)
+        ResidentCreateViewModel resident,
+        ResidentVerifyOtpViewModel otp)
     {
-        // 1. Kiểm tra OTP
-        var verified = await _otpService.VerifyOtpAsync(
-            model.Email,
-            model.OtpCode!);
+        resident.Email = resident.Email.Trim();
 
-        if (!verified)
+        otp.Email = otp.Email.Trim();
+
+        if (!resident.Email.Equals(
+                otp.Email,
+                StringComparison.OrdinalIgnoreCase))
         {
             throw new InvalidOperationException(
-                "Mã OTP không đúng hoặc đã hết hạn.");
+                "Email xác thực không khớp.");
         }
 
-        // 2. Kiểm tra email đã được xác thực
-        if (!await _otpService.IsEmailVerifiedAsync(model.Email))
+        if (!await _otpService.VerifyOtpAsync(
+                otp.Email,
+                otp.OtpCode))
         {
             throw new InvalidOperationException(
-                "Email chưa được xác thực.");
+                "Mã OTP không hợp lệ hoặc đã hết hạn.");
         }
 
-        // 3. Transaction
+        if (await ResidentExistsByEmailAsync(resident.Email))
+        {
+            throw new InvalidOperationException(
+                "Email đã tồn tại.");
+        }
+
         await using var transaction =
             await _context.Database.BeginTransactionAsync();
 
         try
         {
-            // Kiểm tra lại dữ liệu trước khi lưu
-            if (await ResidentExistsByEmailAsync(model.Email))
-            {
-                throw new InvalidOperationException(
-                    "Email đã tồn tại.");
-            }
-
-            if (!string.IsNullOrWhiteSpace(model.PhoneNumber))
-            {
-                if (await ResidentExistsByPhoneAsync(model.PhoneNumber))
-                {
-                    throw new InvalidOperationException(
-                        "Số điện thoại đã tồn tại.");
-                }
-            }
-
-            // 4. Tạo Account
             var account = new Account
             {
-                Email = model.Email.Trim(),
+                Email = resident.Email,
 
                 AccountRole = AccountRole.Resident,
+
+                PasswordHash = string.Empty,
 
                 IsActive = true,
 
@@ -287,38 +282,33 @@ public class ResidentService : IResidentService
             account.PasswordHash =
                 passwordHasher.HashPassword(
                     account,
-                    model.Password);
+                    resident.Password);
+
+            account.Resident = new Resident
+            {
+                FullName = resident.FullName.Trim(),
+
+                DateOfBirth = resident.DateOfBirth,
+
+                Gender = resident.Gender,
+
+                PhoneNumber =
+                    resident.PhoneNumber?.Trim(),
+
+                ApartmentNumber =
+                    resident.ApartmentNumber?.Trim(),
+
+                PermanentAddress =
+                    resident.PermanentAddress?.Trim()
+            };
 
             _context.Accounts.Add(account);
 
             await _context.SaveChangesAsync();
 
-            // 5. Tạo Resident
-            var resident = new Resident
-            {
-                AccountId = account.AccountId,
+            await _otpService.DeleteOtpAsync(
+                resident.Email);
 
-                FullName = model.FullName.Trim(),
-
-                DateOfBirth = model.DateOfBirth,
-
-                Gender = model.Gender,
-
-                PhoneNumber = model.PhoneNumber?.Trim(),
-
-                ApartmentNumber = model.ApartmentNumber?.Trim(),
-
-                PermanentAddress = model.PermanentAddress?.Trim()
-            };
-
-            _context.Residents.Add(resident);
-
-            await _context.SaveChangesAsync();
-
-            // 6. Xóa OTP
-            await _otpService.DeleteOtpAsync(model.Email);
-
-            // 7. Commit
             await transaction.CommitAsync();
         }
         catch
@@ -328,8 +318,12 @@ public class ResidentService : IResidentService
             throw;
         }
     }
+
+    #endregion
+    #region CRUD
+
     public async Task UpdateAsync(
-    ResidentViewModel model)
+        ResidentEditViewModel model)
     {
         var resident = await _context.Residents
             .Include(x => x.Account)
@@ -337,33 +331,41 @@ public class ResidentService : IResidentService
                 x.ResidentId == model.ResidentId);
 
         if (resident == null)
-            throw new Exception("Không tìm thấy cư dân.");
+        {
+            throw new InvalidOperationException(
+                "Không tìm thấy cư dân.");
+        }
 
         if (await ResidentExistsByEmailForUpdateAsync(
-            model.Email,
-            model.ResidentId))
+                model.Email,
+                model.ResidentId))
         {
-            throw new Exception("Email đã tồn tại.");
+            throw new InvalidOperationException(
+                "Email đã tồn tại.");
         }
 
         if (!string.IsNullOrWhiteSpace(model.PhoneNumber))
         {
             if (await ResidentExistsByPhoneForUpdateAsync(
-                model.PhoneNumber,
-                model.ResidentId))
+                    model.PhoneNumber,
+                    model.ResidentId))
             {
-                throw new Exception(
+                throw new InvalidOperationException(
                     "Số điện thoại đã tồn tại.");
             }
         }
 
-        resident.FullName = model.FullName.Trim();
+        resident.FullName =
+            model.FullName.Trim();
 
-        resident.DateOfBirth = model.DateOfBirth;
+        resident.DateOfBirth =
+            model.DateOfBirth;
 
-        resident.Gender = model.Gender;
+        resident.Gender =
+            model.Gender;
 
-        resident.PhoneNumber = model.PhoneNumber?.Trim();
+        resident.PhoneNumber =
+            model.PhoneNumber?.Trim();
 
         resident.ApartmentNumber =
             model.ApartmentNumber?.Trim();
@@ -373,22 +375,33 @@ public class ResidentService : IResidentService
 
         resident.Account.Email =
             model.Email.Trim();
+
         resident.Account.IsActive =
-    model.IsActive;
+            model.IsActive;
 
         await _context.SaveChangesAsync();
     }
-    public async Task ToggleActiveAsync(int residentId)
+
+    public async Task ToggleActiveAsync(
+        int residentId)
     {
         var resident = await _context.Residents
             .Include(x => x.Account)
-            .FirstOrDefaultAsync(x => x.ResidentId == residentId);
+            .FirstOrDefaultAsync(x =>
+                x.ResidentId == residentId);
 
         if (resident == null)
-            throw new Exception("Không tìm thấy cư dân.");
+        {
+            throw new InvalidOperationException(
+                "Không tìm thấy cư dân.");
+        }
 
-        resident.Account.IsActive = !resident.Account.IsActive;
+        resident.Account.IsActive =
+            !resident.Account.IsActive;
 
         await _context.SaveChangesAsync();
     }
+
+    #endregion
+
 }

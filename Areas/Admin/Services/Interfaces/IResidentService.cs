@@ -1,4 +1,4 @@
-using LibraryApp.Areas.Admin.ViewModels;
+using LibraryApp.Areas.Admin.ViewModels.Resident;
 using LibraryApp.Common;
 
 namespace LibraryApp.Services.Interfaces;
@@ -7,43 +7,37 @@ public interface IResidentService
 {
     #region Query
 
-    // Danh sách + tìm kiếm + phân trang
-    Task<PaginatedList<ResidentViewModel>> GetPagedAsync(
+    Task<PaginatedList<ResidentListViewModel>> GetPagedAsync(
         string? keyword,
         int page,
         int pageSize);
 
-    // Model cho Create
-    Task<ResidentViewModel> GetCreateModelAsync();
+    Task<ResidentCreateViewModel> GetCreateModelAsync();
 
-    // Model cho Edit
-    Task<ResidentViewModel?> GetEditModelAsync(int id);
+    Task<ResidentEditViewModel?> GetEditModelAsync(int id);
 
-    // Chi tiết
-    Task<ResidentViewModel?> GetByIdAsync(int id);
+    Task<ResidentDetailViewModel?> GetByIdAsync(int id);
 
     #endregion
 
-    #region OTP
+    #region Registration
 
-    // Gửi OTP
-    Task SendOtpAsync(ResidentViewModel model);
+    Task SendOtpAsync(
+    ResidentCreateViewModel model);
 
-    // Gửi lại OTP
-    Task ResendOtpAsync(string email);
+    Task ResendOtpAsync(
 
-    // Kiểm tra email đã xác thực OTP hay chưa
-    Task<bool> IsOtpVerifiedAsync(string email);
+    string email);
 
-    // Xác thực OTP + tạo Account + Resident
     Task VerifyOtpAndCreateAsync(
-        ResidentViewModel model);
+        ResidentCreateViewModel resident,
+        ResidentVerifyOtpViewModel otp);
 
     #endregion
 
     #region CRUD
 
-    Task UpdateAsync(ResidentViewModel model);
+    Task UpdateAsync(ResidentEditViewModel model);
 
     Task ToggleActiveAsync(int residentId);
 
@@ -51,18 +45,16 @@ public interface IResidentService
 
     #region Validation
 
-    Task<bool> ResidentExistsByEmailAsync(
-        string email);
+    Task<bool> ResidentExistsByEmailAsync(string email);
 
-    Task<bool> ResidentExistsByPhoneAsync(
-        string phoneNumber);
+    Task<bool> ResidentExistsByPhoneAsync(string? phoneNumber);
 
     Task<bool> ResidentExistsByEmailForUpdateAsync(
         string email,
         int residentId);
 
     Task<bool> ResidentExistsByPhoneForUpdateAsync(
-        string phoneNumber,
+        string? phoneNumber,
         int residentId);
 
     #endregion

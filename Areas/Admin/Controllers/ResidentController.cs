@@ -1,4 +1,4 @@
-using LibraryApp.Areas.Admin.ViewModels;
+using LibraryApp.Areas.Admin.ViewModels.Resident;
 using LibraryApp.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -46,97 +46,104 @@ public class ResidentController : AdminBaseController
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-        ResidentViewModel model)
+     ResidentCreateViewModel model)
     {
         if (!ModelState.IsValid)
-        {
-            return Json(new
-            {
-                success = false,
-                message = "Dữ liệu không hợp lệ."
-            });
-        }
+            return View(model);
 
         try
         {
-            await _residentService.SendOtpAsync(model);
+            await _residentService.SendOtpAsync(
+                model);
 
-            return Json(new
-            {
-                success = true,
-                message = "Đã gửi mã OTP tới email."
-            });
+            TempData["Resident"] = System.Text.Json.JsonSerializer.Serialize(model);
+
+            return RedirectToAction(
+                nameof(VerifyOtp),
+                new { email = model.Email });
         }
         catch (Exception ex)
         {
-            return Json(new
+            if (ex.Message.Contains("Số điện thoại"))
             {
-                success = false,
-                message = ex.Message
-            });
+                ModelState.AddModelError(
+                    nameof(model.PhoneNumber),
+                    ex.Message);
+            }
+            else
+            {
+                ModelState.AddModelError(
+                    nameof(model.Email),
+                    ex.Message);
+            }
+
+            return View(model);
         }
     }
 
     #endregion
+
 
     #region Verify OTP
 
+    [HttpGet]
+    public IActionResult VerifyOtp(string email)
+    {
+        return View(
+            new ResidentVerifyOtpViewModel
+            {
+                Email = email
+            });
+    }
+
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> VerifyOtp(
-        ResidentViewModel model)
+        ResidentVerifyOtpViewModel model)
     {
+        if (!ModelState.IsValid)
+            return View(model);
+
         try
         {
-            await _residentService
-                .VerifyOtpAndCreateAsync(model);
+            var resident =
+                System.Text.Json.JsonSerializer.Deserialize<ResidentCreateViewModel>(
+                    TempData["Resident"]!.ToString()!);
 
-            return Json(new
+            if (resident == null)
             {
-                success = true,
-                redirectUrl = Url.Action(nameof(Index))
-            });
+                TempData["Error"] =
+                    "Phiên đăng ký đã hết hạn.";
+
+                return RedirectToAction(nameof(Create));
+            }
+
+            await _residentService
+                .VerifyOtpAndCreateAsync(
+                    resident,
+                    model);
+
+            TempData["Success"] =
+                "Thêm cư dân thành công.";
+
+            return RedirectToAction(nameof(Index));
         }
         catch (Exception ex)
         {
-            return Json(new
-            {
-                success = false,
-                message = ex.Message
-            });
+            ModelState.AddModelError(
+                nameof(model.OtpCode),
+                ex.Message);
+
+            TempData.Keep("Resident");
+
+            return View(model);
         }
     }
 
     #endregion
 
-    #region Resend OTP
-
-    [HttpPost]
-    public async Task<IActionResult> ResendOtp(
-        string email)
-    {
-        try
-        {
-            await _residentService
-                .ResendOtpAsync(email);
-
-            return Json(new
-            {
-                success = true,
-                message = "Đã gửi lại mã OTP."
-            });
-        }
-        catch (Exception ex)
-        {
-            return Json(new
-            {
-                success = false,
-                message = ex.Message
-            });
-        }
-    }
-
-    #endregion
 
     #region Edit
 
@@ -144,8 +151,7 @@ public class ResidentController : AdminBaseController
     public async Task<IActionResult> Edit(int id)
     {
         var model =
-            await _residentService
-                .GetEditModelAsync(id);
+            await _residentService.GetEditModelAsync(id);
 
         if (model == null)
             return NotFound();
@@ -154,8 +160,9 @@ public class ResidentController : AdminBaseController
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
-        ResidentViewModel model)
+    ResidentEditViewModel model)
     {
         if (!ModelState.IsValid)
             return View(model);
@@ -171,28 +178,37 @@ public class ResidentController : AdminBaseController
         }
         catch (Exception ex)
         {
-            ModelState.AddModelError(
-                "",
-                ex.Message);
+            if (ex.Message.Contains("Số điện thoại"))
+            {
+                ModelState.AddModelError(
+                    nameof(model.PhoneNumber),
+                    ex.Message);
+            }
+            else
+            {
+                ModelState.AddModelError(
+                    nameof(model.Email),
+                    ex.Message);
+            }
 
             return View(model);
         }
     }
 
     #endregion
-
-    #region Delete
+    #region Toggle Active
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ToggleActive(int id)
+    public async Task<IActionResult> ToggleActive(
+        int id)
     {
         try
         {
             await _residentService.ToggleActiveAsync(id);
 
             TempData["Success"] =
-                "Cập nhật trạng thái tài khoản thành công.";
+                "Cập nhật trạng thái thành công.";
         }
         catch (Exception ex)
         {
@@ -203,4 +219,31 @@ public class ResidentController : AdminBaseController
     }
 
     #endregion
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResendOtp(
+     ResidentVerifyOtpViewModel model)
+    {
+        try
+        {
+            await _residentService.ResendOtpAsync(
+                model.Email);
+
+            TempData["Success"] =
+                "Đã gửi lại mã OTP.";
+
+            return RedirectToAction(
+                nameof(VerifyOtp),
+                new { email = model.Email });
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = ex.Message;
+
+            return RedirectToAction(
+                nameof(VerifyOtp),
+                new { email = model.Email });
+        }
+    }
 }

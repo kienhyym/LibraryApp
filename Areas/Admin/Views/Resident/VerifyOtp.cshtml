@@ -1,0 +1,158 @@
+@using LibraryApp.Areas.Admin.ViewModels.Resident
+
+@model ResidentVerifyOtpViewModel
+
+@{
+    ViewData["Title"] = "Xác thực OTP";
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+<div class="row justify-content-center">
+
+    <div class="col-md-6">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header bg-primary text-white">
+
+                <h4 class="mb-0">
+
+                    Xác thực Email
+
+                </h4>
+
+            </div>
+
+            <div class="card-body">
+
+                <form asp-action="VerifyOtp" method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <input asp-for="Email" type="hidden" />
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Email
+
+                        </label>
+
+                        <input class="form-control" value="@Model.Email" readonly />
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label asp-for="OtpCode" class="form-label"></label>
+
+                        <input asp-for="OtpCode" class="form-control" />
+
+                        <span asp-validation-for="OtpCode" class="text-danger"></span>
+
+                    </div>
+
+                   
+
+                    <button class="btn btn-primary">
+
+                        Xác nhận
+
+                    </button>
+
+                    <a asp-action="Create" class="btn btn-secondary">
+
+                        Quay lại
+
+                    </a>
+
+                </form>
+                <div class="mb-3 text-center">
+
+                    <small class="text-muted">
+
+                        Có thể gửi lại OTP sau
+
+                        <strong>
+
+                            <span id="countdown">60</span>
+
+                        </strong>
+
+                        giây
+
+                    </small>
+
+                </div>
+                <form asp-action="ResendOtp" method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <input asp-for="Email" type="hidden" />
+
+                    <button id="btnResend" type="submit" class="btn btn-outline-secondary" disabled>
+
+                        <i class="bi bi-arrow-repeat"></i>
+
+                        Gửi lại OTP
+
+                    </button>
+
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        let seconds = 60;
+
+        const countdown = document.getElementById("countdown");
+        const btnResend = document.getElementById("btnResend");
+
+        btnResend.disabled = true;
+        countdown.textContent = seconds;
+        btnResend.classList.add("disabled");
+
+        const timer = setInterval(() => {
+
+            seconds--;
+
+            countdown.textContent = seconds;
+
+            if (seconds <= 0) {
+
+                clearInterval(timer);
+
+                btnResend.disabled = false;
+
+                countdown.textContent = "0";
+btnResend.classList.remove("disabled");
+            }
+
+        }, 1000);
+
+    </script>
+}

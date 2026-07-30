@@ -1,146 +1,205 @@
-@model LibraryApp.Areas.Admin.ViewModels.ResidentViewModel
-
+@using LibraryApp.Areas.Admin.ViewModels.Resident
 @using LibraryApp.Enums
+
+@model ResidentEditViewModel
 
 @{
     ViewData["Title"] = "Cập nhật cư dân";
 }
 
-<div class="card shadow-sm">
+<form asp-action="Edit" method="post">
 
-    <div class="card-header bg-white">
+    @Html.AntiForgeryToken()
 
-        <h4 class="mb-0">
+    <input asp-for="ResidentId" type="hidden" />
+    <input asp-for="AccountId" type="hidden" />
 
-            <i class="bi bi-pencil-square"></i>
+    <div class="row">
 
-            Cập nhật cư dân
+        <!-- Thông tin tài khoản -->
+        <div class="col-lg-4">
 
-        </h4>
+            <div class="card shadow-sm mb-4">
 
-    </div>
+                <div class="card-header bg-primary text-white">
 
-    <div class="card-body">
+                    <h5 class="mb-0">
 
-        <form asp-action="Edit" method="post">
+                        <i class="bi bi-person-circle"></i>
 
-            <input asp-for="ResidentId" type="hidden" />
+                        Thông tin tài khoản
 
-            <input asp-for="AccountId" type="hidden" />
-
-            <div class="row">
-
-                <div class="col-md-6 mb-3">
-
-                    <label asp-for="FullName" class="form-label"></label>
-
-                    <input asp-for="FullName" class="form-control" />
-
-                    <span asp-validation-for="FullName" class="text-danger"></span>
+                    </h5>
 
                 </div>
 
-                <div class="col-md-6 mb-3">
+                <div class="card-body">
 
-                    <label asp-for="Email" class="form-label"></label>
+                    <div class="mb-3">
 
-                    <input asp-for="Email" class="form-control" />
+                        <label asp-for="Email" class="form-label"></label>
 
-                    <span asp-validation-for="Email" class="text-danger"></span>
+                        <input asp-for="Email"
+                               class="form-control"
+                               readonly />
 
-                </div>
-                <div class="col-md-6 mb-3">
+                        <span asp-validation-for="Email"
+                              class="text-danger"></span>
 
-                    <label asp-for="IsActive" class="form-label"></label>
+                    </div>
 
-                    <select asp-for="IsActive" class="form-select">
+                    <div class="mb-3">
 
-                        <option value="true">
-                            Hoạt động
-                        </option>
+                        <label asp-for="IsActive" class="form-label"></label>
 
-                        <option value="false">
-                            Khóa tài khoản
-                        </option>
+                        <select asp-for="IsActive"
+                                class="form-select">
 
-                    </select>
+                            <option value="true">
+                                Hoạt động
+                            </option>
 
-                </div>
+                            <option value="false">
+                                Khóa tài khoản
+                            </option>
 
-                <div class="col-md-6 mb-3">
+                        </select>
 
-                    <label asp-for="DateOfBirth" class="form-label"></label>
-
-                    <input asp-for="DateOfBirth" class="form-control" />
-
-                </div>
-
-                <div class="col-md-6 mb-3">
-
-                    <label asp-for="Gender" class="form-label"></label>
-
-                    <select asp-for="Gender" asp-items="Html.GetEnumSelectList<Gender>()" class="form-select">
-
-                        <option value="">
-                            -- Chọn giới tính --
-                        </option>
-
-                    </select>
-
-                </div>
-
-                <div class="col-md-6 mb-3">
-
-                    <label asp-for="PhoneNumber" class="form-label"></label>
-
-                    <input asp-for="PhoneNumber" class="form-control" />
-
-                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-
-                </div>
-
-                <div class="col-md-6 mb-3">
-
-                    <label asp-for="ApartmentNumber" class="form-label"></label>
-
-                    <input asp-for="ApartmentNumber" class="form-control" />
-
-                </div>
-
-                <div class="col-12 mb-3">
-
-                    <label asp-for="PermanentAddress" class="form-label"></label>
-
-                    <textarea asp-for="PermanentAddress" rows="3" class="form-control"></textarea>
+                    </div>
 
                 </div>
 
             </div>
 
-            <hr />
+        </div>
 
-            <button class="btn btn-success">
+        <!-- Thông tin cư dân -->
+        <div class="col-lg-8">
 
-                <i class="bi bi-check-circle"></i>
+            <div class="card shadow-sm">
 
-                Cập nhật
+                <div class="card-header bg-success text-white">
 
-            </button>
+                    <h5 class="mb-0">
 
-            <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-people"></i>
 
-                Quay lại
+                        Thông tin cư dân
 
-            </a>
+                    </h5>
 
-        </form>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label asp-for="FullName"
+                                   class="form-label"></label>
+
+                            <input asp-for="FullName"
+                                   class="form-control" />
+
+                            <span asp-validation-for="FullName"
+                                  class="text-danger"></span>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label asp-for="DateOfBirth"
+                                   class="form-label"></label>
+
+                            <input asp-for="DateOfBirth"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label asp-for="Gender"
+                                   class="form-label"></label>
+
+                            <select asp-for="Gender"
+                                    asp-items="Html.GetEnumSelectList<Gender>()"
+                                    class="form-select">
+
+                                <option value="">
+                                    -- Chọn giới tính --
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label asp-for="PhoneNumber"
+                                   class="form-label"></label>
+
+                            <input asp-for="PhoneNumber"
+                                   class="form-control" />
+
+                            <span asp-validation-for="PhoneNumber"
+                                  class="text-danger"></span>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label asp-for="ApartmentNumber"
+                                   class="form-label"></label>
+
+                            <input asp-for="ApartmentNumber"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="col-12 mb-3">
+
+                            <label asp-for="PermanentAddress"
+                                   class="form-label"></label>
+
+                            <textarea asp-for="PermanentAddress"
+                                      rows="3"
+                                      class="form-control"></textarea>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
-</div>
+    <div class="mt-4">
 
-@section Scripts {
+        <button class="btn btn-success">
 
+            <i class="bi bi-check-circle"></i>
+
+            Cập nhật
+
+        </button>
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+
+            Quay lại
+
+        </a>
+
+    </div>
+
+</form>
+
+@section Scripts
+{
     <partial name="_ValidationScriptsPartial" />
-
 }

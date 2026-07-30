@@ -1,5 +1,7 @@
 @using LibraryApp.Common
-@model PaginatedList<LibraryApp.Areas.Admin.ViewModels.ResidentViewModel>
+@using LibraryApp.Areas.Admin.ViewModels.Resident
+
+@model PaginatedList<ResidentListViewModel>
 
 @{
     ViewData["Title"] = "Quản lý cư dân";
@@ -11,8 +13,7 @@
 
         @TempData["Success"]
 
-        <button class="btn-close"
-                data-bs-dismiss="alert">
+        <button class="btn-close" data-bs-dismiss="alert">
         </button>
 
     </div>
@@ -24,8 +25,7 @@
 
         @TempData["Error"]
 
-        <button class="btn-close"
-                data-bs-dismiss="alert">
+        <button class="btn-close" data-bs-dismiss="alert">
         </button>
 
     </div>
@@ -45,8 +45,7 @@
 
             </h4>
 
-            <a asp-action="Create"
-               class="btn btn-primary">
+            <a asp-action="Create" class="btn btn-primary">
 
                 <i class="bi bi-person-plus"></i>
 
@@ -60,17 +59,12 @@
 
     <div class="card-body">
 
-        <form method="get"
-              class="row g-3 mb-4">
+        <form method="get" class="row g-3 mb-4">
 
             <div class="col-md-4">
 
-                <input
-                    type="text"
-                    class="form-control"
-                    name="keyword"
-                    value="@ViewBag.Keyword"
-                    placeholder="Tên, Email, SĐT, Căn hộ..." />
+                <input type="text" class="form-control" name="keyword" value="@ViewBag.Keyword"
+                       placeholder="Tên, Email, SĐT, Căn hộ..." />
 
             </div>
 
@@ -84,8 +78,7 @@
 
                 </button>
 
-                <a asp-action="Index"
-                   class="btn btn-secondary">
+                <a asp-action="Index" class="btn btn-secondary">
 
                     Làm mới
 
@@ -121,110 +114,106 @@
 
                 <tbody>
 
-@if (Model.Any())
-{
-    foreach (var item in Model)
-    {
-        <tr>
+                    @if (Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
 
-            <td>
+                                <td>
 
-                <div class="fw-bold">
+                                    <div class="fw-bold">
 
-                    @item.FullName
+                                        @item.FullName
 
-                </div>
+                                    </div>
 
-            </td>
+                                </td>
 
-            <td>
+                                <td>
 
-                @item.Email
+                                    @item.Email
 
-            </td>
+                                </td>
 
-            <td>
+                                <td>
 
-                @(string.IsNullOrWhiteSpace(item.PhoneNumber)
-                    ? "-"
-                    : item.PhoneNumber)
+                                    @(string.IsNullOrWhiteSpace(item.PhoneNumber)
+                                        ? "-"
+                                        : item.PhoneNumber)
 
-            </td>
+                                </td>
 
-            <td>
+                                <td>
 
-                @(string.IsNullOrWhiteSpace(item.ApartmentNumber)
-                    ? "-"
-                    : item.ApartmentNumber)
+                                    @(string.IsNullOrWhiteSpace(item.ApartmentNumber)
+                                        ? "-"
+                                        : item.ApartmentNumber)
 
-            </td>
+                                </td>
 
-            <td>
+                                <td>
 
-@if(item.IsActive)
-{
-    <span class="badge bg-success">
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge bg-success">
 
-        Hoạt động
+                                            Hoạt động
 
-    </span>
-}
-else
-{
-    <span class="badge bg-danger">
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">
 
-        Đã khóa
+                                            Đã khóa
 
-    </span>
-}
+                                        </span>
+                                    }
 
-            </td>
+                                </td>
 
-            <td>
+                                <td>
 
-                <a asp-action="Edit"
-                   asp-route-id="@item.ResidentId"
-                   class="btn btn-warning btn-sm">
+                                    <a asp-action="Edit" asp-route-id="@item.ResidentId" class="btn btn-warning btn-sm">
 
-                    <i class="bi bi-pencil-square"></i>
+                                        <i class="bi bi-pencil-square"></i>
 
-                </a>
+                                    </a>
 
-                <button class="btn btn-outline-secondary btn-sm"
-        onclick="confirmToggle(
-            @item.ResidentId,
-            '@item.FullName',
-            @(item.IsActive.ToString().ToLower()))">
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="confirmToggle(
+                                        @item.ResidentId,
+                                        '@item.FullName',
+                                        @(item.IsActive.ToString().ToLower()))">
 
-    @if(item.IsActive)
-    {
-        <i class="bi bi-lock"></i>
-    }
-    else
-    {
-        <i class="bi bi-unlock"></i>
-    }
+                                        @if (item.IsActive)
+                                        {
+                                            <i class="bi bi-lock"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-unlock"></i>
+                                        }
 
-</button>
+                                    </button>
 
-            </td>
+                                </td>
 
-        </tr>
-    }
-}
-else
-{
-    <tr>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
 
-        <td colspan="6"
-            class="text-center text-muted">
+                            <td colspan="6" class="text-center text-muted">
 
-            Chưa có dữ liệu.
+                                Chưa có dữ liệu.
 
-        </td>
+                            </td>
 
-    </tr>
-}
+                        </tr>
+                    }
 
                 </tbody>
 
@@ -252,50 +241,44 @@ else
 
                 <ul class="pagination mb-0">
 
-@if(Model.HasPreviousPage)
-{
-<li class="page-item">
+                    @if (Model.HasPreviousPage)
+                    {
+                        <li class="page-item">
 
-<a class="page-link"
-   asp-route-page="@(Model.PageIndex-1)"
-   asp-route-keyword="@ViewBag.Keyword">
+                            <a class="page-link" asp-route-page="@(Model.PageIndex - 1)" asp-route-keyword="@ViewBag.Keyword">
 
-«
+                                «
 
-</a>
+                            </a>
 
-</li>
-}
+                        </li>
+                    }
 
-@for(int i=1;i<=Model.TotalPages;i++)
-{
-<li class="page-item @(i==Model.PageIndex?"active":"")">
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.PageIndex ? "active" : "")">
 
-<a class="page-link"
-   asp-route-page="@i"
-   asp-route-keyword="@ViewBag.Keyword">
+                            <a class="page-link" asp-route-page="@i" asp-route-keyword="@ViewBag.Keyword">
 
-@i
+                                @i
 
-</a>
+                            </a>
 
-</li>
-}
+                        </li>
+                    }
 
-@if(Model.HasNextPage)
-{
-<li class="page-item">
+                    @if (Model.HasNextPage)
+                    {
+                        <li class="page-item">
 
-<a class="page-link"
-   asp-route-page="@(Model.PageIndex+1)"
-   asp-route-keyword="@ViewBag.Keyword">
+                            <a class="page-link" asp-route-page="@(Model.PageIndex + 1)" asp-route-keyword="@ViewBag.Keyword">
 
-»
+                                »
 
-</a>
+                            </a>
 
-</li>
-}
+                        </li>
+                    }
 
                 </ul>
 
@@ -307,9 +290,7 @@ else
 
 </div>
 
-<div class="modal fade"
-     id="toggleModal"
-     tabindex="-1">
+<div class="modal fade" id="toggleModal" tabindex="-1">
 
     <div class="modal-dialog">
 
@@ -323,8 +304,7 @@ else
 
                 </h5>
 
-                <button class="btn-close btn-close-white"
-                        data-bs-dismiss="modal">
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal">
                 </button>
 
             </div>
@@ -332,44 +312,36 @@ else
             <div class="modal-body">
 
                 Bạn có chắc muốn
-                    <strong id="actionText"></strong>
+                <strong id="actionText"></strong>
 
-                    tài khoản của
+                tài khoản của
 
-                    <strong id="residentName"></strong>
-                    ?
+                <strong id="residentName"></strong>
+                ?
 
             </div>
 
             <div class="modal-footer">
 
-                <button
-                    class="btn btn-secondary"
-                    data-bs-dismiss="modal">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">
 
                     Hủy
 
                 </button>
 
-               <form asp-action="ToggleActive"
+                <form asp-action="ToggleActive" method="post">
 
-      method="post">
+                    @Html.AntiForgeryToken()
 
-    @Html.AntiForgeryToken()
+                    <input type="hidden" id="toggleId" name="id" />
 
-    <input type="hidden"
+                    <button class="btn btn-warning">
 
-           id="toggleId"
+                        Xác nhận
 
-           name="id"/>
+                    </button>
 
-    <button class="btn btn-warning">
-
-        Xác nhận
-
-    </button>
-
-</form>
+                </form>
 
             </div>
 
@@ -380,24 +352,24 @@ else
 </div>
 
 
-@section Scripts{
+@section Scripts {
 
-<script>
+    <script>
 
-function confirmToggle(id, name, isActive) {
+        function confirmToggle(id, name, isActive) {
 
-    document.getElementById("toggleId").value = id;
+            document.getElementById("toggleId").value = id;
 
-    document.getElementById("residentName").innerText = name;
+            document.getElementById("residentName").innerText = name;
 
-    document.getElementById("actionText").innerText =
-        isActive ? "khóa" : "mở khóa";
+            document.getElementById("actionText").innerText =
+                isActive ? "khóa" : "mở khóa";
 
-    new bootstrap.Modal(
-        document.getElementById("toggleModal")
-    ).show();
-}
+            new bootstrap.Modal(
+                document.getElementById("toggleModal")
+            ).show();
+        }
 
-</script>
+    </script>
 
 }
