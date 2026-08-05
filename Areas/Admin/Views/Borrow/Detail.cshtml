@@ -1,0 +1,328 @@
+@using LibraryApp.Areas.Admin.ViewModels.Borrow
+@using LibraryApp.Enums
+
+@model BorrowDetailViewModel
+
+@{
+    ViewData["Title"] = "Chi tiết phiếu mượn";
+}
+
+<div class="card shadow-sm">
+
+    <div class="card-header bg-white">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <h4 class="mb-0">
+
+                <i class="bi bi-eye"></i>
+
+                Chi tiết phiếu mượn
+
+            </h4>
+
+            <a asp-action="Index" class="btn btn-secondary">
+
+                <i class="bi bi-arrow-left"></i>
+
+                Quay lại
+
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+
+            <div class="col-md-6 mb-3">
+
+                <label class="form-label fw-bold">
+
+                    Cư dân
+
+                </label>
+
+                <input class="form-control" value="@Model.ResidentName" readonly />
+
+            </div>
+
+            <div class="col-md-6 mb-3">
+
+                <label class="form-label fw-bold">
+
+                    Nhân viên
+
+                </label>
+
+                <input class="form-control" value="@Model.PersonnelName" readonly />
+
+            </div>
+
+            <div class="col-md-3 mb-3">
+
+                <label class="form-label fw-bold">
+
+                    Ngày mượn
+
+                </label>
+
+                <input class="form-control" value="@Model.BorrowDate.ToString("dd/MM/yyyy")" readonly />
+
+            </div>
+
+            <div class="col-md-3 mb-3">
+
+                <label class="form-label fw-bold">
+
+                    Hạn trả
+
+                </label>
+
+                <input class="form-control" value="@Model.DueDate.ToString("dd/MM/yyyy")" readonly />
+
+            </div>
+
+            <div class="col-md-3 mb-3">
+
+                <label class="form-label fw-bold">
+
+                    Trạng thái
+
+                </label>
+
+                <div>
+
+                    @switch (Model.BorrowRecordStatus)
+                    {
+                        case BorrowRecordStatus.Borrowing:
+
+                            <span class="badge bg-warning text-dark fs-6">
+
+                                Đang mượn
+
+                            </span>
+
+                            break;
+
+                        case BorrowRecordStatus.Completed:
+
+                            <span class="badge bg-success fs-6">
+
+                                Hoàn thành
+
+                            </span>
+
+                            break;
+
+                        case BorrowRecordStatus.Overdue:
+
+                            <span class="badge bg-danger fs-6">
+
+                                Quá hạn
+
+                            </span>
+
+                            break;
+
+                    }
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3 mb-3">
+
+                <label class="form-label fw-bold">
+
+                    Tổng số sách
+
+                </label>
+
+                <input class="form-control" value="@Model.Books.Count" readonly />
+
+            </div>
+
+        </div>
+
+        <div class="mb-3">
+
+            <label class="form-label fw-bold">
+
+                Ghi chú
+
+            </label>
+
+            <textarea class="form-control" rows="3" readonly>@Model.Notes</textarea>
+
+        </div>
+
+        <hr />
+
+        <h5 class="mb-3">
+
+            Danh sách sách
+
+        </h5>
+
+        <div class="table-responsive">
+
+            <table class="table table-bordered table-hover align-middle">
+
+                <thead class="table-light">
+
+                    <tr>
+                        <th>STT</th>
+
+                        <th>Sách</th>
+
+                        <th>Tác giả</th>
+
+                        <th>Thể loại</th>
+
+                        <th width="150">
+                            Trạng thái trả
+                        </th>
+
+                        <th>
+                            Ghi chú
+                        </th>
+
+                        <th width="130">
+                            Ngày trả
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+@{
+
+    var stt = 1;
+
+}
+                    @foreach (var item in Model.Books)
+                    {
+                        <tr>
+                            <td>
+
+            @(stt++)
+
+        </td>
+                            <td>
+
+                                @item.Title
+
+                            </td>
+
+                            <td>
+
+                                @item.AuthorName
+
+                            </td>
+
+                            <td>
+
+                                @item.CategoryName
+
+                            </td>
+
+                            <td>
+
+                                @if (item.ReturnStatus == null)
+                                {
+                                    <span class="badge bg-secondary">
+
+                                        Chưa cập nhật
+
+                                    </span>
+                                }
+                                else
+                                {
+                                    switch (item.ReturnStatus)
+                                    {
+                                        case ReturnStatus.Returned:
+
+                                            <span class="badge bg-success">
+
+                                                Đã trả
+
+                                            </span>
+
+                                            break;
+
+                                        case ReturnStatus.Lost:
+
+                                            <span class="badge bg-danger">
+
+                                                Mất sách
+
+                                            </span>
+
+                                            break;
+
+                                        case ReturnStatus.Damaged:
+
+                                            <span class="badge bg-warning text-dark">
+
+                                                Sách hỏng
+
+                                            </span>
+
+                                            break;
+                                    }
+                                }
+
+                            </td>
+
+                            <td>
+
+                                @(string.IsNullOrWhiteSpace(item.ReturnNote)
+                                    ? "-"
+                                    : item.ReturnNote)
+
+                            </td>
+
+                            <td>
+
+                                @(item.ReturnDate?.ToString("dd/MM/yyyy HH:mm")
+                                    ?? "-")
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="mt-3">
+
+            @if (Model.BorrowRecordStatus == BorrowRecordStatus.Borrowing)
+            {
+                <a asp-action="ReturnBooks" asp-route-id="@Model.BorrowRecordId" class="btn btn-success">
+
+                    <i class="bi bi-arrow-return-left"></i>
+
+                    Trả sách
+
+                </a>
+            }
+
+            <a asp-action="Index" class="btn btn-secondary">
+
+                Đóng
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

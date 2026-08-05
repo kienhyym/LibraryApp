@@ -76,10 +76,12 @@ public class AuthService : IAuthService
             CookieAuthenticationDefaults.AuthenticationScheme);
     }
     private async Task<Account?> GetAccountAsync(string email)
-    {
-        return await _context.Accounts
-            .FirstOrDefaultAsync(x => x.Email == email);
-    }
+{
+    return await _context.Accounts
+        .Include(x => x.Personnel)
+        .Include(x => x.Resident)
+        .FirstOrDefaultAsync(x => x.Email == email);
+}
 
     private bool VerifyPassword(
     Account account,
@@ -95,9 +97,9 @@ public class AuthService : IAuthService
     return result != PasswordVerificationResult.Failed;
 }
 
-    private List<Claim> CreateClaims(Account account)
-    {
-        return new List<Claim>
+   private List<Claim> CreateClaims(Account account)
+{
+    var claims = new List<Claim>
     {
         new Claim(
             ClaimTypes.NameIdentifier,
@@ -111,7 +113,25 @@ public class AuthService : IAuthService
             ClaimTypes.Role,
             account.AccountRole.ToString())
     };
+
+    if (account.Personnel != null)
+    {
+        claims.Add(
+            new Claim(
+                "PersonnelId",
+                account.Personnel.PersonnelId.ToString()));
     }
+
+    if (account.Resident != null)
+    {
+        claims.Add(
+            new Claim(
+                "ResidentId",
+                account.Resident.ResidentId.ToString()));
+    }
+
+    return claims;
+}
 
     private async Task SignInAsync(
         HttpContext httpContext,

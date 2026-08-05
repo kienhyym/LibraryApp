@@ -61,6 +61,8 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IResidentService, ResidentService>();
 builder.Services.AddScoped<IPersonnelService, PersonnelService>();
+builder.Services.AddScoped<IBorrowService, BorrowService>();
+
 #endregion
 
 var app = builder.Build();

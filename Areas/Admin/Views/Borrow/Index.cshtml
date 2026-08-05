@@ -1,0 +1,343 @@
+@using LibraryApp.Areas.Admin.ViewModels.Borrow
+@using LibraryApp.Common
+@using LibraryApp.Enums
+
+@model PaginatedList<BorrowListViewModel>
+
+@{
+    ViewData["Title"] = "Quản lý phiếu mượn";
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+
+        @TempData["Success"]
+
+        <button class="btn-close"
+                data-bs-dismiss="alert"></button>
+
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+
+        @TempData["Error"]
+
+        <button class="btn-close"
+                data-bs-dismiss="alert"></button>
+
+    </div>
+}
+
+<div class="card shadow-sm">
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+
+        <h4 class="mb-0">
+
+            <i class="bi bi-journal-bookmark"></i>
+
+            Quản lý phiếu mượn
+
+        </h4>
+
+        <a asp-action="Create"
+           class="btn btn-primary">
+
+            <i class="bi bi-plus-circle"></i>
+
+            Lập phiếu mượn
+
+        </a>
+
+    </div>
+
+    <div class="card-body">
+
+        <form method="get"
+              class="row g-2 mb-3">
+
+            <div class="col-md-4">
+
+                <input name="keyword"
+                       value="@ViewBag.Keyword"
+                       class="form-control"
+                       placeholder="Tìm cư dân hoặc nhân viên..." />
+
+            </div>
+
+            <div class="col-auto">
+
+                <button class="btn btn-outline-primary">
+
+                    <i class="bi bi-search"></i>
+
+                    Tìm kiếm
+
+                </button>
+
+            </div>
+
+            <div class="col-auto">
+
+                <a asp-action="Index"
+                   class="btn btn-outline-secondary">
+
+                    Làm mới
+
+                </a>
+
+            </div>
+
+        </form>
+
+        <div class="table-responsive">
+
+            <table class="table table-bordered table-hover align-middle">
+
+                <thead class="table-light">
+
+                    <tr>
+
+                        <th width="70">
+
+                            Mã
+
+                        </th>
+
+                        <th>
+
+                            Cư dân
+
+                        </th>
+
+                        <th>
+
+                            Nhân viên
+
+                        </th>
+
+                        <th width="120">
+
+                            Ngày mượn
+
+                        </th>
+
+                        <th width="120">
+
+                            Hạn trả
+
+                        </th>
+
+                        <th width="130">
+
+                            Trạng thái
+
+                        </th>
+
+                        <th width="80">
+
+                            Sách
+
+                        </th>
+
+                        <th width="160">
+
+                            Thao tác
+
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @if (Model.Any())
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>
+
+                                    @item.BorrowRecordId
+
+                                </td>
+
+                                <td>
+
+                                    @item.ResidentName
+
+                                </td>
+
+                                <td>
+
+                                    @item.PersonnelName
+
+                                </td>
+
+                                <td>
+
+                                    @item.BorrowDate.ToString("dd/MM/yyyy")
+
+                                </td>
+
+                                <td>
+
+                                    @item.DueDate.ToString("dd/MM/yyyy")
+
+                                </td>
+
+                                <td>
+
+                                    @switch (item.BorrowRecordStatus)
+                                    {
+                                        case BorrowRecordStatus.Borrowing:
+
+                                            <span class="badge bg-warning text-dark">
+
+                                                Đang mượn
+
+                                            </span>
+
+                                            break;
+
+                                        case BorrowRecordStatus.Completed:
+
+                                            <span class="badge bg-success">
+
+                                                Hoàn thành
+
+                                            </span>
+
+                                            break;
+
+                                        case BorrowRecordStatus.Overdue:
+
+                                            <span class="badge bg-danger">
+
+                                                Quá hạn
+
+                                            </span>
+
+                                            break;
+
+                                    }
+
+                                </td>
+
+                                <td class="text-center">
+
+                                    @item.TotalBooks
+
+                                </td>
+
+                                <td>
+
+                                    <a asp-action="Detail"
+                                       asp-route-id="@item.BorrowRecordId"
+                                       class="btn btn-info btn-sm">
+
+                                        <i class="bi bi-eye"></i>
+
+                                    </a>
+
+                                    @if (item.BorrowRecordStatus == BorrowRecordStatus.Borrowing)
+                                    {
+                                        <a asp-action="ReturnBooks"
+                                           asp-route-id="@item.BorrowRecordId"
+                                           class="btn btn-success btn-sm">
+
+                                            <i class="bi bi-arrow-return-left"></i>
+
+                                        </a>
+                                    }
+
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+
+                            <td colspan="8"
+                                class="text-center text-muted">
+
+                                Không có dữ liệu.
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <nav>
+
+                <ul class="pagination justify-content-center">
+
+                    @if (Model.HasPreviousPage)
+                    {
+                        <li class="page-item">
+
+                            <a class="page-link"
+                               asp-route-page="@(Model.PageIndex-1)"
+                               asp-route-keyword="@ViewBag.Keyword">
+
+                                &laquo;
+
+                            </a>
+
+                        </li>
+                    }
+
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+
+                            <a class="page-link"
+                               asp-route-page="@i"
+                               asp-route-keyword="@ViewBag.Keyword">
+
+                                @i
+
+                            </a>
+
+                        </li>
+                    }
+
+                    @if (Model.HasNextPage)
+                    {
+                        <li class="page-item">
+
+                            <a class="page-link"
+                               asp-route-page="@(Model.PageIndex+1)"
+                               asp-route-keyword="@ViewBag.Keyword">
+
+                                &raquo;
+
+                            </a>
+
+                        </li>
+                    }
+
+                </ul>
+
+            </nav>
+        }
+
+    </div>
+
+</div>

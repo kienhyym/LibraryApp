@@ -1,3 +1,4 @@
+using LibraryApp.Enums;
 using LibraryApp.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -6,26 +7,41 @@ namespace LibraryApp.Data;
 public static class DbInitializer
 {
     public static void Seed(LibDbContext context)
+{
+    if (context.Accounts.Any())
+        return;
+
+    var admin = new Account
     {
-        // Nếu đã có tài khoản thì không tạo nữa
-        if (context.Accounts.Any())
+        Email = "admin@example.com",
+
+        AccountRole = AccountRole.Admin,
+
+        IsActive = true,
+
+        IsEmailVerified = true,
+
+        CreatedAt = DateTime.Now,
+
+        Personnel = new Personnel
         {
-            return;
+            FullName = "Administrator",
+
+            PhoneNumber = "0900000000",
+
+            PersonnelAddress = "Library",
+
+            Position = "Administrator"
         }
+    };
 
-        var admin = new Account
-        {
-            Email = "admin@example.com",
-            AccountRole = Enums.AccountRole.Admin,
-            IsActive = true
-        };
+    var hasher = new PasswordHasher<Account>();
 
-        var passwordHasher = new PasswordHasher<Account>();
+    admin.PasswordHash =
+        hasher.HashPassword(admin, "123456");
 
-        admin.PasswordHash = passwordHasher.HashPassword(admin, "123456");
+    context.Accounts.Add(admin);
 
-        context.Accounts.Add(admin);
-
-        context.SaveChanges();
-    }
+    context.SaveChanges();
+}
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using LibraryApp.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibraryApp.Models;
@@ -99,7 +100,7 @@ public partial class LibDbContext : DbContext
             entity.Property(e => e.BorrowDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.BorrowRecordStatus).HasDefaultValue(1);
+            entity.Property(e => e.BorrowRecordStatus).HasDefaultValue(BorrowRecordStatus.Borrowing);
             entity.Property(e => e.DueDate).HasColumnType("datetime");
             entity.Property(e => e.Notes).HasMaxLength(250);
 
@@ -119,9 +120,8 @@ public partial class LibDbContext : DbContext
             entity.ToTable("BORROWRECORDDETAILS");
 
             entity.HasIndex(e => new { e.BorrowRecordId, e.BookId }, "UQ_BORROWRECORDDETAILS_BorrowRecordId_BookId").IsUnique();
-
-            entity.Property(e => e.Quantity).HasDefaultValue(1);
-            entity.Property(e => e.ReturnCondition).HasMaxLength(100);
+            entity.Property(e => e.ReturnNote).HasMaxLength(500);
+            entity.Property(e => e.ReturnStatus);
             entity.Property(e => e.ReturnDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.Book).WithMany(p => p.Borrowrecorddetails)

@@ -1,4 +1,5 @@
 using LibraryApp.Areas.Admin.ViewModels;
+using LibraryApp.Enums;
 using LibraryApp.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,11 +29,11 @@ public class DashboardService : IDashboardService
             TotalBorrowRecords = await _context.Borrowrecords.CountAsync(),
 
             BorrowingBooks = await _context.Borrowrecords
-                .CountAsync(x => x.BorrowRecordStatus == 1),
+                .CountAsync(x => x.BorrowRecordStatus == BorrowRecordStatus.Borrowing),
 
             OverdueBooks = await _context.Borrowrecords
                 .CountAsync(x =>
-                    x.BorrowRecordStatus == 1 &&
+                    x.BorrowRecordStatus == BorrowRecordStatus.Borrowing &&
                     x.DueDate < DateTime.Now)
         };
     }

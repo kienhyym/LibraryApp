@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using LibraryApp.Enums;
 
 namespace LibraryApp.Models;
 
@@ -15,7 +16,7 @@ public partial class Borrowrecord
 
     public DateTime DueDate { get; set; }
 
-    public int BorrowRecordStatus { get; set; }
+    public BorrowRecordStatus BorrowRecordStatus { get; set; }
 
     public string? Notes { get; set; }
 
