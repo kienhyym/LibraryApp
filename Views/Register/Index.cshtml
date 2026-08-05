@@ -1,107 +1,260 @@
+@using LibraryApp.Enums
 @model LibraryApp.ViewModels.RegisterViewModel
 
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Đăng ký tài khoản";
 }
-
-<div class="container mt-5">
+<div class="container py-5">
 
     <div class="row justify-content-center">
 
-        <div class="col-md-8">
+        <div class="col-lg-8">
 
-            <div class="card shadow">
+            <div class="card shadow border-0 rounded-4">
 
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Đăng ký tài khoản</h3>
+                <div class="card-header bg-primary text-white text-center py-4">
+
+                    <h2 class="fw-bold mb-1">
+
+                        <i class="bi bi-person-plus-fill me-2"></i>
+
+                        Đăng ký tài khoản
+
+                    </h2>
+
+                    <p class="mb-0 opacity-75">
+
+                        Thư viện Chung cư
+
+                    </p>
+
                 </div>
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-                    <form asp-action="Index" method="post">
+                    <form asp-action="Index" method="post" id="registerForm">
 
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        @Html.AntiForgeryToken()
 
-                        <div class="row">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="FullName" class="form-label">Họ tên</label>
-                                <input asp-for="FullName" class="form-control"/>
-                                <span asp-validation-for="FullName" class="text-danger"></span>
-                            </div>
+                        <!-- ACCOUNT -->
 
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Email" class="form-label"></label>
-                                <input asp-for="Email" class="form-control"/>
-                                <span asp-validation-for="Email" class="text-danger"></span>
-                            </div>
+                        <div class="mb-4">
 
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Password" class="form-label">Mật khẩu</label>
-                                <input asp-for="Password" class="form-control"/>
-                                <span asp-validation-for="Password" class="text-danger"></span>
-                            </div>
+                            <h5 class="fw-bold border-bottom pb-2">
 
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="ConfirmPassword" class="form-label">Xác nhận mật khẩu</label>
-                                <input asp-for="ConfirmPassword" class="form-control"/>
-                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                            </div>
+                                <i class="bi bi-person-circle me-2"></i>
 
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="DateOfBirth" class="form-label">Ngày sinh</label>
-                                <input asp-for="DateOfBirth"
-                                       type="date"
-                                       class="form-control"/>
-                                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
-                            </div>
+                                Thông tin tài khoản
 
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Gender" class="form-label">Giới tính</label>
+                            </h5>
 
-                                <select asp-for="Gender" class="form-select">
+                        </div>
 
-                                    <option value="">-- Select Gender --</option>
+                        <!-- ACCOUNT INPUTS -->
 
-                                    <option value="1">Male</option>
+                        <div class="row g-3">
 
-                                    <option value="2">Female</option>
+                            <div class="col-md-12">
 
-                                    <option value="3">Other</option>
+                                <label asp-for="Email" class="form-label fw-semibold"></label>
 
-                                </select>
+                                <div class="input-group">
 
-                                <span asp-validation-for="Gender" class="text-danger"></span>
+                                    <span class="input-group-text">
+
+                                        <i class="bi bi-envelope-fill"></i>
+
+                                    </span>
+
+                                    <input asp-for="Email" class="form-control" placeholder="example@gmail.com"
+                                           autocomplete="email" />
+
+                                </div>
+
+                                <span asp-validation-for="Email" class="text-danger small"></span>
 
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="PhoneNumber" class="form-label">Số điện thoại</label>
-                                <input asp-for="PhoneNumber" class="form-control"/>
-                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            <div class="col-md-6">
+
+                                <label asp-for="Password" class="form-label fw-semibold"></label>
+
+                                <div class="input-group">
+
+                                    <span class="input-group-text">
+
+                                        <i class="bi bi-lock-fill"></i>
+
+                                    </span>
+
+                                    <input asp-for="Password" id="Password" type="password" class="form-control"
+                                           placeholder="Nhập mật khẩu" />
+
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+
+                                        <i class="bi bi-eye"></i>
+
+                                    </button>
+
+                                </div>
+
+                                <span asp-validation-for="Password" class="text-danger small"></span>
+
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="ApartmentNumber" class="form-label">Số căn hộ</label>
-                                <input asp-for="ApartmentNumber" class="form-control"/>
-                                <span asp-validation-for="ApartmentNumber" class="text-danger"></span>
-                            </div>
+                            <div class="col-md-6">
 
-                            <div class="col-12 mb-3">
-                                <label asp-for="PermanentAddress" class="form-label">Địa chỉ thường trú</label>
+                                <label asp-for="ConfirmPassword" class="form-label fw-semibold"></label>
 
-                                <textarea asp-for="PermanentAddress"
-                                          rows="2"
-                                          class="form-control"></textarea>
+                                <div class="input-group">
 
-                                <span asp-validation-for="PermanentAddress" class="text-danger"></span>
+                                    <span class="input-group-text">
+
+                                        <i class="bi bi-lock-fill"></i>
+
+                                    </span>
+
+                                    <input asp-for="ConfirmPassword" id="ConfirmPassword" type="password"
+                                           class="form-control" placeholder="Nhập lại mật khẩu" />
+
+                                    <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
+
+                                        <i class="bi bi-eye"></i>
+
+                                    </button>
+
+                                </div>
+
+                                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+
                             </div>
 
                         </div>
 
-                        <button class="btn btn-primary w-100">
-                            Send OTP
-                        </button>
+                        <!-- RESIDENT -->
+
+                        <div class="mt-5 mb-4">
+
+                            <h5 class="fw-bold border-bottom pb-2">
+
+                                <i class="bi bi-house-heart me-2"></i>
+
+                                Thông tin cư dân
+
+                            </h5>
+
+                        </div>
+
+                        <!-- RESIDENT INPUTS -->
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+
+                                <label asp-for="FullName" class="form-label fw-semibold"></label>
+
+                                <input asp-for="FullName" class="form-control" placeholder="Nhập họ và tên" />
+
+                                <span asp-validation-for="FullName" class="text-danger small"></span>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label asp-for="DateOfBirth" class="form-label fw-semibold"></label>
+
+                                <input asp-for="DateOfBirth" type="date" class="form-control" />
+
+                                <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label asp-for="Gender" class="form-label fw-semibold"></label>
+
+                                <select asp-for="Gender" class="form-select">
+
+                                    <option value="">
+                                        -- Chọn giới tính --
+                                    </option>
+
+                                    <option value="1">
+                                        Nam
+                                    </option>
+
+                                    <option value="2">
+                                        Nữ
+                                    </option>
+
+                                    <option value="3">
+                                        Khác
+                                    </option>
+
+                                </select>
+
+                                <span asp-validation-for="Gender" class="text-danger small"></span>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label asp-for="PhoneNumber" class="form-label fw-semibold"></label>
+
+                                <input asp-for="PhoneNumber" class="form-control" placeholder="09xxxxxxxx" />
+
+                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label asp-for="ApartmentNumber" class="form-label fw-semibold"></label>
+
+                                <input asp-for="ApartmentNumber" class="form-control" placeholder="Ví dụ: A-1205" />
+
+                                <span asp-validation-for="ApartmentNumber" class="text-danger small"></span>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label asp-for="PermanentAddress" class="form-label fw-semibold"></label>
+
+                                <input asp-for="PermanentAddress" class="form-control"
+                                       placeholder="Địa chỉ thường trú" />
+
+                                <span asp-validation-for="PermanentAddress" class="text-danger small"></span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="d-grid mt-5">
+
+                            <button id="btnSubmit" type="submit" class="btn btn-primary btn-lg">
+
+                                <i class="bi bi-envelope-paper-fill me-2"></i>
+
+                                Gửi mã OTP
+
+                            </button>
+
+                        </div>
+
+                        <div class="text-center mt-4">
+
+                            Đã có tài khoản?
+
+                            <a asp-controller="Login" asp-action="Index" class="fw-semibold text-decoration-none">
+
+                                Đăng nhập
+
+                            </a>
+
+                        </div>
 
                     </form>
 
@@ -115,8 +268,45 @@
 
 </div>
 
-@section Scripts{
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        function togglePassword(inputId, buttonId)
+        {
+            const input = document.getElementById(inputId);
+            const icon = document.querySelector(`#${buttonId} i`);
+
+            if (input.type === "password")
+            {
+                input.type = "text";
+
+                icon.classList.remove("bi-eye");
+                icon.classList.add("bi-eye-slash");
+            }
+            else
+            {
+                input.type = "password";
+
+                icon.classList.remove("bi-eye-slash");
+                icon.classList.add("bi-eye");
+            }
+        }
+
+        document.getElementById("togglePassword")
+            .addEventListener("click", function ()
+            {
+                togglePassword("Password", "togglePassword");
+            });
+
+        document.getElementById("toggleConfirmPassword")
+            .addEventListener("click", function ()
+            {
+                togglePassword("ConfirmPassword", "toggleConfirmPassword");
+            });
+
+    </script>
 }

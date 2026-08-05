@@ -33,6 +33,7 @@ public class RegisterService : IRegisterService
         RegisterViewModel model,
         ISession session)
     {
+        Console.WriteLine("1. Kiểm tra email");
         bool emailExists = await _context.Accounts
             .AnyAsync(x => x.Email == model.Email);
 
@@ -40,16 +41,16 @@ public class RegisterService : IRegisterService
         {
             return (false, "Email đã được sử dụng.");
         }
-
+Console.WriteLine("2. Lưu Session");
         // Lưu thông tin đăng ký vào Session
         SessionHelper.SetObject(
             session,
             REGISTER_SESSION_KEY,
             model);
-
+    Console.WriteLine("3. Sinh OTP");
         // Sinh OTP
         string otp = await _otpService.GenerateOtpAsync(model.Email);
-
+Console.WriteLine("4. Chuẩn bị gửi mail");
         string html = $@"
             <h2>Library Management System</h2>
 
@@ -67,7 +68,7 @@ public class RegisterService : IRegisterService
             model.Email,
             "Email Verification",
             html);
-
+    Console.WriteLine("5. Gửi mail xong");
         return (true, "OTP đã được gửi đến email của bạn.");
     }
 
@@ -178,5 +179,39 @@ public class RegisterService : IRegisterService
 
             return (false, "Có lỗi xảy ra trong quá trình đăng ký. Vui lòng thử lại.");
         }
+    }
+    public async Task<(bool Success, string Message)> ResendOtpAsync(
+    string email,
+    ISession session)
+    {
+        var registerInfo =
+            SessionHelper.GetObject<RegisterViewModel>(
+                session,
+                REGISTER_SESSION_KEY);
+
+        if (registerInfo == null)
+        {
+            return (false,
+                "Phiên đăng ký đã hết hạn.");
+        }
+
+        string otp =
+            await _otpService.GenerateOtpAsync(email);
+
+        string html = $@"
+        <h2>Library Management System</h2>
+
+        <p>Mã OTP mới của bạn là:</p>
+
+        <h1 style='color:#0d6efd'>{otp}</h1>
+
+        <p>Mã có hiệu lực trong 5 phút.</p>";
+
+        await _emailService.SendEmailAsync(
+            email,
+            "Email Verification",
+            html);
+
+        return (true, "Đã gửi lại OTP.");
     }
 }

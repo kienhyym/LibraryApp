@@ -12,4 +12,8 @@ public interface IRegisterService
     Task<(bool Success, string Message)> RegisterAsync(
         VerifyOtpViewModel model,
         ISession session);
+
+        Task<(bool Success, string Message)> ResendOtpAsync(
+    string email,
+    ISession session);
 }
