@@ -43,4 +43,13 @@ public class HomeController : Controller
     }
 
     #endregion
+    #region About
+    public async Task<IActionResult> About()
+    {
+        var model =
+            await _homeService.GetAboutAsync();
+
+        return View(model);
+    }
+    #endregion
 }

@@ -16,4 +16,5 @@ public interface IHomeService
         string? keyword);
 
     #endregion
+    Task<AboutViewModel> GetAboutAsync();
 }

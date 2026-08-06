@@ -201,5 +201,17 @@ public class HomeService : IHomeService
 
     #endregion
 
+    public async Task<AboutViewModel> GetAboutAsync()
+    {
+        return new AboutViewModel
+        {
+            TotalBooks = await _context.Books.CountAsync(),
 
+            TotalCategories = await _context.Categories.CountAsync(),
+
+            TotalAuthors = await _context.Authors.CountAsync(),
+
+            TotalResidents = await _context.Residents.CountAsync()
+        };
+    }
 }

@@ -1,0 +1,316 @@
+﻿@model LibraryApp.ViewModels.Home.AboutViewModel
+
+@{
+    ViewData["Title"] = "Giới thiệu";
+}
+
+<div class="container py-5">
+
+    <!-- Hero -->
+
+    <div class="text-center mb-5">
+
+        <h1 class="fw-bold">
+
+            Thư viện Chung cư An Bình City
+
+        </h1>
+
+        <p class="lead text-muted mt-3">
+
+            Không gian tri thức dành cho cộng đồng cư dân.
+
+        </p>
+
+    </div>
+
+    <!-- Giới thiệu -->
+
+    <section class="mb-5">
+
+        <div class="card border-0 shadow-sm rounded-4">
+
+            <div class="card-body p-5">
+
+                <h2 class="fw-bold mb-4">
+
+                    Giới thiệu
+
+                </h2>
+
+                <p>
+
+                    Thư viện Chung cư An Bình City được xây dựng nhằm tạo nên
+                    một không gian học tập, nghiên cứu và giải trí ngay trong
+                    khuôn viên chung cư, góp phần lan tỏa văn hóa đọc và kết nối
+                    cộng đồng cư dân.
+
+                </p>
+
+                <p>
+
+                    Với hàng nghìn đầu sách thuộc nhiều lĩnh vực khác nhau như
+                    Công nghệ thông tin, Văn học, Kinh tế, Khoa học, Thiếu nhi
+                    và Ngoại ngữ, thư viện đáp ứng nhu cầu học tập, làm việc và
+                    giải trí của mọi lứa tuổi.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Tổng quan -->
+
+    <section class="mb-5">
+
+        <h2 class="fw-bold text-center mb-4">
+
+            Tổng quan thư viện
+
+        </h2>
+
+        <div class="row g-4">
+
+            <div class="col-lg-3">
+
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                    <div class="card-body text-center">
+
+                        <i class="bi bi-book text-primary fs-1"></i>
+
+                        <h3 class="mt-3 fw-bold">
+
+                            @Model.TotalBooks+
+
+                        </h3>
+
+                        <p class="text-muted mb-0">
+
+                            Đầu sách
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3">
+
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                    <div class="card-body text-center">
+
+                        <i class="bi bi-grid-3x3-gap text-success fs-1"></i>
+
+                        <h3 class="mt-3 fw-bold">
+
+                            @Model.TotalCategories
+
+                        </h3>
+
+                        <p class="text-muted mb-0">
+
+                            Thể loại
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3">
+
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                    <div class="card-body text-center">
+
+                        <i class="bi bi-pencil-square text-warning fs-1"></i>
+
+                        <h3 class="mt-3 fw-bold">
+
+                               @Model.TotalAuthors
+
+                        </h3>
+
+                        <p class="text-muted mb-0">
+
+                            Tác giả
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3">
+
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                    <div class="card-body text-center">
+
+                        <i class="bi bi-people text-danger fs-1"></i>
+
+                        <h3 class="mt-3 fw-bold">
+
+                            Cư dân
+
+                        </h3>
+
+                        <p class="text-muted mb-0">
+
+                            Phục vụ
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Không gian -->
+
+    <section class="mb-5">
+
+        <div class="row g-4">
+
+            <div class="col-lg-6">
+
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                    <div class="card-body p-4">
+
+                        <h3 class="fw-bold mb-3">
+
+                            Không gian thư viện
+
+                        </h3>
+
+                        <ul class="list-group list-group-flush">
+
+                            <li class="list-group-item">
+
+                                📚 Khu vực đọc sách yên tĩnh.
+
+                            </li>
+
+                            <li class="list-group-item">
+
+                                👨‍👩‍👧 Không gian dành cho thiếu nhi.
+
+                            </li>
+
+                            <li class="list-group-item">
+
+                                💻 Khu vực học nhóm và nghiên cứu.
+
+                            </li>
+
+                            <li class="list-group-item">
+
+                                🌿 Môi trường sạch sẽ, thoáng mát.
+
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-6">
+
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                    <div class="card-body p-4">
+
+                        <h3 class="fw-bold mb-3">
+
+                            Dịch vụ thư viện
+
+                        </h3>
+
+                        <ul class="list-group list-group-flush">
+
+                            <li class="list-group-item">
+
+                                🔍 Tra cứu sách trực tuyến.
+
+                            </li>
+
+                            <li class="list-group-item">
+
+                                📖 Mượn và trả sách nhanh chóng.
+
+                            </li>
+
+                            <li class="list-group-item">
+
+                                📜 Theo dõi lịch sử mượn sách.
+
+                            </li>
+
+                            <li class="list-group-item">
+
+                                ✉️ Nhận thông báo khi có sách mới.
+
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Sứ mệnh -->
+
+    <section>
+
+        <div class="card bg-primary text-white border-0 rounded-4">
+
+            <div class="card-body p-5 text-center">
+
+                <h2 class="fw-bold mb-4">
+
+                    Sứ mệnh
+
+                </h2>
+
+                <p class="lead mb-0">
+
+                    Xây dựng một cộng đồng yêu thích đọc sách, tạo môi trường
+                    học tập suốt đời và mang tri thức đến gần hơn với mọi cư
+                    dân thông qua hệ thống thư viện hiện đại, tiện lợi và thân
+                    thiện.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
