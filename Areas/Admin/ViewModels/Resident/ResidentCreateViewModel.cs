@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using LibraryApp.Enums;
 
 namespace LibraryApp.Areas.Admin.ViewModels.Resident;
 
@@ -33,7 +34,7 @@ public class ResidentCreateViewModel
     public DateOnly? DateOfBirth { get; set; }
 
     [Display(Name = "Giới tính")]
-    public int? Gender { get; set; }
+    public Gender? Gender { get; set; }
 
     [Display(Name = "Số điện thoại")]
     [Required(ErrorMessage = "Vui lòng nhập số điện thoại.")]

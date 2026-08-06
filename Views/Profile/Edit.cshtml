@@ -1,0 +1,228 @@
+@model LibraryApp.ViewModels.Profile.ProfileUpdateViewModel
+@using LibraryApp.Enums
+
+@{
+    ViewData["Title"] = "Cập nhật hồ sơ";
+}
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow rounded-4">
+
+                <div class="card-header bg-white border-0 p-4">
+
+                    <h3 class="fw-bold mb-0">
+
+                        Cập nhật hồ sơ
+
+                    </h3>
+
+                </div>
+
+                <div class="card-body p-4">
+
+                    <form asp-action="Edit"
+                          method="post">
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="text-danger mb-3">
+                        </div>
+
+                        <!-- Email -->
+
+                        <div class="mb-4">
+
+                            <label asp-for="Email"
+                                   class="form-label fw-semibold">
+
+                                Email
+
+                            </label>
+
+                            <input asp-for="Email"
+                                   class="form-control"
+                                   readonly />
+
+                        </div>
+
+                        <!-- Họ tên -->
+
+                        <div class="mb-4">
+
+                            <label asp-for="FullName"
+                                   class="form-label fw-semibold">
+
+                                Họ và tên
+
+                            </label>
+
+                            <input asp-for="FullName"
+                                   class="form-control" />
+
+                            <span asp-validation-for="FullName"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <div class="row">
+
+                            <!-- Ngày sinh -->
+
+                            <div class="col-md-6 mb-4">
+
+                                <label asp-for="DateOfBirth"
+                                       class="form-label fw-semibold">
+
+                                    Ngày sinh
+
+                                </label>
+
+                                <input asp-for="DateOfBirth"
+                                       type="date"
+                                       class="form-control" />
+
+                                <span asp-validation-for="DateOfBirth"
+                                      class="text-danger">
+                                </span>
+
+                            </div>
+
+                            <!-- Giới tính -->
+
+                            <div class="col-md-6 mb-4">
+
+                                <label asp-for="Gender"
+                                       class="form-label fw-semibold">
+
+                                    Giới tính
+
+                                </label>
+
+                                <select asp-for="Gender"
+                                        asp-items="Html.GetEnumSelectList<Gender>()"
+                                        class="form-select">
+
+                                    <option value="">
+
+                                        -- Chọn giới tính --
+
+                                    </option>
+
+                                </select>
+
+                                <span asp-validation-for="Gender"
+                                      class="text-danger">
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Điện thoại -->
+
+                        <div class="mb-4">
+
+                            <label asp-for="PhoneNumber"
+                                   class="form-label fw-semibold">
+
+                                Số điện thoại
+
+                            </label>
+
+                            <input asp-for="PhoneNumber"
+                                   class="form-control" />
+
+                            <span asp-validation-for="PhoneNumber"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- Căn hộ -->
+
+                        <div class="mb-4">
+
+                            <label asp-for="ApartmentNumber"
+                                   class="form-label fw-semibold">
+
+                                Số căn hộ
+
+                            </label>
+
+                            <input asp-for="ApartmentNumber"
+                                   class="form-control" />
+
+                            <span asp-validation-for="ApartmentNumber"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- Địa chỉ -->
+
+                        <div class="mb-4">
+
+                            <label asp-for="PermanentAddress"
+                                   class="form-label fw-semibold">
+
+                                Địa chỉ
+
+                            </label>
+
+                            <textarea asp-for="PermanentAddress"
+                                      rows="3"
+                                      class="form-control">
+                            </textarea>
+
+                            <span asp-validation-for="PermanentAddress"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <hr />
+
+                        <div class="d-flex justify-content-between">
+
+                            <a asp-action="Index"
+                               class="btn btn-outline-secondary rounded-pill px-4">
+
+                                <i class="bi bi-arrow-left me-2"></i>
+
+                                Quay lại
+
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-primary rounded-pill px-5">
+
+                                <i class="bi bi-check-lg me-2"></i>
+
+                                Lưu thay đổi
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts{
+
+    <partial name="_ValidationScriptsPartial" />
+
+}

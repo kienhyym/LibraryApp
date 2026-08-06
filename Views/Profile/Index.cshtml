@@ -1,0 +1,344 @@
+@model LibraryApp.ViewModels.Profile.ProfileViewModel
+@using LibraryApp.Extensions
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân";
+}
+@if (TempData["Success"] != null)
+{
+    <script>
+
+        document.addEventListener("DOMContentLoaded", () => {
+
+            Swal.fire({
+
+                icon: "success",
+
+                title: "Thành công",
+
+            text: "@Html.Raw(TempData["Success"])",
+
+                timer: 1800,
+
+                showConfirmButton: false
+
+            });
+
+        });
+
+    </script>
+}
+<div class="container py-4">
+
+    <div class="row g-4">
+
+        <!-- Left -->
+
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow rounded-4">
+
+                <div class="card-body text-center p-5">
+
+                    <img src="~/uploads/books/avatar.png" class="rounded-circle shadow-sm mb-4" width="130" height="130"
+                         style="object-fit:cover;" />
+
+                    <h3 class="fw-bold">
+
+                        @Model.FullName
+
+                    </h3>
+
+                    <p class="text-muted mb-4">
+
+                        Cư dân An Bình City
+
+                    </p>
+
+                    @if (Model.IsEmailVerified)
+                    {
+                        <span class="badge bg-success px-3 py-2">
+
+                            <i class="bi bi-patch-check-fill"></i>
+
+                            Email đã xác thực
+
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark px-3 py-2">
+
+                            <i class="bi bi-exclamation-circle"></i>
+
+                            Chưa xác thực Email
+
+                        </span>
+                    }
+
+                    <hr class="my-4" />
+
+                    <div class="d-grid gap-2">
+
+                        <a asp-action="Edit" class="btn btn-primary rounded-pill">
+
+                            <i class="bi bi-pencil-square me-2"></i>
+
+                            Cập nhật hồ sơ
+
+                        </a>
+
+                        <a asp-action="ChangePassword" class="btn btn-outline-primary rounded-pill">
+
+                            <i class="bi bi-key me-2"></i>
+
+                            Đổi mật khẩu
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Right -->
+
+        <div class="col-lg-8">
+
+            <!-- Dashboard -->
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-4">
+
+                    <div class="card border-0 bg-primary text-white rounded-4">
+
+                        <div class="card-body text-center">
+
+                            <i class="bi bi-book fs-1"></i>
+
+                            <h2 class="fw-bold mt-2">
+
+                                @Model.TotalBorrowedBooks
+
+                            </h2>
+
+                            <div>
+
+                                Đã mượn
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="card border-0 bg-success text-white rounded-4">
+
+                        <div class="card-body text-center">
+
+                            <i class="bi bi-journal-check fs-1"></i>
+
+                            <h2 class="fw-bold mt-2">
+
+                                @Model.BorrowingBooks
+
+                            </h2>
+
+                            <div>
+
+                                Đang mượn
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="card border-0 bg-danger text-white rounded-4">
+
+                        <div class="card-body text-center">
+
+                            <i class="bi bi-clock-history fs-1"></i>
+
+                            <h2 class="fw-bold mt-2">
+
+                                @Model.OverdueBooks
+
+                            </h2>
+
+                            <div>
+
+                                Quá hạn
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Personal Information -->
+
+            <div class="card border-0 shadow rounded-4">
+
+                <div class="card-header bg-white border-0 p-4">
+
+                    <h4 class="fw-bold mb-0">
+
+                        Thông tin cá nhân
+
+                    </h4>
+
+                </div>
+
+                <div class="card-body px-4 pb-4">
+
+                    <div class="row gy-4">
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted">
+
+                                Email
+
+                            </small>
+
+                            <div class="fw-semibold fs-5">
+
+                                @Model.Email
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted">
+
+                                Điện thoại
+
+                            </small>
+
+                            <div class="fw-semibold fs-5">
+
+                                @(Model.PhoneNumber ?? "Chưa cập nhật")
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted">
+
+                                Ngày sinh
+
+                            </small>
+
+                            <div class="fw-semibold">
+
+                                @(Model.DateOfBirth?.ToString("dd/MM/yyyy")
+                                    ?? "Chưa cập nhật")
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted">
+
+                                Giới tính
+
+                            </small>
+
+                            <div class="fw-semibold">
+
+                                @if (Model.Gender.HasValue)
+                                {
+                                    @Model.Gender.Value.GetDisplayName()
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Chưa cập nhật</span>
+                                }
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted">
+
+                                Căn hộ
+
+                            </small>
+
+                            <div class="fw-semibold">
+
+                                @(Model.ApartmentNumber
+                                    ?? "Chưa cập nhật")
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted">
+
+                                Ngày tham gia
+
+                            </small>
+
+                            <div class="fw-semibold">
+
+                                @Model.CreatedAt.ToString("dd/MM/yyyy")
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-12">
+
+                            <small class="text-muted">
+
+                                Địa chỉ
+
+                            </small>
+
+                            <div class="fw-semibold">
+
+                                @(Model.PermanentAddress
+                                    ?? "Chưa cập nhật")
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using LibraryApp.Enums;
 
 namespace LibraryApp.ViewModels;
 
@@ -29,7 +30,7 @@ public class RegisterViewModel
     public DateOnly? DateOfBirth { get; set; } = new DateOnly(2000, 1, 1);
 
     [Required(ErrorMessage = "Vui lòng chọn giới tính")]
-    public int Gender { get; set; }
+    public Gender? Gender { get; set; }
 
     [Phone(ErrorMessage = "Invalid phone number.")]
     [Required(ErrorMessage = "Vui lòng nhập số điện thoại")]

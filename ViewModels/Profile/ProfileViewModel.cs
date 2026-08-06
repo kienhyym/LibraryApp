@@ -1,8 +1,8 @@
 using LibraryApp.Enums;
 
-namespace LibraryApp.Areas.Admin.ViewModels.Resident;
+namespace LibraryApp.ViewModels.Profile;
 
-public class ResidentDetailViewModel
+public class ProfileViewModel
 {
     public int ResidentId { get; set; }
 
@@ -20,7 +20,15 @@ public class ResidentDetailViewModel
 
     public string? PermanentAddress { get; set; }
 
-    public bool IsActive { get; set; }
+    public bool IsEmailVerified { get; set; }
 
     public DateTime CreatedAt { get; set; }
+
+    // Dashboard
+
+    public int TotalBorrowedBooks { get; set; }
+
+    public int BorrowingBooks { get; set; }
+
+    public int OverdueBooks { get; set; }
 }

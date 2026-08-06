@@ -14,18 +14,18 @@
 
 <body>
     @{
-    var currentController =
-        ViewContext.RouteData.Values["controller"]?.ToString();
+        var currentController =
+            ViewContext.RouteData.Values["controller"]?.ToString();
 
-    var currentAction =
-        ViewContext.RouteData.Values["action"]?.ToString();
+        var currentAction =
+            ViewContext.RouteData.Values["action"]?.ToString();
 
-    var hideSearch =
+        var hideSearch =
 
-        currentController == "Books"
+            currentController == "Books"
 
-        && currentAction == "Index";
-}
+            && currentAction == "Index";
+    }
     <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
             <div class="container">
@@ -34,7 +34,7 @@
 
                     <i class="bi bi-book-half"></i>
 
-                    LibraryApp
+                    Thư viện Chung cư An Bình
 
                 </a>
 
@@ -90,8 +90,8 @@
 
                             <a asp-controller="Home" asp-action="About" class="nav-link fw-semibold
                                 @(currentController == "Home" && currentAction == "About"
-                                 ? "active"
-                                 : "")">
+                                ? "active"
+                                : "")">
 
                                 Giới thiệu
 
@@ -99,23 +99,23 @@
 
                         </li>
                     </ul>
-@if (!hideSearch)
+                    @if (!hideSearch)
 
-{
-                    <form class="d-flex me-3" style="width:300px" asp-controller="Books" asp-action="Index"
-                          method="get">
+                    {
+                        <form class="d-flex me-3" style="width:300px" asp-controller="Books" asp-action="Index"
+                              method="get">
 
-                        <input class="form-control me-2" type="search" name="Keyword"
-                               value="@Context.Request.Query["Keyword"]" placeholder="Tìm tên sách..." />
+                            <input class="form-control me-2" type="search" name="Keyword"
+                                   value="@Context.Request.Query["Keyword"]" placeholder="Tìm tên sách..." />
 
-                        <button class="btn btn-primary" type="submit">
+                            <button class="btn btn-primary" type="submit">
 
-                            <i class="bi bi-search"></i>
+                                <i class="bi bi-search"></i>
 
-                        </button>
+                            </button>
 
-                    </form>
-}
+                        </form>
+                    }
                     @if (User.Identity!.IsAuthenticated)
                     {
                         <div class="dropdown">
@@ -130,9 +130,12 @@
 
                             <ul class="dropdown-menu dropdown-menu-end">
 
-                                <li>
+                                <li class="nav-item">
 
-                                    <a class="dropdown-item" href="#">
+                                    <a asp-controller="Profile" asp-action="Index" class="nav-link fw-semibold
+                                        @(currentController == "Profile" ? "active" : "")">
+
+                                        <i class="bi bi-person-circle me-1"></i>
 
                                         Hồ sơ
 
