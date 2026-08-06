@@ -1,0 +1,121 @@
+@model LibraryApp.ViewModels.ForgotPassword.ForgotPasswordViewModel
+
+@{
+    ViewData["Title"] = "Quên mật khẩu";
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+
+        @TempData["Success"]
+
+        <button class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+
+    </div>
+}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-5 col-md-7">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body p-5">
+
+                    <div class="text-center mb-4">
+
+                        <i class="bi bi-key-fill
+                                  text-warning"
+                           style="font-size:60px">
+                        </i>
+
+                        <h2 class="fw-bold mt-3">
+
+                            Quên mật khẩu
+
+                        </h2>
+
+                        <p class="text-muted">
+
+                            Nhập Email đã đăng ký để nhận mã OTP.
+
+                        </p>
+
+                    </div>
+
+                    <form asp-action="Index"
+                          method="post"
+                          id="forgotPasswordForm">
+
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="text-danger mb-3">
+                        </div>
+
+                        <div class="mb-4">
+
+                            <label asp-for="Email"
+                                   class="form-label fw-semibold">
+                            </label>
+
+                            <input asp-for="Email"
+                                   class="form-control form-control-lg"
+                                   placeholder="Nhập Email..." />
+
+                            <span asp-validation-for="Email"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <div class="d-grid">
+
+                            <button id="btnSubmit"
+                                    type="submit"
+                                    class="btn btn-warning btn-lg">
+
+                                <i class="bi bi-envelope-paper-fill me-2"></i>
+
+                                Gửi mã OTP
+
+                            </button>
+
+                        </div>
+
+                        <hr class="my-4"/>
+
+                        <div class="text-center">
+
+                            <a asp-controller="Login"
+                               asp-action="Index"
+                               class="text-decoration-none">
+
+                                <i class="bi bi-arrow-left-circle me-1"></i>
+
+                                Quay lại đăng nhập
+
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

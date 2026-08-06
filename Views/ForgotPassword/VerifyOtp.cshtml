@@ -1,0 +1,425 @@
+@model LibraryApp.ViewModels.ForgotPassword.ForgotPasswordVerifyOtpViewModel
+
+@{
+    ViewData["Title"] = "Xác thực OTP";
+}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-6">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body p-5">
+
+                    <div class="text-center mb-4">
+
+                        <i class="bi bi-shield-lock-fill
+                                  text-primary"
+                           style="font-size:60px">
+                        </i>
+
+                        <h2 class="fw-bold mt-3">
+
+                            Xác thực OTP
+
+                        </h2>
+
+                        <p class="text-muted">
+
+                            Mã OTP đã được gửi tới
+
+                            <strong>@Model.Email</strong>
+
+                        </p>
+
+                    </div>
+
+                    <form asp-action="VerifyOtp"
+                          method="post"
+                          id="otpForm">
+
+                        @Html.AntiForgeryToken()
+
+                        <input asp-for="Email" type="hidden"/>
+
+                        <input asp-for="OtpCode"
+                               type="hidden"/>
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="text-danger mb-3">
+                        </div>
+
+                        <div class="d-flex
+                                    justify-content-center
+                                    gap-2
+                                    mb-4">
+
+                            @for (int i = 0; i < 6; i++)
+                            {
+                                <input
+                                    type="text"
+                                    maxlength="1"
+                                    class="form-control
+                                           text-center
+                                           fs-3
+                                           otp-input"
+                                    style="width:60px;height:60px;" />
+                            }
+
+                        </div>
+
+                        <span asp-validation-for="OtpCode"
+                              class="text-danger">
+                        </span>
+
+                        <div class="text-center mb-4">
+
+                            <small class="text-muted">
+
+                                Gửi lại sau
+
+                                <span id="countdown"
+                                      class="fw-bold text-danger">
+
+                                    01:00
+
+                                </span>
+
+                            </small>
+
+                        </div>
+
+                        <div class="d-grid mb-3">
+
+                            <button id="btnVerify"
+                                    type="submit"
+                                    class="btn btn-primary btn-lg">
+
+                                <i class="bi bi-check-circle me-2"></i>
+
+                                Xác nhận OTP
+
+                            </button>
+
+                        </div>
+
+                        <div class="d-grid">
+
+                            <button
+                                type="button"
+                                id="btnResend"
+                                class="btn btn-outline-secondary"
+                                disabled>
+
+                                <i class="bi bi-arrow-repeat me-2"></i>
+
+                                Gửi lại OTP
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        //=====================================
+        // DOM Elements
+        //=====================================
+
+        const otpInputs =
+            document.querySelectorAll(".otp-input");
+
+        const hiddenOtp =
+            document.getElementById("OtpCode");
+
+        const btnVerify =
+            document.getElementById("btnVerify");
+
+        const btnResend =
+            document.getElementById("btnResend");
+
+        const countdown =
+            document.getElementById("countdown");
+
+        const email =
+            document.querySelector('input[name="Email"]').value;
+
+        const antiForgeryToken =
+            document.querySelector(
+                'input[name="__RequestVerificationToken"]'
+            ).value;
+
+        let timer = null;
+
+        //=====================================
+        // Initialize
+        //=====================================
+
+        init();
+
+        function init() {
+
+            initOtpInput();
+
+            initResendButton();
+
+            startCountdown();
+
+        }
+
+        //=====================================
+        // Events
+        //=====================================
+
+        function initResendButton() {
+
+            btnResend.addEventListener(
+                "click",
+                resendOtp);
+
+        }
+
+        //=====================================
+        // OTP
+        //=====================================
+
+        function initOtpInput() {
+
+            otpInputs[0].focus();
+
+            otpInputs.forEach((input, index) => {
+
+                input.addEventListener("input", () => {
+
+                    input.value =
+                        input.value.replace(/\D/g, "");
+
+                    updateOtp();
+
+                    if (input.value && index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+
+                });
+
+                input.addEventListener("keydown", e => {
+
+                    if (
+                        e.key === "Backspace"
+                        && input.value === ""
+                        && index > 0) {
+                        otpInputs[index - 1].focus();
+                    }
+
+                    if (e.key === "Enter") {
+                        btnVerify.click();
+                    }
+
+                });
+
+            });
+
+            otpInputs[0].addEventListener(
+                "paste",
+                pasteOtp);
+
+        }
+        function updateOtp() {
+
+            hiddenOtp.value =
+                [...otpInputs]
+                    .map(x => x.value)
+                    .join("");
+
+        }
+        function pasteOtp(e) {
+
+            e.preventDefault();
+
+            const text =
+                e.clipboardData
+                    .getData("text")
+                    .trim();
+
+            if (!/^\d{6}$/.test(text))
+                return;
+
+            [...text].forEach((number, index) => {
+
+                otpInputs[index].value =
+                    number;
+
+            });
+
+            updateOtp();
+
+            otpInputs[5].focus();
+
+        }
+        //=====================================
+        // Countdown
+        //=====================================
+
+        function startCountdown() {
+
+            if (timer)
+                clearInterval(timer);
+
+            let seconds = 60;
+
+            btnResend.disabled = true;
+
+            btnResend.classList.remove(
+                "btn-success");
+
+            btnResend.classList.add(
+                "btn-outline-secondary");
+
+            countdown.innerHTML = "01:00";
+
+            timer = setInterval(() => {
+
+                seconds--;
+
+                const minute =
+                    String(Math.floor(seconds / 60))
+                        .padStart(2, "0");
+
+                const second =
+                    String(seconds % 60)
+                        .padStart(2, "0");
+
+                countdown.innerHTML =
+                    `${minute}:${second}`;
+
+                if (seconds <= 0) {
+
+                    clearInterval(timer);
+
+                    countdown.innerHTML =
+                        "Có thể gửi lại";
+
+                    btnResend.disabled = false;
+
+                    btnResend.classList.remove(
+                        "btn-outline-secondary");
+
+                    btnResend.classList.add(
+                        "btn-success");
+
+                }
+
+            }, 1000);
+
+        }
+        //=====================================
+        // Resend OTP
+        //=====================================
+
+        async function resendOtp() {
+
+            btnResend.disabled = true;
+
+            btnResend.innerHTML =
+                `<span class="spinner-border spinner-border-sm me-2"></span>
+             Đang gửi...`;
+
+            try {
+
+                const response =
+                    await fetch("/ForgotPassword/ResendOtp", {
+
+                        method: "POST",
+
+                        headers: {
+
+                            "Content-Type": "application/json",
+
+                            "RequestVerificationToken":
+                                antiForgeryToken
+
+                        },
+
+                        body: JSON.stringify({
+
+                            email: email
+
+                        })
+
+                    });
+
+                if (!response.ok)
+                    throw new Error();
+
+                const result =
+                    await response.json();
+
+                if (result.success) {
+
+                    await Swal.fire({
+
+                        icon: "success",
+
+                        title: "Đã gửi OTP",
+
+                        text: result.message,
+
+                        timer: 1800,
+
+                        showConfirmButton: false
+
+                    });
+
+                    btnResend.innerHTML =
+                        '<i class="bi bi-arrow-repeat me-2"></i> Gửi lại OTP';
+
+                    startCountdown();
+
+                }
+                else {
+
+                    throw new Error(result.message);
+
+                }
+
+            }
+            catch (ex) {
+
+                Swal.fire({
+
+                    icon: "error",
+
+                    title: "Lỗi",
+
+                    text: ex.message || "Không thể gửi OTP."
+
+                });
+
+                btnResend.disabled = false;
+
+                btnResend.innerHTML =
+                    '<i class="bi bi-arrow-repeat me-2"></i> Gửi lại OTP';
+
+            }
+
+        }
+    </script>
+
+}

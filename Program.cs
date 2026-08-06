@@ -62,6 +62,7 @@ builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IResidentService, ResidentService>();
 builder.Services.AddScoped<IPersonnelService, PersonnelService>();
 builder.Services.AddScoped<IBorrowService, BorrowService>();
+builder.Services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
 
 #endregion
 
