@@ -1,12 +1,316 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model LibraryApp.ViewModels.Home.HomeViewModel
+
+@{
+    ViewData["Title"] = "Trang chủ";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <h2>Số sách hiện có: @ViewBag.SoSach</h2>
-    <h2>Xin chào @User.Identity?.Name</h2>
+<div class="container py-4">
 
-<p>Vai trò: @User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value</p>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <!-- Welcome -->
+
+    <div class="mb-5">
+
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <h2 class="fw-bold">
+
+                Xin chào 👋
+
+            </h2>
+
+            <p class="text-muted">
+
+                Chúc bạn có một ngày học tập hiệu quả.
+
+            </p>
+        }
+        else
+        {
+            <h2 class="fw-bold">
+
+                Chào mừng đến với thư viện Chung cư An Bình
+
+            </h2>
+
+            <p class="text-muted">
+
+                Khám phá hàng nghìn đầu sách trong thư viện.
+
+            </p>
+        }
+
+    </div>
+
+    <!-- ============================== -->
+    <!-- Sách mới -->
+    <!-- ============================== -->
+
+    <section class="mb-5">
+
+        <div class="d-flex
+                    justify-content-between
+                    align-items-center
+                    mb-4">
+
+            <div>
+
+                <h3 class="fw-bold mb-1">
+
+                    📚 Sách mới
+
+                </h3>
+
+                <small class="text-muted">
+
+                    Những đầu sách vừa được bổ sung.
+
+                </small>
+
+            </div>
+
+            <a asp-controller="Book"
+               asp-action="Index"
+               class="text-decoration-none">
+
+                Xem tất cả →
+
+            </a>
+
+        </div>
+
+        <div class="row
+                    row-cols-1
+                    row-cols-md-2
+                    row-cols-lg-4
+                    g-4">
+
+            @foreach (var item in Model.NewBooks)
+            {
+                <partial name="_BookCard"
+                         model="item" />
+            }
+
+        </div>
+
+    </section>
+
+    <!-- ============================== -->
+    <!-- Sách nổi bật -->
+    <!-- ============================== -->
+
+    <section class="bg-light rounded-4 p-4 mb-5">
+
+        <div class="d-flex
+                    justify-content-between
+                    align-items-center
+                    mb-4">
+
+            <div>
+
+                <h3 class="fw-bold mb-1">
+
+                    🔥 Được mượn nhiều
+
+                </h3>
+
+                <small class="text-muted">
+
+                    Những đầu sách được yêu thích.
+
+                </small>
+
+            </div>
+
+        </div>
+
+        <div class="row
+                    row-cols-1
+                    row-cols-md-2
+                    row-cols-lg-4
+                    g-4">
+
+            @foreach (var item in Model.PopularBooks)
+            {
+                <partial name="_BookCard"
+                         model="item" />
+            }
+
+        </div>
+
+    </section>
+
+    <!-- ============================== -->
+    <!-- Thể loại -->
+    <!-- ============================== -->
+
+    <section class="mb-5">
+
+        <h3 class="fw-bold mb-4">
+
+            📂 Khám phá theo thể loại
+
+        </h3>
+
+        <div class="d-flex
+                    flex-wrap
+                    gap-3">
+
+            @foreach (var item in Model.Categories)
+            {
+                <a asp-controller="Book"
+                   asp-action="Category"
+                   asp-route-id="@item.CategoryId"
+                   class="btn btn-outline-primary rounded-pill px-4">
+
+                    @item.CategoryName
+
+                    <span class="badge
+                                 bg-primary
+                                 ms-2">
+
+                        @item.TotalBooks
+
+                    </span>
+
+                </a>
+            }
+
+        </div>
+
+    </section>
+
+    <!-- ============================== -->
+    <!-- Thống kê -->
+    <!-- ============================== -->
+
+    <section>
+
+        <h3 class="fw-bold mb-4">
+
+            📊 Thống kê thư viện
+
+        </h3>
+
+        <div class="row g-4">
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="card border-0 shadow-sm rounded-4">
+
+                    <div class="card-body text-center py-4">
+
+                        <i class="bi bi-book
+                                  text-primary"
+                           style="font-size:40px;">
+                        </i>
+
+                        <h2 class="fw-bold mt-3">
+
+                            @Model.TotalBooks
+
+                        </h2>
+
+                        <div class="text-muted">
+
+                            Đầu sách
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="card border-0 shadow-sm rounded-4">
+
+                    <div class="card-body text-center py-4">
+
+                        <i class="bi bi-pencil-square
+                                  text-success"
+                           style="font-size:40px;">
+                        </i>
+
+                        <h2 class="fw-bold mt-3">
+
+                            @Model.TotalAuthors
+
+                        </h2>
+
+                        <div class="text-muted">
+
+                            Tác giả
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="card border-0 shadow-sm rounded-4">
+
+                    <div class="card-body text-center py-4">
+
+                        <i class="bi bi-bookmark-star
+                                  text-warning"
+                           style="font-size:40px;">
+                        </i>
+
+                        <h2 class="fw-bold mt-3">
+
+                            @Model.TotalCategories
+
+                        </h2>
+
+                        <div class="text-muted">
+
+                            Thể loại
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="card border-0 shadow-sm rounded-4">
+
+                    <div class="card-body text-center py-4">
+
+                        <i class="bi bi-people
+                                  text-danger"
+                           style="font-size:40px;">
+                        </i>
+
+                        <h2 class="fw-bold mt-3">
+
+                            @Model.TotalResidents
+
+                        </h2>
+
+                        <div class="text-muted">
+
+                            Cư dân
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
 </div>
