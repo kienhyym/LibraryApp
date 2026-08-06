@@ -1,0 +1,157 @@
+@model LibraryApp.ViewModels.Book.BookListViewModel
+
+@{
+    ViewData["Title"] = "Danh sách sách";
+}
+@using LibraryApp.ViewModels.Shared
+
+@{
+    var routes = new Dictionary<string, string?>
+    {
+        ["keyword"] = Model.Filter.Keyword,
+        ["categoryId"] = Model.Filter.CategoryId?.ToString(),
+        ["authorId"] = Model.Filter.AuthorId?.ToString(),
+        ["sortBy"] = Model.Filter.SortBy
+    };
+
+    var pagination = new PaginationViewModel
+    {
+        CurrentPage = Model.Books.PageIndex,
+        TotalPages = Model.Books.TotalPages,
+        Action = "Index",
+        RouteValues = routes
+    };
+}
+<div class="d-flex
+    justify-content-between
+    align-items-center
+    mb-4">
+
+    <div>
+
+        <h2 class="fw-bold mb-1 mt-2">
+
+            📚 Danh sách sách
+
+        </h2>
+
+        <div class="text-muted">
+
+            Khám phá hơn @Model.TotalBooks đầu sách trong thư viện
+
+        </div>
+        @if (Model.Books.Count() != Model.TotalBooks)
+
+        {
+
+            <small class="text-primary">
+
+                Tìm thấy @Model.Books.Count() kết quả phù hợp
+
+            </small>
+
+        }
+    </div>
+
+</div>
+<div class="card shadow-sm border-0 rounded-4">
+
+    <div class="card-body">
+
+        <form method="get" asp-action="Index">
+
+            <div class="row g-3 align-items-end">
+
+                <div class="col-lg-3">
+
+                    <label class="form-label">Tìm kiếm</label>
+
+                    <input asp-for="Filter.Keyword" class="form-control" placeholder="Tên sách..." />
+
+                </div>
+
+                <div class="col-lg-2">
+
+                    <label class="form-label">Thể loại</label>
+
+                    <select asp-for="Filter.CategoryId" asp-items="Model.Categories" class="form-select">
+                    </select>
+
+                </div>
+
+                <div class="col-lg-3">
+
+                    <label class="form-label">Tác giả</label>
+
+                    <select asp-for="Filter.AuthorId" asp-items="Model.Authors" class="form-select">
+                    </select>
+
+                </div>
+
+                <div class="col-lg-2">
+
+                    <label class="form-label">Sắp xếp</label>
+
+                    <select asp-for="Filter.SortBy" class="form-select">
+
+                        <option value="newest">Mới nhất</option>
+                        <option value="title">Tên A-Z</option>
+                        <option value="popular">Được mượn nhiều</option>
+                        <option value="available">Còn nhiều sách</option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-lg-2">
+
+                    <div class="d-flex gap-2">
+
+                        <button type="submit" class="btn btn-primary flex-fill">
+
+                            <i class="bi bi-search"></i>
+
+                        </button>
+
+                        <a asp-action="Index" class="btn btn-outline-secondary flex-fill">
+
+                            bỏ lọc
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+@if (Model.Books.Any())
+{
+    <div class="row
+        row-cols-1
+        row-cols-md-2
+        row-cols-lg-4
+        g-4">
+
+        @foreach (var item in Model.Books)
+        {
+            <partial name="_BookCard" model="item" />
+        }
+
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+
+        Không tìm thấy sách.
+
+    </div>
+}
+<partial name="_Pagination"
+         model="pagination" />
