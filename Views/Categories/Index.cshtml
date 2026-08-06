@@ -1,0 +1,92 @@
+@model List<LibraryApp.ViewModels.Category.CategoriesViewModel>
+
+@{
+    ViewData["Title"] = "Thể loại";
+}
+
+<div class="container py-4">
+
+    <div class="mb-5">
+
+        <h2 class="fw-bold mb-2">
+
+            📚 Thể loại sách
+
+        </h2>
+
+        <p class="text-muted mb-0">
+
+            Khám phá sách theo từng thể loại.
+
+        </p>
+
+    </div>
+
+    <div class="row g-4">
+
+        @foreach (var item in Model)
+        {
+            <div class="col-lg-4 col-md-6">
+
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                    <div class="card-body d-flex flex-column">
+
+                        <div class="d-flex align-items-center mb-3">
+
+                            <div class="rounded-circle bg-primary bg-opacity-10
+                                        d-flex align-items-center justify-content-center"
+                                 style="width:60px;height:60px;">
+
+                                <i class="bi bi-book text-primary fs-3"></i>
+
+                            </div>
+
+                            <div class="ms-3">
+
+                                <h5 class="fw-bold mb-1">
+
+                                    @item.CategoryName
+
+                                </h5>
+
+                                <small class="text-muted">
+
+                                    @item.TotalBooks đầu sách
+
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(item.Description))
+                        {
+                            <p class="text-muted flex-grow-1">
+
+                                @item.Description
+
+                            </p>
+                        }
+
+                        <a asp-controller="Books"
+                           asp-action="Index"
+                           asp-route-categoryId="@item.CategoryId"
+                           class="btn btn-outline-primary rounded-pill">
+
+                            Xem sách
+
+                            <i class="bi bi-arrow-right ms-1"></i>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+</div>
