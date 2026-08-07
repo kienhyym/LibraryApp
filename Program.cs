@@ -68,6 +68,7 @@ builder.Services.AddScoped<IBooksService, BooksService>();
 builder.Services.AddScoped<ICategoriesService, CategoriesService>();
 builder.Services.AddScoped<IAuthorsService, AuthorsService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IBorrowHistoryService, BorrowHistoryService>();
 #endregion
 
 var app = builder.Build();

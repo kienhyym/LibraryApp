@@ -90,8 +90,8 @@
 
                             <a asp-controller="Home" asp-action="About" class="nav-link fw-semibold
                                 @(currentController == "Home" && currentAction == "About"
-                                ? "active"
-                                : "")">
+                               ? "active"
+                               : "")">
 
                                 Giới thiệu
 
@@ -143,9 +143,14 @@
 
                                 </li>
 
-                                <li>
+                                <li class="nav-item">
 
-                                    <a class="dropdown-item" href="#">
+                                    <a asp-controller="BorrowHistory" asp-action="Index" class="nav-link fw-semibold
+                                        @(currentController == "BorrowHistory"
+                                         ? "active"
+                                         : "")">
+
+                                        <i class="bi bi-clock-history me-1"></i>
 
                                         Lịch sử mượn
 

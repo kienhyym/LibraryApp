@@ -521,7 +521,7 @@ public class BorrowService : IBorrowService
 
                 detail.ReturnDate = DateTime.Now;
 
-                detail.ReturnStatus = (int)item.ReturnStatus;
+                detail.ReturnStatus = item.ReturnStatus;
 
                 detail.ReturnNote = item.ReturnNote;
 

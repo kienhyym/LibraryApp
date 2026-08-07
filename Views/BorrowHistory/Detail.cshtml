@@ -1,0 +1,318 @@
+@using LibraryApp.Enums
+@model LibraryApp.ViewModels.BorrowHistory.BorrowRecordViewModel
+
+@{
+    ViewData["Title"] = "Chi tiết phiếu mượn";
+}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+
+    <nav class="mb-4">
+
+        <a asp-controller="Home"
+           asp-action="Index"
+           class="text-decoration-none">
+
+            Trang chủ
+
+        </a>
+
+        <span class="mx-2">/</span>
+
+        <a asp-controller="BorrowHistory"
+           asp-action="Index"
+           class="text-decoration-none">
+
+            Lịch sử mượn
+
+        </a>
+
+        <span class="mx-2">/</span>
+
+        <span class="text-muted">
+
+            @Model.BorrowRecordId.ToString("D5")
+
+        </span>
+
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold mb-1">
+
+                Phiếu mượn
+                #PM@(Model.BorrowRecordId.ToString("D5"))
+
+            </h2>
+
+            <p class="text-muted">
+
+                Chi tiết thông tin phiếu mượn
+
+            </p>
+
+        </div>
+
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">
+
+            <i class="bi bi-arrow-left me-2"></i>
+
+            Quay lại
+
+        </a>
+
+    </div>
+    <div class="card shadow-sm border-0 rounded-4 mb-4">
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-3">
+
+                    <small class="text-muted">
+
+                        Ngày mượn
+
+                    </small>
+
+                    <h6>
+
+                        @Model.BorrowDate.ToString("dd/MM/yyyy")
+
+                    </h6>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <small class="text-muted">
+
+                        Hạn trả
+
+                    </small>
+
+                    <h6>
+
+                        @Model.DueDate.ToString("dd/MM/yyyy")
+
+                    </h6>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <small class="text-muted">
+
+                        Số lượng sách
+
+                    </small>
+
+                    <h6>
+
+                        @Model.TotalBooks quyển
+
+                    </h6>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <small class="text-muted">
+
+                        Trạng thái
+
+                    </small>
+
+                    <br />
+
+                    @switch (Model.Status)
+                    {
+                        case "Đã trả":
+
+                            <span class="badge bg-success">
+
+                                Đã trả
+
+                            </span>
+
+                            break;
+
+                        case "Đang mượn":
+
+                            <span class="badge bg-warning text-dark">
+
+                                Đang mượn
+
+                            </span>
+
+                            break;
+
+                        default:
+
+                            <span class="badge bg-danger">
+
+                                Quá hạn
+
+                            </span>
+
+                            break;
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="card shadow-sm border-0 rounded-4">
+
+        <div class="card-header bg-white">
+
+            <h5 class="mb-0">
+                Sách đã mượn
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+            @foreach (var book in Model.Books)
+            {
+                <div class="row align-items-center py-3 border-bottom">
+
+                    <!-- Ảnh -->
+
+                    <div class="col-md-2 text-center">
+
+                        <img src="@(string.IsNullOrWhiteSpace(book.CoverImage)
+                                         ? "/uploads/books/no-book.png"
+                                         : book.CoverImage)" class="img-fluid rounded shadow-sm" style="height:120px;object-fit:contain;" />
+
+                    </div>
+
+                    <!-- Thông tin -->
+
+                    <div class="col-md-4">
+
+                        <h5 class="fw-bold mb-1">
+
+                            @book.BookTitle
+
+                        </h5>
+
+                        <small class="text-muted">
+
+                            Mã sách: #@book.BookId
+
+                        </small>
+
+                    </div>
+
+                    <!-- Ngày trả -->
+
+                    <div class="col-md-2">
+
+                        <div class="fw-semibold">
+
+                            Ngày trả
+
+                        </div>
+
+                        <span class="text-muted">
+
+                            @(book.ReturnDate?.ToString("dd/MM/yyyy") ?? "--")
+
+                        </span>
+
+                    </div>
+
+                    <!-- Tình trạng -->
+
+                    <div class="col-md-2">
+
+                        <div class="fw-semibold mb-1">
+
+                            Tình trạng
+
+                        </div>
+
+                        @if (book.ReturnStatus == null)
+                        {
+                            <span class="badge bg-secondary">
+
+                                <i class="bi bi-clock-history me-1"></i>
+
+                                Chưa trả
+
+                            </span>
+                        }
+                        else
+                        {
+                            switch (book.ReturnStatus)
+                            {
+                                case ReturnStatus.Returned:
+
+                                    <span class="badge bg-success">
+
+                                        <i class="bi bi-check-circle-fill me-1"></i>
+
+                                        Đã trả
+
+                                    </span>
+
+                                    break;
+
+                                case ReturnStatus.Damaged:
+
+                                    <span class="badge bg-warning text-dark">
+
+                                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+
+                                        Hỏng
+
+                                    </span>
+
+                                    break;
+
+                                case ReturnStatus.Lost:
+
+                                    <span class="badge bg-danger">
+
+                                        <i class="bi bi-x-circle-fill me-1"></i>
+
+                                        Mất
+
+                                    </span>
+
+                                    break;
+                            }
+                        }
+
+                    </div>
+
+                    <!-- Nút -->
+
+                    <div class="col-md-2 text-md-end text-center">
+
+                        <a asp-controller="Books" asp-action="Detail" asp-route-id="@book.BookId"
+                           class="btn btn-outline-primary rounded-pill">
+
+                            <i class="bi bi-eye me-1"></i>
+
+                            Xem sách
+
+                        </a>
+
+                    </div>
+
+                </div>
+            }
+        </div>
+
+    </div>
+
+</div>
