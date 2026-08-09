@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using LibraryApp.Services.Interfaces;
 
 using Microsoft.AspNetCore.Mvc;
@@ -19,8 +20,16 @@ public class HomeController : Controller
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        var model =
-            await _homeService.GetHomeAsync();
+
+        int? accountId = null;
+
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            accountId = int.Parse(
+                User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        }
+
+        var model = await _homeService.GetHomeAsync(accountId);
 
         return View(model);
     }

@@ -1,8 +1,13 @@
 using LibraryApp.Areas.Admin.ViewModels;
+using LibraryApp.Areas.Admin.ViewModels.Dashboard;
 
-namespace LibraryApp.Services;
+namespace LibraryApp.Areas.Admin.Services;
 
 public interface IDashboardService
+
 {
-    Task<DashboardViewModel> GetDashboardAsync();
+    Task<DashboardViewModel> GetDashboardAsync(int year);
+    
+    Task<BorrowChartViewModel> GetBorrowChartAsync(int year);
+
 }

@@ -1,9 +1,10 @@
-using LibraryApp.Services;
 using Microsoft.AspNetCore.Mvc;
+using LibraryApp.Areas.Admin.Services;
 
 namespace LibraryApp.Areas.Admin.Controllers;
 
-public class DashboardController : AdminBaseController
+[Area("Admin")]
+public class DashboardController : Controller
 {
     private readonly IDashboardService _dashboardService;
 
@@ -12,10 +13,28 @@ public class DashboardController : AdminBaseController
         _dashboardService = dashboardService;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int? year)
     {
-        var vm = await _dashboardService.GetDashboardAsync();
+        int selectedYear = year ?? 2026;
 
-        return View(vm);
+        var model = await _dashboardService
+
+            .GetDashboardAsync(selectedYear);
+
+
+        return View(model);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> BorrowChart(int year)
+    {
+        var chart = await _dashboardService.GetBorrowChartAsync(year);
+
+        return Json(new
+        {
+            labels = chart.Labels,
+            values = chart.Values,
+            year = chart.Year
+        });
     }
 }

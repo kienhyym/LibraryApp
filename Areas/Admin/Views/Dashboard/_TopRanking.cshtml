@@ -1,0 +1,179 @@
+@model LibraryApp.Areas.Admin.ViewModels.Dashboard.DashboardViewModel
+
+<div class="card shadow-sm border-0 rounded-4 h-100">
+
+    <div class="card-header bg-white border-0 p-0">
+
+        <ul class="nav nav-tabs dashboard-ranking-tabs px-3 pt-2"
+            role="tablist">
+
+            <!-- Top sách -->
+
+            <li class="nav-item" role="presentation">
+
+                <button class="nav-link active"
+                        id="top-books-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#top-books"
+                        type="button"
+                        role="tab"
+                        aria-controls="top-books"
+                        aria-selected="true">
+
+                    <i class="bi bi-book me-1"></i>
+
+                    Top 10 Sách
+
+                </button>
+
+            </li>
+
+
+            <!-- Top thể loại -->
+
+            <li class="nav-item" role="presentation">
+
+                <button class="nav-link"
+                        id="top-categories-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#top-categories"
+                        type="button"
+                        role="tab"
+                        aria-controls="top-categories"
+                        aria-selected="false">
+
+                    <i class="bi bi-tags me-1"></i>
+
+                    Top Thể loại
+
+                </button>
+
+            </li>
+
+
+            <!-- Top tác giả -->
+
+            <li class="nav-item" role="presentation">
+
+                <button class="nav-link"
+                        id="top-authors-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#top-authors"
+                        type="button"
+                        role="tab"
+                        aria-controls="top-authors"
+                        aria-selected="false">
+
+                    <i class="bi bi-person-vcard me-1"></i>
+
+                    Top Tác giả
+
+                </button>
+
+            </li>
+
+        </ul>
+
+    </div>
+
+
+    <div class="card-body">
+
+        <div class="tab-content">
+
+            <!-- ========================= -->
+            <!-- TOP SÁCH -->
+            <!-- ========================= -->
+
+            <div class="tab-pane fade show active"
+                 id="top-books"
+                 role="tabpanel"
+                 aria-labelledby="top-books-tab">
+
+                <partial name="_TopRankingList"
+                         model="Model.TopBooks" />
+
+            </div>
+
+
+            <!-- ========================= -->
+            <!-- TOP THỂ LOẠI -->
+            <!-- ========================= -->
+
+            <div class="tab-pane fade"
+                 id="top-categories"
+                 role="tabpanel"
+                 aria-labelledby="top-categories-tab">
+
+                <partial name="_TopRankingList"
+                         model="Model.TopCategories" />
+
+            </div>
+
+
+            <!-- ========================= -->
+            <!-- TOP TÁC GIẢ -->
+            <!-- ========================= -->
+
+            <div class="tab-pane fade"
+                 id="top-authors"
+                 role="tabpanel"
+                 aria-labelledby="top-authors-tab">
+
+                <partial name="_TopRankingList"
+                         model="Model.TopAuthors" />
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    .dashboard-ranking-tabs {
+
+        border-bottom: 1px solid #eeeeee;
+
+    }
+
+    .dashboard-ranking-tabs .nav-link {
+
+        border: none;
+
+        color: #6c757d;
+
+        font-weight: 500;
+
+        padding: 12px 14px;
+
+        border-radius: 10px 10px 0 0;
+
+        transition: all .2s ease;
+
+    }
+
+    .dashboard-ranking-tabs .nav-link:hover {
+
+        color: #0d6efd;
+
+        background-color: #f8f9fa;
+
+    }
+
+    .dashboard-ranking-tabs .nav-link.active {
+
+        color: #0d6efd;
+
+        background-color: #fff;
+
+        font-weight: 700;
+
+        border-bottom: 3px solid #0d6efd;
+
+    }
+
+</style>

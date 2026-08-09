@@ -1,0 +1,63 @@
+@* @model LibraryApp.Areas.Admin.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container-fluid">
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-lg-8">
+
+            <partial name="_Statistics"
+                     model="Model.Statistics" />
+
+        </div>
+
+        <div class="col-lg-4">
+
+            <partial name="_BorrowStatus"
+                     model="Model.Statistics" />
+
+        </div>
+
+    </div>
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-lg-6">
+
+            <partial name="_BorrowChart"
+                     model="Model.BorrowChart" />
+
+        </div>
+
+        <div class="col-lg-6">
+
+            <partial name="_TopRanking"
+                     model="Model" />
+
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-12">
+
+            <partial name="_DueBorrow"
+                     model="Model.DueBorrows" />
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts{
+
+    <partial name="_BorrowChartScripts"
+             model="Model.BorrowChart" />
+
+} *@

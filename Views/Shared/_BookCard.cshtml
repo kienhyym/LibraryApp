@@ -2,28 +2,40 @@
 
 <div class="col">
 
-    <div class="card book-card h-100 shadow-sm border-0 rounded-4">
+    <div class="card h-100 shadow-sm border-0 rounded-4 position-relative">
+
+        <!-- Nút yêu thích -->
+        <button class="btn btn-light rounded-circle shadow-sm favorite-btn" data-book-id="@Model.BookId"
+                data-favorite="@Model.IsFavorite.ToString().ToLower()">
+
+            @if (Model.IsFavorite)
+            {
+                <i class="bi bi-heart-fill text-danger"></i>
+            }
+            else
+            {
+                <i class="bi bi-heart"></i>
+            }
+
+        </button>
 
         <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:280px;">
 
             @if (!string.IsNullOrWhiteSpace(Model.CoverImage))
             {
                 <img src="@Model.CoverImage" class="img-fluid" style="max-height:260px;
-
                 max-width:100%;
-
                 object-fit:contain;" />
             }
             else
             {
                 <img src="~/uploads/books/no-book.png" class="img-fluid" style="max-height:260px;
-
                 object-fit:contain;" />
             }
 
             @if (Model.AvailableQuantity > 0)
             {
-                <span class="badge bg-success 
+                <span class="badge bg-success
                     position-absolute
                     top-0
                     end-0
@@ -75,7 +87,7 @@
             <div class="mt-auto">
 
                 <a asp-controller="Books" asp-action="Detail" asp-route-id="@Model.BookId"
-                   class="btn btn-primary  w-100 rounded-pill">
+                   class="btn btn-primary w-100 rounded-pill">
 
                     <i class="bi bi-book me-2"></i>
 
@@ -92,16 +104,32 @@
 </div>
 
 <style>
-    .book-card {
+    .card {
         height: 100%;
         transition: .25s;
     }
 
-    .book-card:hover {
-
+    .card:hover {
         transform: translateY(-6px);
-
         box-shadow: 0 .75rem 1.5rem rgba(0, 0, 0, .15);
+    }
 
+    .favorite-btn {
+        width: 42px;
+        height: 42px;
+        padding: 0;
+        border: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: .2s;
+    }
+
+    .favorite-btn:hover {
+        transform: scale(1.1);
+    }
+
+    .favorite-btn i {
+        font-size: 1.25rem;
     }
 </style>

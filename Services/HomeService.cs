@@ -19,10 +19,26 @@ public class HomeService : IHomeService
 
     #region Home
 
-    public async Task<HomeViewModel> GetHomeAsync()
+    public async Task<HomeViewModel> GetHomeAsync(int? accountId)
     {
         var model = new HomeViewModel();
+        var favoriteBookIds = new List<int>();
 
+        if (accountId.HasValue)
+        {
+            var residentId = await _context.Residents
+                .Where(x => x.AccountId == accountId.Value)
+                .Select(x => (int?)x.ResidentId)
+                .FirstOrDefaultAsync();
+
+            if (residentId.HasValue)
+            {
+                favoriteBookIds = await _context.Favoritebooks
+                    .Where(x => x.ResidentId == residentId.Value)
+                    .Select(x => x.BookId)
+                    .ToListAsync();
+            }
+        }
 
         // ==========================
         // Sách mới
@@ -54,7 +70,9 @@ public class HomeService : IHomeService
 
                 AvailableQuantity = x.AvailableQuantity,
 
-                IsAvailable = x.IsAvailable
+                IsAvailable = x.IsAvailable,
+
+                IsFavorite = favoriteBookIds.Contains(x.BookId),
             })
 
             .ToListAsync();
@@ -100,7 +118,9 @@ public class HomeService : IHomeService
 
                     AvailableQuantity = x.AvailableQuantity,
 
-                    IsAvailable = x.IsAvailable
+                    IsAvailable = x.IsAvailable,
+                    
+                    IsFavorite = favoriteBookIds.Contains(x.BookId)
                 })
 
                 .ToListAsync();

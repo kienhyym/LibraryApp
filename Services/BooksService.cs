@@ -22,7 +22,8 @@ public class BooksService : IBooksService
     #region Book List
 
     public async Task<BookListViewModel> GetBooksAsync(
-        BookFilterViewModel filter)
+    int accountId,
+    BookFilterViewModel filter)
     {
         var model = new BookListViewModel
         {
@@ -32,7 +33,31 @@ public class BooksService : IBooksService
         model.Categories = await GetCategoriesAsync();
 
         model.Authors = await GetAuthorsAsync();
+
         model.TotalBooks = await _context.Books.CountAsync();
+
+        // Lấy ResidentId của tài khoản hiện tại
+        var residentId = await _context.Residents
+
+            .Where(x => x.AccountId == accountId)
+
+            .Select(x => (int?)x.ResidentId)
+
+            .FirstOrDefaultAsync();
+
+        // Danh sách BookId đã yêu thích
+        var favoriteBookIds = residentId == null
+
+            ? new List<int>()
+
+            : await _context.Favoritebooks
+
+                .Where(x => x.ResidentId == residentId)
+
+                .Select(x => x.BookId)
+
+                .ToListAsync();
+
         var query = _context.Books
 
             .AsNoTracking()
@@ -135,7 +160,9 @@ public class BooksService : IBooksService
 
                 AvailableQuantity = x.AvailableQuantity,
 
-                IsAvailable = x.IsAvailable
+                IsAvailable = x.IsAvailable,
+
+                IsFavorite = favoriteBookIds.Contains(x.BookId)
             });
 
         model.Books =
@@ -151,11 +178,16 @@ public class BooksService : IBooksService
     }
 
     #endregion
-        #region Book Detail
+    #region Book Detail
 
     public async Task<BookDetailViewModel?> GetBookDetailAsync(
-        int bookId)
+    int accountId,
+    int bookId)
     {
+        var residentId = await _context.Residents
+    .Where(x => x.AccountId == accountId)
+    .Select(x => (int?)x.ResidentId)
+    .FirstOrDefaultAsync();
         return await _context.Books
 
             .AsNoTracking()
@@ -185,6 +217,10 @@ public class BooksService : IBooksService
                 IsAvailable = x.IsAvailable,
 
                 Description = x.BookDescription,
+                IsFavorite = residentId != null &&
+                _context.Favoritebooks.Any(f =>
+                    f.ResidentId == residentId &&
+                    f.BookId == x.BookId)
 
             })
 
@@ -250,7 +286,7 @@ public class BooksService : IBooksService
     }
 
     #endregion
-        #region Related Books
+    #region Related Books
 
     public async Task<List<BookCardViewModel>> GetRelatedBooksAsync(
         int bookId)

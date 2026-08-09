@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using LibraryApp.Services.Interfaces;
 using LibraryApp.ViewModels.Book;
 
@@ -21,8 +22,12 @@ public class BooksController : Controller
     public async Task<IActionResult> Index(
         BookFilterViewModel filter)
     {
-        var model =
-            await _booksService.GetBooksAsync(filter);
+        var accountId = int.Parse(
+    User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var model = await _booksService.GetBooksAsync(
+            accountId,
+            filter);
 
         return View(model);
     }
@@ -35,8 +40,12 @@ public class BooksController : Controller
     public async Task<IActionResult> Detail(
         int id)
     {
-        var model =
-            await _booksService.GetBookDetailAsync(id);
+        var accountId = int.Parse(
+        User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var model = await _booksService.GetBookDetailAsync(
+            accountId,
+            id);
 
         if (model == null)
         {
@@ -64,8 +73,12 @@ public class BooksController : Controller
             Page = page
         };
 
-        var model =
-            await _booksService.GetBooksAsync(filter);
+        var accountId = int.Parse(
+     User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var model = await _booksService.GetBooksAsync(
+            accountId,
+            filter);
 
         return View("Index", model);
     }
@@ -85,8 +98,12 @@ public class BooksController : Controller
             Page = page
         };
 
-        var model =
-            await _booksService.GetBooksAsync(filter);
+        var accountId = int.Parse(
+     User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var model = await _booksService.GetBooksAsync(
+            accountId,
+            filter);
 
         return View("Index", model);
     }
@@ -106,8 +123,12 @@ public class BooksController : Controller
             Page = page
         };
 
-        var model =
-            await _booksService.GetBooksAsync(filter);
+        var accountId = int.Parse(
+     User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var model = await _booksService.GetBooksAsync(
+            accountId,
+            filter);
 
         return View("Index", model);
     }

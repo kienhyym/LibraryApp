@@ -1,45 +1,64 @@
-@model LibraryApp.Areas.Admin.ViewModels.DashboardViewModel
-
+@model LibraryApp.Areas.Admin.ViewModels.Dashboard.DashboardViewModel
 @{
     ViewData["Title"] = "Dashboard";
 }
 
-<div class="row g-4">
+<div class="container-fluid">
 
-    <div class="col-md-3">
-        <div class="card shadow-sm">
-            <div class="card-body text-center">
-                <h2>@Model.TotalBooks</h2>
-                <p>Tổng sách</p>
-            </div>
+    <!-- Hàng 1 -->
+
+    <div class="row g-4 mb-4 align-items-stretch">
+
+        <div class="col-lg-8 d-flex">
+
+            <partial name="_Statistics" model="Model.Statistics" />
+
         </div>
+
+        <div class="col-lg-4 d-flex">
+
+            <partial name="_BorrowStatus" model="Model.Statistics" />
+
+        </div>
+
     </div>
 
-    <div class="col-md-3">
-        <div class="card shadow-sm">
-            <div class="card-body text-center">
-                <h2>@Model.TotalAuthors</h2>
-                <p>Tác giả</p>
-            </div>
+
+    <!-- Hàng 2 -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-lg-6">
+
+            <partial name="_BorrowChart" model="Model.BorrowChart" />
+
         </div>
+
+        <!-- Top Ranking -->
+
+        <div class="col-lg-6">
+
+            <partial name="_TopRanking" model="Model" />
+
+        </div>
+
     </div>
 
-    <div class="col-md-3">
-        <div class="card shadow-sm">
-            <div class="card-body text-center">
-                <h2>@Model.TotalResidents</h2>
-                <p>Cư dân</p>
-            </div>
-        </div>
-    </div>
 
-    <div class="col-md-3">
-        <div class="card shadow-sm">
-            <div class="card-body text-center">
-                <h2>@Model.OverdueBooks</h2>
-                <p>Sách quá hạn</p>
-            </div>
+    <!-- Hàng 3 -->
+
+    <div class="row">
+
+        <div class="col-12">
+
+            <partial name="_DueBorrow" model="Model.DueBorrows" />
+
         </div>
+
     </div>
 
 </div>
+
+@section Scripts {
+    <partial name="_BorrowChartScripts" model="Model.BorrowChart" />
+}

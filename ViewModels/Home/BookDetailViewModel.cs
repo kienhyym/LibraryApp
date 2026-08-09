@@ -25,4 +25,5 @@ public class BookDetailViewModel
     public string? Description { get; set; }
 
     public string? ShelfLocation { get; set; }
+    public bool IsFavorite { get; set; }
 }

@@ -15,4 +15,6 @@ public class BookCardViewModel
     public int AvailableQuantity { get; set; }
 
     public bool IsAvailable { get; set; }
+    public bool IsFavorite { get; set; }
+    
 }

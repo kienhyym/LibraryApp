@@ -6,8 +6,7 @@ public interface IHomeService
 {
     #region Home
 
-    Task<HomeViewModel> GetHomeAsync();
-
+    Task<HomeViewModel> GetHomeAsync(int? accountId);
     #endregion
 
     #region Search

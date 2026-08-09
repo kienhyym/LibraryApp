@@ -1,0 +1,250 @@
+@model LibraryApp.Areas.Admin.ViewModels.Dashboard.BorrowChartViewModel
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const canvas =
+            document.getElementById("borrowChart");
+
+        const yearSelect =
+            document.getElementById("borrowChartYear");
+
+        const description =
+            document.getElementById("borrowChartDescription");
+
+
+        if (!canvas) {
+            return;
+        }
+
+
+        if (typeof Chart === "undefined") {
+
+            console.error("Chart.js chưa được load.");
+
+            return;
+        }
+
+
+        // ============================
+        // DỮ LIỆU BAN ĐẦU
+        // ============================
+
+        const labels =
+            @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                    Model.Labels
+                )
+            );
+
+
+        const values =
+            @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                    Model.Values
+                )
+            );
+
+
+        // ============================
+        // TẠO CHART
+        // ============================
+
+        const borrowChart =
+            new Chart(canvas, {
+
+                type: "line",
+
+                data: {
+
+                    labels: labels,
+
+                    datasets: [
+
+                        {
+
+                            label: "Phiếu mượn",
+
+                            data: values,
+
+                            borderWidth: 3,
+
+                            tension: 0.35,
+
+                            fill: false,
+
+                            pointRadius: 4,
+
+                            pointHoverRadius: 7
+
+                        }
+
+                    ]
+
+                },
+
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    interaction: {
+
+                        intersect: false,
+
+                        mode: "index"
+
+                    },
+
+
+                    plugins: {
+
+                        legend: {
+
+                            display: false
+
+                        },
+
+
+                        tooltip: {
+
+                            callbacks: {
+
+                                label: function (context) {
+
+                                    return " " +
+                                        context.parsed.y +
+                                        " phiếu";
+
+                                }
+
+                            }
+
+                        }
+
+                    },
+
+
+                    scales: {
+
+                        x: {
+
+                            grid: {
+
+                                display: false
+
+                            }
+
+                        },
+
+
+                        y: {
+
+                            beginAtZero: true,
+
+                            ticks: {
+
+                                precision: 0
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            });
+
+
+        // ============================
+        // CHỌN NĂM
+        // ============================
+
+        if (yearSelect) {
+
+            yearSelect.addEventListener(
+                "change",
+                async function () {
+
+                    const year = this.value;
+
+
+                    try {
+
+                        // Tạm khóa dropdown
+
+                        yearSelect.disabled = true;
+
+
+                        const response =
+                            await fetch(
+                                `/Admin/Dashboard/BorrowChart?year=${year}`
+                            );
+
+
+                        if (!response.ok) {
+
+                            throw new Error(
+                                "Không thể lấy dữ liệu biểu đồ."
+                            );
+
+                        }
+
+
+                        const data =
+                            await response.json();
+
+
+                        // ============================
+                        // CẬP NHẬT CHART
+                        // ============================
+
+                        borrowChart.data.labels =
+                            data.labels;
+
+                        borrowChart.data.datasets[0].data =
+                            data.values;
+
+
+                        borrowChart.update();
+
+
+                        // ============================
+                        // CẬP NHẬT TEXT
+                        // ============================
+
+                        if (description) {
+
+                            description.textContent =
+                                `Số lượng phiếu mượn trong năm ${data.year}`;
+
+                        }
+
+                    }
+                    catch (error) {
+
+                        console.error(error);
+
+                        alert(
+                            "Không thể tải dữ liệu biểu đồ."
+                        );
+
+                    }
+                    finally {
+
+                        yearSelect.disabled = false;
+
+                    }
+
+                }
+            );
+
+        }
+
+    });
+
+</script>

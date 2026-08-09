@@ -1,7 +1,8 @@
-namespace LibraryApp.Areas.Admin.ViewModels;
-
-public class DashboardViewModel
+namespace LibraryApp.Areas.Admin.ViewModels.Dashboard;
+public class DashboardStatisticViewModel
 {
+    //70%
+
     public int TotalBooks { get; set; }
 
     public int TotalAuthors { get; set; }
@@ -12,7 +13,9 @@ public class DashboardViewModel
 
     public int TotalBorrowRecords { get; set; }
 
-    public int BorrowingBooks { get; set; }
+    //30%
 
-    public int OverdueBooks { get; set; }
+    public int BorrowingRecords { get; set; }
+
+    public int OverdueRecords { get; set; }
 }

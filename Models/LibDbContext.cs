@@ -29,6 +29,7 @@ public partial class LibDbContext : DbContext
     public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<EmailVerification> EmailVerifications { get; set; }
+    public virtual DbSet<Favoritebook> Favoritebooks { get; set; }
 
     public virtual DbSet<Personnel> Personnel { get; set; }
 
@@ -183,6 +184,31 @@ public partial class LibDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PERSONNEL_ACCOUNTS");
         });
+        
+        modelBuilder.Entity<Favoritebook>(entity =>
+{
+    entity.ToTable("FAVORITEBOOK");
+
+    entity.HasIndex(e => new { e.ResidentId, e.BookId }, "UQ_FAVORITEBOOK")
+        .IsUnique();
+
+    entity.Property(e => e.CreatedDate)
+        .HasDefaultValueSql("(getdate())")
+        .HasColumnType("datetime");
+
+    entity.HasOne(d => d.Book)
+        .WithMany(p => p.Favoritebooks)
+        .HasForeignKey(d => d.BookId)
+        .OnDelete(DeleteBehavior.ClientSetNull)
+        .HasConstraintName("FK_FAVORITEBOOK_BOOKS");
+
+    entity.HasOne(d => d.Resident)
+        .WithMany(p => p.Favoritebooks)
+        .HasForeignKey(d => d.ResidentId)
+        .OnDelete(DeleteBehavior.ClientSetNull)
+        .HasConstraintName("FK_FAVORITEBOOK_RESIDENTS");
+});
+
 
         modelBuilder.Entity<Resident>(entity =>
         {

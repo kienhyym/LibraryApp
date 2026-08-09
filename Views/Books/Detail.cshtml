@@ -15,9 +15,7 @@
 
     <nav class="mb-4">
 
-        <a asp-controller="Home"
-           asp-action="Index"
-           class="text-decoration-none">
+        <a asp-controller="Home" asp-action="Index" class="text-decoration-none">
 
             Trang chủ
 
@@ -25,9 +23,7 @@
 
         <span class="mx-2">/</span>
 
-        <a asp-controller="Books"
-           asp-action="Index"
-           class="text-decoration-none">
+        <a asp-controller="Books" asp-action="Index" class="text-decoration-none">
 
             Danh sách sách
 
@@ -49,8 +45,7 @@
 
         <div class="col-lg-4">
 
-            <div class="sticky-top"
-                 style="top:90px;">
+            <div class="sticky-top" style="top:90px;">
 
                 <div class="card border-0 shadow rounded-4">
 
@@ -58,17 +53,13 @@
 
                         @if (!string.IsNullOrWhiteSpace(Model.CoverImage))
                         {
-                            <img src="@Model.CoverImage"
-                                 class="img-fluid"
-                                 style="max-height:500px;
-                                        object-fit:contain;" />
+                            <img src="@Model.CoverImage" class="img-fluid" style="max-height:500px;
+                            object-fit:contain;" />
                         }
                         else
                         {
-                            <img src="~/uploads/books/no-book.png"
-                                 class="img-fluid"
-                                 style="max-height:400px;
-                                        object-fit:contain;" />
+                            <img src="~/uploads/books/no-book.png" class="img-fluid" style="max-height:400px;
+                            object-fit:contain;" />
                         }
 
                     </div>
@@ -272,23 +263,32 @@
 
             @if (User.Identity?.IsAuthenticated == true)
             {
-                <button class="btn btn-primary btn-lg rounded-pill px-5">
+                <button id="favoriteDetailBtn"
+                        class="btn @(Model.IsFavorite ? "btn-danger" : "btn-outline-danger") rounded-pill"
+                        data-book-id="@Model.BookId" data-favorite="@Model.IsFavorite.ToString().ToLower()">
 
-                    <i class="bi bi-journal-plus me-2"></i>
+                    @if (Model.IsFavorite)
+                    {
+                        <i class="bi bi-heart-fill me-2"></i>
 
-                    Mượn sách
+                        <span>Đã yêu thích</span>
+                    }
+                    else
+                    {
+                        <i class="bi bi-heart me-2"></i>
+
+                        <span>Yêu thích</span>
+                    }
 
                 </button>
             }
             else
             {
-                <a asp-controller="Login"
-                   asp-action="Index"
-                   class="btn btn-outline-primary btn-lg rounded-pill px-5">
+                <a asp-controller="Login" asp-action="Index" class="btn btn-outline-primary btn-lg rounded-pill px-5">
 
                     <i class="bi bi-box-arrow-in-right me-2"></i>
 
-                    Đăng nhập để mượn
+                    Đăng nhập để thêm vào yêu thích
 
                 </a>
             }
@@ -309,9 +309,8 @@
 
                 </h3>
 
-                <p class="mb-0"
-                   style="white-space:pre-line;
-                          line-height:1.9">
+                <p class="mb-0" style="white-space:pre-line;
+                    line-height:1.9">
 
                     @Model.Description
 
@@ -327,9 +326,9 @@
         <div class="mt-5">
 
             <div class="d-flex
-                        justify-content-between
-                        align-items-center
-                        mb-4">
+                justify-content-between
+                align-items-center
+                mb-4">
 
                 <div>
 
@@ -350,15 +349,14 @@
             </div>
 
             <div class="row
-                        row-cols-1
-                        row-cols-md-2
-                        row-cols-lg-4
-                        g-4">
+                row-cols-1
+                row-cols-md-2
+                row-cols-lg-4
+                g-4">
 
                 @foreach (var item in relatedBooks)
                 {
-                    <partial name="_BookCard"
-                             model="item" />
+                    <partial name="_BookCard" model="item" />
                 }
 
             </div>
@@ -368,8 +366,7 @@
 
     <div class="mt-5">
 
-        <a asp-action="Index"
-           class="btn btn-outline-secondary rounded-pill">
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">
 
             <i class="bi bi-arrow-left me-2"></i>
 
@@ -380,3 +377,99 @@
     </div>
 
 </div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+    const btn =
+        document.getElementById("favoriteDetailBtn");
+
+    if(!btn)
+        return;
+
+    const token = document.querySelector(
+        '#antiForgeryForm input[name="__RequestVerificationToken"]'
+    ).value;
+
+    btn.addEventListener("click",async()=>{
+
+        btn.disabled=true;
+
+        try{
+
+            const response =
+                await fetch("/Favorite/ToggleAjax",{
+
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":"application/x-www-form-urlencoded",
+                        "RequestVerificationToken":token
+                    },
+
+                    body:new URLSearchParams({
+                        bookId:btn.dataset.bookId
+                    })
+
+                });
+
+            const result =
+                await response.json();
+
+            if(!result.success)
+                return;
+
+            btn.dataset.favorite=result.isFavorite;
+
+            const icon =
+                btn.querySelector("i");
+
+            const text =
+                btn.querySelector("span");
+
+            if(result.isFavorite){
+
+                btn.classList.remove("btn-outline-danger");
+
+                btn.classList.add("btn-danger");
+
+                icon.className="bi bi-heart-fill me-2";
+
+                text.textContent="Đã yêu thích";
+
+            }
+            else{
+
+                btn.classList.remove("btn-danger");
+
+                btn.classList.add("btn-outline-danger");
+
+                icon.className="bi bi-heart me-2";
+
+                text.textContent="Yêu thích";
+
+            }
+
+            icon.animate([
+                {transform:"scale(1)"},
+                {transform:"scale(1.3)"},
+                {transform:"scale(1)"}
+            ],{
+                duration:180
+            });
+
+            showFavoriteToast(result.message);
+
+        }
+        finally{
+
+            btn.disabled=false;
+
+        }
+
+    });
+
+});
+
+</script>

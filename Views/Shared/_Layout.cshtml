@@ -13,6 +13,7 @@
 </head>
 
 <body>
+
     @{
         var currentController =
             ViewContext.RouteData.Values["controller"]?.ToString();
@@ -26,6 +27,11 @@
 
             && currentAction == "Index";
     }
+    <form id="antiForgeryForm" style="display:none;">
+
+        @Html.AntiForgeryToken()
+
+    </form>
     <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
             <div class="container">
@@ -90,14 +96,15 @@
 
                             <a asp-controller="Home" asp-action="About" class="nav-link fw-semibold
                                 @(currentController == "Home" && currentAction == "About"
-                               ? "active"
-                               : "")">
+                       ? "active"
+                       : "")">
 
                                 Giới thiệu
 
                             </a>
 
                         </li>
+
                     </ul>
                     @if (!hideSearch)
 
@@ -142,13 +149,25 @@
                                     </a>
 
                                 </li>
+                                <li class="nav-item">
+
+                                    <a asp-controller="Favorite" asp-action="Index" class="nav-link fw-semibold
+                                        @(currentController == "Favorite" ? "active" : "")">
+
+                                        <i class="bi bi-heart-fill me-1 text-danger"></i>
+
+                                        Yêu thích
+
+                                    </a>
+
+                                </li>
 
                                 <li class="nav-item">
 
                                     <a asp-controller="BorrowHistory" asp-action="Index" class="nav-link fw-semibold
                                         @(currentController == "BorrowHistory"
-                                         ? "active"
-                                         : "")">
+                                 ? "active"
+                                 : "")">
 
                                         <i class="bi bi-clock-history me-1"></i>
 
@@ -234,11 +253,204 @@
         </div>
 
     </footer>
+
+    <div id="favoriteToast" class="toast
+        position-fixed
+        bottom-0
+        end-0
+        m-4
+        border-0
+        shadow" data-bs-delay="2000">
+
+        <div class="toast-body bg-success text-white rounded">
+
+        </div>
+
+    </div>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+
+        document.addEventListener("click", async function (e) {
+
+        const btn = e.target.closest(".favorite-btn");
+
+        if (!btn) return;
+
+        e.preventDefault();
+
+        const bookId = btn.dataset.bookId;
+
+        const token = document.querySelector(
+        'input[name="__RequestVerificationToken"]'
+        ).value;
+
+        const response = await fetch("/Favorite/ToggleAjax", {
+
+        method: "POST",
+
+        headers: {
+
+        "Content-Type": "application/x-www-form-urlencoded",
+
+        "RequestVerificationToken": token
+
+        },
+
+        body:
+
+        "bookId=" + bookId
+
+        });
+
+        const result = await response.json();
+
+        const icon = btn.querySelector("i");
+
+        if (result.isFavorite) {
+
+        icon.className =
+
+        "bi bi-heart-fill text-danger";
+
+        }
+        else {
+
+        icon.className =
+
+        "bi bi-heart";
+
+        }
+
+        const toastEl =
+        document.getElementById("favoriteToast");
+
+        toastEl.querySelector(".toast-body").innerText =
+        result.message;
+
+        new bootstrap.Toast(toastEl).show();
+
+        });
+
+    </script>
+    <script>
+
+        document.addEventListener("DOMContentLoaded", () => {
+
+        const token = document.querySelector(
+        '#antiForgeryForm input[name="__RequestVerificationToken"]'
+        ).value;
+
+        document.addEventListener("click", async function (e) {
+
+        const btn = e.target.closest(".favorite-btn");
+
+        if (!btn) return;
+
+        e.preventDefault();
+
+        const bookId = btn.dataset.bookId;
+
+        btn.disabled = true;
+
+        try {
+
+        const response = await fetch("/Favorite/ToggleAjax", {
+
+        method: "POST",
+
+        headers: {
+
+        "Content-Type": "application/x-www-form-urlencoded",
+
+        "RequestVerificationToken": token
+
+        },
+
+        body: new URLSearchParams({
+
+        bookId: bookId
+
+        })
+
+        });
+
+        const result = await response.json();
+
+        if (!result.success)
+        return;
+
+        const icon = btn.querySelector("i");
+
+        btn.dataset.favorite = result.isFavorite;
+
+        if (result.isFavorite) {
+
+        icon.className =
+        "bi bi-heart-fill text-danger";
+
+        }
+        else {
+
+        icon.className =
+        "bi bi-heart";
+
+        }
+
+        icon.animate([
+
+        {
+        transform: "scale(1)"
+        },
+
+        {
+        transform: "scale(1.35)"
+        },
+
+        {
+        transform: "scale(1)"
+        }
+
+        ], {
+
+        duration: 200
+
+        });
+
+        showFavoriteToast(result.message);
+
+        }
+        finally {
+
+        btn.disabled = false;
+
+        }
+
+        });
+
+        });
+
+        function showFavoriteToast(message) {
+
+        const toast =
+        document.getElementById("favoriteToast");
+
+        toast.querySelector(".toast-body")
+        .innerText = message;
+
+        bootstrap.Toast
+        .getOrCreateInstance(toast)
+        .show();
+
+        }
+
+    </script>
 </body>
 
 </html>

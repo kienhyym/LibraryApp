@@ -1,3 +1,4 @@
+using LibraryApp.Areas.Admin.Services;
 using LibraryApp.Configurations;
 using LibraryApp.Data;
 using LibraryApp.Models;
@@ -69,6 +70,7 @@ builder.Services.AddScoped<ICategoriesService, CategoriesService>();
 builder.Services.AddScoped<IAuthorsService, AuthorsService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IBorrowHistoryService, BorrowHistoryService>();
+builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 #endregion
 
 var app = builder.Build();

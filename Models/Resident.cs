@@ -25,4 +25,5 @@ public partial class Resident
     public virtual Account Account { get; set; } = null!;
 
     public virtual ICollection<Borrowrecord> Borrowrecords { get; set; } = new List<Borrowrecord>();
+    public virtual ICollection<Favoritebook> Favoritebooks { get; set; } = new List<Favoritebook>();
 }

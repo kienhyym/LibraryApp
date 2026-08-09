@@ -174,7 +174,7 @@ public class BorrowHistoryService : IBorrowHistoryService
                     CoverImage = d.Book.CoverImage,
 
                     ReturnDate = d.ReturnDate,
-                    
+
                     ReturnStatus = d.ReturnStatus
                 })
                 .ToList()

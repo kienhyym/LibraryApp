@@ -30,8 +30,9 @@ public partial class Book
     public DateTime CreatedAt { get; set; }
 
     public virtual Author Author { get; set; } = null!;
+    
+    public virtual Category Category { get; set; } = null!;
 
     public virtual ICollection<Borrowrecorddetail> Borrowrecorddetails { get; set; } = new List<Borrowrecorddetail>();
-
-    public virtual Category Category { get; set; } = null!;
+    public virtual ICollection<Favoritebook> Favoritebooks { get; set; } = new List<Favoritebook>();
 }
