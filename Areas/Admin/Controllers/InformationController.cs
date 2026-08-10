@@ -1,5 +1,5 @@
 using System.Security.Claims;
-
+using LibraryApp.Areas.Admin.Controllers;
 using LibraryApp.Services.Interfaces;
 using LibraryApp.ViewModels.Information;
 
@@ -8,9 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryApp.Controllers;
 
-[Authorize]
-[Area("Admin")]
-public class InformationController : Controller
+public class InformationController : AdminBaseController
 {
     private readonly IInformationService _informationService;
 

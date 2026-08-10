@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using LibraryApp.Areas.Admin.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibraryApp.Areas.Admin.Controllers;
 
-[Area("Admin")]
-public class DashboardController : Controller
+public class DashboardController : AdminBaseController
 {
     private readonly IDashboardService _dashboardService;
 
