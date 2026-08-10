@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using LibraryApp.Enums;
 
 namespace LibraryApp.Models;
 
@@ -13,7 +14,7 @@ public partial class Personnel
 
     public DateOnly? DateOfBirth { get; set; }
 
-    public int? Gender { get; set; }
+    public Gender? Gender { get; set; }
 
     public string? PhoneNumber { get; set; }
 

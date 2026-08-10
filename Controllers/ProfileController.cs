@@ -94,23 +94,41 @@ public class ProfileController : Controller
     }
 
     [HttpGet]
-    public IActionResult ChangePassword()
+    public IActionResult ChangePassword(
+    string? returnUrl = null)
     {
+        ViewBag.ReturnUrl = returnUrl;
+
         return View();
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ChangePassword(
-        ChangePasswordViewModel model)
+    ChangePasswordViewModel model,
+    string? returnUrl = null)
     {
+        ViewBag.ReturnUrl = returnUrl;
+
         if (!ModelState.IsValid)
         {
             return View(model);
         }
 
-        var accountId = int.Parse(
-            User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var accountIdClaim =
+    User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (accountIdClaim == null)
+        {
+            return Challenge();
+        }
+
+        if (!int.TryParse(
+                accountIdClaim,
+                out int accountId))
+        {
+            return Challenge();
+        }
 
         var result =
             await _profileService.ChangePasswordAsync(
@@ -126,8 +144,16 @@ public class ProfileController : Controller
             return View(model);
         }
 
-        TempData["Success"] = "Đổi mật khẩu thành công.";
+        TempData["Success"] = result.Message;
 
-        return RedirectToAction(nameof(Index));
+        // Đổi mật khẩu thành công → quay về nơi đã bắt đầu
+
+        if (!string.IsNullOrWhiteSpace(returnUrl)
+            && Url.IsLocalUrl(returnUrl))
+        {
+            return Redirect(returnUrl);
+        }
+
+        return RedirectToAction(nameof(ChangePassword));
     }
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using LibraryApp.Enums;
 
 namespace LibraryApp.Areas.Admin.ViewModels.Personnel;
 
@@ -23,7 +24,7 @@ public class PersonnelEditViewModel
     public DateOnly? DateOfBirth { get; set; }
 
     [Display(Name = "Giới tính")]
-    public int? Gender { get; set; }
+    public Gender? Gender { get; set; }
 
     [Display(Name = "Số điện thoại")]
     [Phone(ErrorMessage = "Số điện thoại không hợp lệ.")]

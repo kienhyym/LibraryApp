@@ -1,9 +1,8 @@
-using System.ComponentModel.DataAnnotations;
 using LibraryApp.Enums;
 
-namespace LibraryApp.Areas.Admin.ViewModels.Personnel;
+namespace LibraryApp.ViewModels.Information;
 
-public class PersonnelDetailViewModel
+public class InformationViewModel
 {
     public int PersonnelId { get; set; }
 
@@ -19,7 +18,7 @@ public class PersonnelDetailViewModel
 
     public string? PersonnelAddress { get; set; }
 
-    public bool IsActive { get; set; }
+    public bool IsEmailVerified { get; set; }
 
     public DateTime CreatedAt { get; set; }
 }

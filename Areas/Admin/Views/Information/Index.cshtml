@@ -1,8 +1,10 @@
-@model LibraryApp.ViewModels.Profile.ProfileViewModel
-@using LibraryApp.Extensions
+@model LibraryApp.ViewModels.Information.InformationViewModel
+@using LibraryApp.Enums
+
 @{
-    ViewData["Title"] = "Hồ sơ cá nhân";
+    ViewData["Title"] = "Thông tin cá nhân";
 }
+
 @if (TempData["Success"] != null)
 {
     <script>
@@ -28,7 +30,6 @@
     </script>
 }
 <div class="container py-4">
-
     <div class="row g-4">
 
         <!-- Left -->
@@ -48,32 +49,14 @@
 
                     </h3>
 
-                    <p class="text-muted mb-4">
 
-                        Cư dân An Bình City
+                    <span class="badge bg-primary px-3 py-2">
 
-                    </p>
+                        <i class="bi bi-person-badge-fill me-1"></i>
 
-                    @if (Model.IsEmailVerified)
-                    {
-                        <span class="badge bg-success px-3 py-2">
+                        Nhân viên thư viện
 
-                            <i class="bi bi-patch-check-fill"></i>
-
-                            Email đã xác thực
-
-                        </span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-warning text-dark px-3 py-2">
-
-                            <i class="bi bi-exclamation-circle"></i>
-
-                            Chưa xác thực Email
-
-                        </span>
-                    }
+                    </span>
 
                     <hr class="my-4" />
 
@@ -83,14 +66,15 @@
 
                             <i class="bi bi-pencil-square me-2"></i>
 
-                            Cập nhật hồ sơ
+                            Cập nhật thông tin
 
                         </a>
 
-                        <a asp-controller="Profile" asp-action="ChangePassword" asp-route-returnUrl="/Profile"
-                           class="btn btn-outline-primary rounded-pill">
+                        <a asp-area="" asp-controller="Profile" asp-action="ChangePassword"
+                           asp-route-returnUrl="/Admin/Information" class="btn btn-outline-primary rounded-pill">
 
                             <i class="bi bi-key me-2"></i>
+
                             Đổi mật khẩu
 
                         </a>
@@ -106,90 +90,6 @@
         <!-- Right -->
 
         <div class="col-lg-8">
-
-            <!-- Dashboard -->
-
-            <div class="row g-3 mb-4">
-
-                <div class="col-md-4">
-
-                    <div class="card border-0 bg-primary text-white rounded-4">
-
-                        <div class="card-body text-center">
-
-                            <i class="bi bi-book fs-1"></i>
-
-                            <h2 class="fw-bold mt-2">
-
-                                @Model.TotalBorrowedBooks
-
-                            </h2>
-
-                            <div>
-
-                                Đã mượn
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="col-md-4">
-
-                    <div class="card border-0 bg-success text-white rounded-4">
-
-                        <div class="card-body text-center">
-
-                            <i class="bi bi-journal-check fs-1"></i>
-
-                            <h2 class="fw-bold mt-2">
-
-                                @Model.BorrowingBooks
-
-                            </h2>
-
-                            <div>
-
-                                Đang mượn
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="col-md-4">
-
-                    <div class="card border-0 bg-danger text-white rounded-4">
-
-                        <div class="card-body text-center">
-
-                            <i class="bi bi-clock-history fs-1"></i>
-
-                            <h2 class="fw-bold mt-2">
-
-                                @Model.OverdueBooks
-
-                            </h2>
-
-                            <div>
-
-                                Quá hạn
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
 
             <!-- Personal Information -->
 
@@ -209,6 +109,26 @@
 
                     <div class="row gy-4">
 
+                        <!-- Họ tên -->
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted">
+
+                                Họ và tên
+
+                            </small>
+
+                            <div class="fw-semibold fs-5">
+
+                                @Model.FullName
+
+                            </div>
+
+                        </div>
+
+                        <!-- Email -->
+
                         <div class="col-md-6">
 
                             <small class="text-muted">
@@ -225,6 +145,8 @@
 
                         </div>
 
+                        <!-- Điện thoại -->
+
                         <div class="col-md-6">
 
                             <small class="text-muted">
@@ -235,11 +157,14 @@
 
                             <div class="fw-semibold fs-5">
 
-                                @(Model.PhoneNumber ?? "Chưa cập nhật")
+                                @(Model.PhoneNumber
+                                    ?? "Chưa cập nhật")
 
                             </div>
 
                         </div>
+
+                        <!-- Ngày sinh -->
 
                         <div class="col-md-6">
 
@@ -258,6 +183,8 @@
 
                         </div>
 
+                        <!-- Giới tính -->
+
                         <div class="col-md-6">
 
                             <small class="text-muted">
@@ -270,33 +197,21 @@
 
                                 @if (Model.Gender.HasValue)
                                 {
-                                    @Model.Gender.Value.GetDisplayName()
+                                    @* @Model.Gender.Value.GetDisplayName() *@
                                 }
                                 else
                                 {
-                                    <span class="text-muted">Chưa cập nhật</span>
+                                    <span class="text-muted">
+                                        Chưa cập nhật
+                                    </span>
                                 }
 
                             </div>
 
                         </div>
 
-                        <div class="col-md-6">
 
-                            <small class="text-muted">
-
-                                Căn hộ
-
-                            </small>
-
-                            <div class="fw-semibold">
-
-                                @(Model.ApartmentNumber
-                                    ?? "Chưa cập nhật")
-
-                            </div>
-
-                        </div>
+                        <!-- Ngày tham gia -->
 
                         <div class="col-md-6">
 
@@ -314,6 +229,8 @@
 
                         </div>
 
+                        <!-- Địa chỉ -->
+
                         <div class="col-12">
 
                             <small class="text-muted">
@@ -324,7 +241,7 @@
 
                             <div class="fw-semibold">
 
-                                @(Model.PermanentAddress
+                                @(Model.PersonnelAddress
                                     ?? "Chưa cập nhật")
 
                             </div>
@@ -340,5 +257,4 @@
         </div>
 
     </div>
-
 </div>
