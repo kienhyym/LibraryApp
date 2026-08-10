@@ -1,24 +1,26 @@
+@using LibraryApp.Enums
 @model LibraryApp.ViewModels.Home.BookCardViewModel
 
 <div class="col">
 
     <div class="card h-100 shadow-sm border-0 rounded-4 position-relative">
+        @if (User.IsInRole(AccountRole.Resident.ToString()))
+        {
+            <!-- Nút yêu thích -->
+            <button class="btn btn-light rounded-circle shadow-sm favorite-btn" data-book-id="@Model.BookId"
+                    data-favorite="@Model.IsFavorite.ToString().ToLower()">
 
-        <!-- Nút yêu thích -->
-        <button class="btn btn-light rounded-circle shadow-sm favorite-btn" data-book-id="@Model.BookId"
-                data-favorite="@Model.IsFavorite.ToString().ToLower()">
+                @if (Model.IsFavorite)
+                {
+                    <i class="bi bi-heart-fill text-danger"></i>
+                }
+                else
+                {
+                    <i class="bi bi-heart"></i>
+                }
 
-            @if (Model.IsFavorite)
-            {
-                <i class="bi bi-heart-fill text-danger"></i>
-            }
-            else
-            {
-                <i class="bi bi-heart"></i>
-            }
-
-        </button>
-
+            </button>
+        }
         <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:280px;">
 
             @if (!string.IsNullOrWhiteSpace(Model.CoverImage))
