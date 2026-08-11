@@ -29,15 +29,16 @@ public partial class LibDbContext : DbContext
     public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<EmailVerification> EmailVerifications { get; set; }
+
     public virtual DbSet<Favoritebook> Favoritebooks { get; set; }
 
     public virtual DbSet<Personnel> Personnel { get; set; }
 
     public virtual DbSet<Resident> Residents { get; set; }
 
-//     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-// #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-//         => optionsBuilder.UseSqlServer("Server=localhost,1433;Database=LibDB;User Id=sa;Password=YourStrong@Pass123;TrustServerCertificate=True;");
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=localhost,1433;Database=LibDB;User Id=sa;Password=YourStrong@Pass123;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -121,9 +122,10 @@ public partial class LibDbContext : DbContext
             entity.ToTable("BORROWRECORDDETAILS");
 
             entity.HasIndex(e => new { e.BorrowRecordId, e.BookId }, "UQ_BORROWRECORDDETAILS_BorrowRecordId_BookId").IsUnique();
-            entity.Property(e => e.ReturnNote).HasMaxLength(500);
-            entity.Property(e => e.ReturnStatus);
+
+            entity.Property(e => e.Penalty).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.ReturnDate).HasColumnType("datetime");
+            entity.Property(e => e.ReturnNote).HasMaxLength(500);
 
             entity.HasOne(d => d.Book).WithMany(p => p.Borrowrecorddetails)
                 .HasForeignKey(d => d.BookId)
@@ -166,6 +168,27 @@ public partial class LibDbContext : DbContext
                 .IsFixedLength();
         });
 
+        modelBuilder.Entity<Favoritebook>(entity =>
+        {
+            entity.ToTable("FAVORITEBOOK");
+
+            entity.HasIndex(e => new { e.ResidentId, e.BookId }, "UQ_FAVORITEBOOK").IsUnique();
+
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Book).WithMany(p => p.Favoritebooks)
+                .HasForeignKey(d => d.BookId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_FAVORITEBOOK_BOOK");
+
+            entity.HasOne(d => d.Resident).WithMany(p => p.Favoritebooks)
+                .HasForeignKey(d => d.ResidentId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_FAVORITEBOOK_RESIDENT");
+        });
+
         modelBuilder.Entity<Personnel>(entity =>
         {
             entity.ToTable("PERSONNEL");
@@ -177,38 +200,12 @@ public partial class LibDbContext : DbContext
             entity.Property(e => e.PhoneNumber)
                 .HasMaxLength(15)
                 .IsUnicode(false);
-            entity.Property(e => e.Position).HasMaxLength(50);
 
             entity.HasOne(d => d.Account).WithOne(p => p.Personnel)
                 .HasForeignKey<Personnel>(d => d.AccountId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PERSONNEL_ACCOUNTS");
         });
-        
-        modelBuilder.Entity<Favoritebook>(entity =>
-{
-    entity.ToTable("FAVORITEBOOK");
-
-    entity.HasIndex(e => new { e.ResidentId, e.BookId }, "UQ_FAVORITEBOOK")
-        .IsUnique();
-
-    entity.Property(e => e.CreatedDate)
-        .HasDefaultValueSql("(getdate())")
-        .HasColumnType("datetime");
-
-    entity.HasOne(d => d.Book)
-        .WithMany(p => p.Favoritebooks)
-        .HasForeignKey(d => d.BookId)
-        .OnDelete(DeleteBehavior.ClientSetNull)
-        .HasConstraintName("FK_FAVORITEBOOK_BOOKS");
-
-    entity.HasOne(d => d.Resident)
-        .WithMany(p => p.Favoritebooks)
-        .HasForeignKey(d => d.ResidentId)
-        .OnDelete(DeleteBehavior.ClientSetNull)
-        .HasConstraintName("FK_FAVORITEBOOK_RESIDENTS");
-});
-
 
         modelBuilder.Entity<Resident>(entity =>
         {

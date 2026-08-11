@@ -22,53 +22,60 @@
 
     <div class="card-body">
 
-        <form asp-action="ReturnBooks" method="post">
+        <form asp-action="ReturnBooks"
+              method="post">
 
             @Html.AntiForgeryToken()
 
-            <input type="hidden" name="borrowRecordId" value="@Model.BorrowRecordId" />
+            <input type="hidden"
+                   name="borrowRecordId"
+                   value="@Model.BorrowRecordId" />
+
+            <!-- Thông tin phiếu -->
 
             <div class="row">
 
                 <div class="col-md-6 mb-3">
 
                     <label class="form-label fw-bold">
-
                         Cư dân
-
                     </label>
 
-                    <input class="form-control" value="@Model.ResidentName" readonly />
+                    <input class="form-control"
+                           value="@Model.ResidentName"
+                           readonly />
 
                 </div>
 
                 <div class="col-md-3 mb-3">
 
                     <label class="form-label fw-bold">
-
                         Ngày mượn
-
                     </label>
 
-                    <input class="form-control" value="@Model.BorrowDate.ToString("dd/MM/yyyy")" readonly />
+                    <input class="form-control"
+                           value="@Model.BorrowDate.ToString("dd/MM/yyyy")"
+                           readonly />
 
                 </div>
 
                 <div class="col-md-3 mb-3">
 
                     <label class="form-label fw-bold">
-
                         Hạn trả
-
                     </label>
 
-                    <input class="form-control" value="@Model.DueDate.ToString("dd/MM/yyyy")" readonly />
+                    <input class="form-control"
+                           value="@Model.DueDate.ToString("dd/MM/yyyy")"
+                           readonly />
 
                 </div>
 
             </div>
 
             <hr />
+
+            <!-- Danh sách sách -->
 
             <div class="table-responsive">
 
@@ -78,34 +85,28 @@
 
                         <tr>
 
-                            <th width="170">
-
-                                Kết quả
-
+                            <th style="width: 180px;">
+                                Tình trạng
                             </th>
 
                             <th>
-
                                 Tên sách
-
                             </th>
 
-                            <th width="200">
-
+                            <th style="width: 180px;">
                                 Tác giả
-
                             </th>
 
-                            <th width="200">
-
+                            <th style="width: 180px;">
                                 Thể loại
-
                             </th>
 
-                            <th width="220">
+                            <th style="width: 220px;">
+                                Tiền phạt
+                            </th>
 
-                                Tình trạng khi trả
-
+                            <th style="width: 250px;">
+                                Ghi chú
                             </th>
 
                         </tr>
@@ -114,35 +115,35 @@
 
                     <tbody>
 
-                        @for (int i = 0; i < Model.Books.Count; i++)
+                        @for (int i = 0;
+                              i < Model.Books.Count;
+                              i++)
                         {
-                            <tr>
+                            <tr class="return-book-row">
 
                                 <td>
 
-                                    <input type="hidden" name="books[@i].BorrowRecordDetailId"
+                                    <input type="hidden"
+                                           name="books[@i].BorrowRecordDetailId"
                                            value="@Model.Books[i].BorrowRecordDetailId" />
 
-                                    <input type="hidden" name="books[@i].BookId" value="@Model.Books[i].BookId" />
+                                    <input type="hidden"
+                                           name="books[@i].BookId"
+                                           value="@Model.Books[i].BookId" />
 
-                                    <select name="books[@i].ReturnStatus" class="form-select">
+                                    <select name="books[@i].ReturnStatus"
+                                            class="form-select return-status">
 
                                         <option value="1">
-
-                                           Trả sách
-
+                                            Tốt
                                         </option>
 
                                         <option value="2">
-
                                             Mất sách
-
                                         </option>
 
                                         <option value="3">
-
                                             Sách hỏng
-
                                         </option>
 
                                     </select>
@@ -151,7 +152,9 @@
 
                                 <td>
 
-                                    @Model.Books[i].Title
+                                    <div class="fw-semibold">
+                                        @Model.Books[i].Title
+                                    </div>
 
                                 </td>
 
@@ -169,10 +172,35 @@
 
                                 <td>
 
+                                    <div class="input-group">
 
-                                        <input type="text" class="form-control" name="books[@i].ReturnNote"
-                                               placeholder="Ghi chú thêm..." />
+                                        <input type="number"
+                                               name="books[@i].Penalty"
+                                               class="form-control penalty-input"
+                                               value="0"
+                                               min="0"
+                                               step="1000"
+                                               readonly />
 
+                                        <span class="input-group-text">
+                                            VNĐ
+                                        </span>
+
+                                    </div>
+
+                                    <div class="form-text">
+                                        Bình thường: 0 VNĐ
+                                    </div>
+
+                                </td>
+
+                                <td>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="books[@i].ReturnNote"
+                                           maxlength="500"
+                                           placeholder="Ghi chú thêm..." />
 
                                 </td>
 
@@ -185,17 +213,48 @@
 
             </div>
 
-            <div class="mt-3">
+            <!-- Tổng tiền phạt -->
 
-                <button id="btnReturn" type="submit" class="btn btn-success">
+            <div class="d-flex justify-content-end mt-3">
 
-                    <i class="bi bi-check-circle"></i>
+                <div class="alert alert-warning mb-0">
+
+                    <i class="bi bi-cash-coin me-2"></i>
+
+                    <strong>
+                        Tổng tiền phạt:
+                    </strong>
+
+                    <span id="totalPenalty"
+                          class="fw-bold text-danger">
+
+                        0 VNĐ
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <!-- Buttons -->
+
+            <div class="mt-4">
+
+                <button id="btnReturn"
+                        type="submit"
+                        class="btn btn-success">
+
+                    <i class="bi bi-check-circle me-1"></i>
 
                     Xác nhận trả sách
 
                 </button>
 
-                <a asp-action="Detail" asp-route-id="@Model.BorrowRecordId" class="btn btn-secondary">
+                <a asp-action="Detail"
+                   asp-route-id="@Model.BorrowRecordId"
+                   class="btn btn-secondary">
+
+                    <i class="bi bi-arrow-left me-1"></i>
 
                     Quay lại
 
@@ -209,44 +268,168 @@
 
 </div>
 
+
 @section Scripts
 {
     <partial name="_ValidationScriptsPartial" />
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
 
-        document.querySelector("form")
-        .addEventListener("submit", function (e) {
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
 
-        e.preventDefault();
+                const form =
+                    document.querySelector("form");
 
-        Swal.fire({
+                const rows =
+                    document.querySelectorAll(
+                        ".return-book-row");
 
-        title: "Xác nhận trả sách?",
+                const totalPenalty =
+                    document.getElementById(
+                        "totalPenalty");
 
-        text: "Thao tác này sẽ hoàn tất phiếu mượn.",
 
-        icon: "question",
+                // =====================================
+                // Tính tổng tiền phạt
+                // =====================================
 
-        showCancelButton: true,
+                function calculateTotalPenalty() {
 
-        confirmButtonText: "Xác nhận",
+                    let total = 0;
 
-        cancelButtonText: "Hủy"
+                    document
+                        .querySelectorAll(".penalty-input")
+                        .forEach(function (input) {
 
-        }).then((result) => {
+                            const value =
+                                parseFloat(input.value) || 0;
 
-        if (result.isConfirmed) {
+                            total += value;
 
-        e.target.submit();
+                        });
 
-        }
+                    totalPenalty.textContent =
+                        total.toLocaleString("vi-VN")
+                        + " VNĐ";
+                }
 
-        });
 
-        });
+                // =====================================
+                // Xử lý tình trạng
+                // =====================================
+
+                rows.forEach(function (row) {
+
+                    const status =
+                        row.querySelector(
+                            ".return-status");
+
+                    const penalty =
+                        row.querySelector(
+                            ".penalty-input");
+
+
+                    function updatePenalty() {
+
+                        // 1 = Trả bình thường
+
+                        if (status.value === "1") {
+
+                            penalty.value = "0";
+
+                            penalty.readOnly = true;
+
+                        }
+
+                        // 2 = Mất
+                        // 3 = Hỏng
+
+                        else {
+
+                            penalty.readOnly = false;
+
+                        }
+
+                        calculateTotalPenalty();
+                    }
+
+
+                    status.addEventListener(
+                        "change",
+                        updatePenalty);
+
+
+                    penalty.addEventListener(
+                        "input",
+                        function () {
+
+                            if (
+                                parseFloat(
+                                    penalty.value) < 0
+                            ) {
+                                penalty.value = "0";
+                            }
+
+                            calculateTotalPenalty();
+
+                        });
+
+
+                    updatePenalty();
+
+                });
+
+
+                // =====================================
+                // Xác nhận trả sách
+                // =====================================
+
+                form.addEventListener(
+                    "submit",
+                    function (e) {
+
+                        e.preventDefault();
+
+                        Swal.fire({
+
+                            title:
+                                "Xác nhận trả sách?",
+
+                            text:
+                                "Sau khi xác nhận, thông tin trả sách sẽ được lưu.",
+
+                            icon:
+                                "question",
+
+                            showCancelButton:
+                                true,
+
+                            confirmButtonText:
+                                "Xác nhận",
+
+                            cancelButtonText:
+                                "Hủy",
+
+                            reverseButtons:
+                                true
+
+                        }).then(function (result) {
+
+                            if (result.isConfirmed) {
+
+                                form.submit();
+
+                            }
+
+                        });
+
+                    });
+
+            });
 
     </script>
 }
-

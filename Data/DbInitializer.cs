@@ -31,7 +31,6 @@ public static class DbInitializer
 
             PersonnelAddress = "Library",
 
-            Position = "Administrator"
         }
     };
 

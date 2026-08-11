@@ -20,8 +20,6 @@ public partial class Personnel
 
     public string? PersonnelAddress { get; set; }
 
-    public string? Position { get; set; }
-
     public virtual Account Account { get; set; } = null!;
 
     public virtual ICollection<Borrowrecord> Borrowrecords { get; set; } = new List<Borrowrecord>();

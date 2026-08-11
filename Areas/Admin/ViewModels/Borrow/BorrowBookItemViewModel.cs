@@ -19,4 +19,5 @@ public class BorrowBookItemViewModel
     public string? ReturnNote { get; set; }
 
     public DateTime? ReturnDate { get; set; }
+    public decimal Penalty { get; set; }
 }

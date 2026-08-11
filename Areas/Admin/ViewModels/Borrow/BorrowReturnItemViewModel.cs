@@ -17,4 +17,11 @@ public class BorrowReturnItemViewModel
 
     [Display(Name = "Ghi chú")]
     public string? ReturnNote { get; set; }
+    [Display(Name = "Tiền phạt")]
+    [Range(
+    typeof(decimal),
+    "0",
+    "9999999999999999.99",
+    ErrorMessage = "Tiền phạt phải lớn hơn hoặc bằng 0.")]
+    public decimal Penalty { get; set; }
 }
