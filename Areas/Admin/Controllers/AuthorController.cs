@@ -18,7 +18,7 @@ public class AuthorController : AdminBaseController
     string? keyword,
     int page = 1)
 {
-    const int pageSize = 5;
+    const int pageSize = 10;
 
     var model = await _authorService.GetPagedAsync(
         keyword,

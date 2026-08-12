@@ -1,0 +1,39 @@
+@{
+    string? type = null;
+    string? message = null;
+
+    if (TempData["Success"] != null)
+    {
+        type = "success";
+        message = TempData["Success"]?.ToString();
+    }
+    else if (TempData["Error"] != null)
+    {
+        type = "error";
+        message = TempData["Error"]?.ToString();
+    }
+    else if (TempData["Warning"] != null)
+    {
+        type = "warning";
+        message = TempData["Warning"]?.ToString();
+    }
+    else if (TempData["Info"] != null)
+    {
+        type = "info";
+        message = TempData["Info"]?.ToString();
+    }
+}
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <script>
+        window.appNotification = {
+            type: @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(type)
+            ),
+            message: @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(message)
+            )
+        };
+    </script>
+}

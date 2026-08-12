@@ -5,30 +5,6 @@
     ViewData["Title"] = "Thông tin cá nhân";
 }
 
-@if (TempData["Success"] != null)
-{
-    <script>
-
-        document.addEventListener("DOMContentLoaded", () => {
-
-            Swal.fire({
-
-                icon: "success",
-
-                title: "Thành công",
-
-                text: "@Html.Raw(TempData["Success"])",
-
-                timer: 1800,
-
-                showConfirmButton: false
-
-            });
-
-        });
-
-    </script>
-}
 <div class="container py-4">
     <div class="row g-4">
 
