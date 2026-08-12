@@ -22,292 +22,357 @@ public class BooksService : IBooksService
     #region Book List
 
     public async Task<BookListViewModel> GetBooksAsync(
-    int accountId,
-    BookFilterViewModel filter)
+        int? accountId,
+        BookFilterViewModel filter)
     {
         var model = new BookListViewModel
         {
             Filter = filter
         };
 
-        model.Categories = await GetCategoriesAsync();
+        model.Categories =
+            await GetCategoriesAsync();
 
-        model.Authors = await GetAuthorsAsync();
+        model.Authors =
+            await GetAuthorsAsync();
 
-        model.TotalBooks = await _context.Books.CountAsync();
+        model.TotalBooks =
+            await _context.Books.CountAsync();
 
+        // ==========================================
         // Lấy ResidentId của tài khoản hiện tại
-        var residentId = await _context.Residents
+        // ==========================================
 
-            .Where(x => x.AccountId == accountId)
+        int? residentId = null;
 
-            .Select(x => (int?)x.ResidentId)
-
-            .FirstOrDefaultAsync();
-
-        // Danh sách BookId đã yêu thích
-        var favoriteBookIds = residentId == null
-
-            ? new List<int>()
-
-            : await _context.Favoritebooks
-
-                .Where(x => x.ResidentId == residentId)
-
-                .Select(x => x.BookId)
-
-                .ToListAsync();
-
-        var query = _context.Books
-
-            .AsNoTracking()
-
-            .Include(x => x.Author)
-
-            .Include(x => x.Category)
-
-            .AsQueryable();
-
-        // ==========================
-        // Keyword
-        // ==========================
-
-        if (!string.IsNullOrWhiteSpace(filter.Keyword))
+        if (accountId.HasValue)
         {
-            string keyword = filter.Keyword.Trim();
-
-            query = query.Where(x =>
-
-                x.Title.Contains(keyword)
-
-                ||
-
-                x.Author.AuthorName.Contains(keyword)
-
-                ||
-
-                x.Category.CategoryName.Contains(keyword)
-
-                ||
-
-                (x.Publisher != null &&
-                 x.Publisher.Contains(keyword)));
+            residentId = await _context.Residents
+                .Where(x =>
+                    x.AccountId == accountId.Value)
+                .Select(x =>
+                    (int?)x.ResidentId)
+                .FirstOrDefaultAsync();
         }
 
-        // ==========================
+        // ==========================================
+        // Danh sách BookId đã yêu thích
+        //
+        // Chỉ Resident hiện tại mới có dữ liệu
+        // trong Favoritebooks.
+        //
+        // Admin / Personnel:
+        // favoriteBookIds = empty
+        // ==========================================
+
+        var favoriteBookIds = residentId.HasValue
+            ? await _context.Favoritebooks
+                .Where(x =>
+                    x.ResidentId == residentId.Value)
+                .Select(x =>
+                    x.BookId)
+                .ToListAsync()
+            : new List<int>();
+
+        // ==========================================
+        // Query Books
+        // ==========================================
+
+        var query = _context.Books
+            .AsNoTracking()
+            .Include(x => x.Author)
+            .Include(x => x.Category)
+            .AsQueryable();
+
+        // ==========================================
+        // Keyword
+        // ==========================================
+
+        if (!string.IsNullOrWhiteSpace(
+                filter.Keyword))
+        {
+            string keyword =
+                filter.Keyword.Trim();
+
+            query = query.Where(x =>
+                x.Title.Contains(keyword)
+                ||
+                x.Author.AuthorName
+                    .Contains(keyword)
+                ||
+                x.Category.CategoryName
+                    .Contains(keyword)
+                ||
+                (
+                    x.Publisher != null
+                    &&
+                    x.Publisher.Contains(keyword)
+                ));
+        }
+
+        // ==========================================
         // Category
-        // ==========================
+        // ==========================================
 
         if (filter.CategoryId.HasValue)
         {
             query = query.Where(x =>
-                x.CategoryId == filter.CategoryId);
+                x.CategoryId ==
+                filter.CategoryId.Value);
         }
 
-        // ==========================
+        // ==========================================
         // Author
-        // ==========================
+        // ==========================================
 
         if (filter.AuthorId.HasValue)
         {
             query = query.Where(x =>
-                x.AuthorId == filter.AuthorId);
+                x.AuthorId ==
+                filter.AuthorId.Value);
         }
 
-        // ==========================
+        // ==========================================
         // Sort
-        // ==========================
+        // ==========================================
 
         query = filter.SortBy switch
         {
-            "title"
+            "title" =>
+                query.OrderBy(x =>
+                    x.Title),
 
-                => query.OrderBy(x => x.Title),
-
-            "popular"
-
-                => query.OrderByDescending(x =>
+            "popular" =>
+                query.OrderByDescending(x =>
                     x.Borrowrecorddetails.Count),
 
-            "available"
-
-                => query.OrderByDescending(x =>
+            "available" =>
+                query.OrderByDescending(x =>
                     x.AvailableQuantity),
 
-            _
-
-                => query.OrderByDescending(x =>
+            _ =>
+                query.OrderByDescending(x =>
                     x.CreatedAt)
         };
 
-        // ==========================
+        // ==========================================
         // Projection
-        // ==========================
+        // ==========================================
 
         var books = query.Select(x =>
-
             new BookCardViewModel
             {
-                BookId = x.BookId,
+                BookId =
+                    x.BookId,
 
-                Title = x.Title,
+                Title =
+                    x.Title,
 
-                CoverImage = x.CoverImage,
+                CoverImage =
+                    x.CoverImage,
 
-                AuthorName = x.Author.AuthorName,
+                AuthorName =
+                    x.Author.AuthorName,
 
-                CategoryName = x.Category.CategoryName,
+                CategoryName =
+                    x.Category.CategoryName,
 
-                AvailableQuantity = x.AvailableQuantity,
+                AvailableQuantity =
+                    x.AvailableQuantity,
 
-                IsAvailable = x.IsAvailable,
+                IsAvailable =
+                    x.IsAvailable,
 
-                IsFavorite = favoriteBookIds.Contains(x.BookId)
+                IsFavorite =
+                    favoriteBookIds.Contains(
+                        x.BookId)
             });
 
         model.Books =
-            await PaginatedList<BookCardViewModel>.CreateAsync(
-
-                books,
-
-                filter.Page,
-
-                filter.PageSize);
+            await PaginatedList<BookCardViewModel>
+                .CreateAsync(
+                    books,
+                    filter.Page,
+                    filter.PageSize);
 
         return model;
     }
 
     #endregion
+
+
     #region Book Detail
 
     public async Task<BookDetailViewModel?> GetBookDetailAsync(
-    int accountId,
-    int bookId)
+        int? accountId,
+        int bookId)
     {
-        var residentId = await _context.Residents
-    .Where(x => x.AccountId == accountId)
-    .Select(x => (int?)x.ResidentId)
-    .FirstOrDefaultAsync();
+        // ==========================================
+        // Lấy ResidentId nếu tài khoản là Resident
+        // ==========================================
+
+        int? residentId = null;
+
+        if (accountId.HasValue)
+        {
+            residentId = await _context.Residents
+                .Where(x =>
+                    x.AccountId ==
+                    accountId.Value)
+                .Select(x =>
+                    (int?)x.ResidentId)
+                .FirstOrDefaultAsync();
+        }
+
+        // ==========================================
+        // Chi tiết sách
+        // ==========================================
+
         return await _context.Books
-
             .AsNoTracking()
+            .Where(x =>
+                x.BookId == bookId)
+            .Select(x =>
+                new BookDetailViewModel
+                {
+                    BookId =
+                        x.BookId,
 
-            .Where(x => x.BookId == bookId)
+                    Title =
+                        x.Title,
 
-            .Select(x => new BookDetailViewModel
-            {
-                BookId = x.BookId,
+                    CoverImage =
+                        x.CoverImage,
 
-                Title = x.Title,
+                    AuthorName =
+                        x.Author.AuthorName,
 
-                CoverImage = x.CoverImage,
+                    CategoryName =
+                        x.Category.CategoryName,
 
-                AuthorName = x.Author.AuthorName,
+                    Publisher =
+                        x.Publisher,
 
-                CategoryName = x.Category.CategoryName,
+                    PublishYear =
+                        x.PublicationYear,
 
-                Publisher = x.Publisher,
+                    Quantity =
+                        x.Quantity,
 
-                PublishYear = x.PublicationYear,
+                    AvailableQuantity =
+                        x.AvailableQuantity,
 
-                Quantity = x.Quantity,
+                    IsAvailable =
+                        x.IsAvailable,
 
-                AvailableQuantity = x.AvailableQuantity,
+                    Description =
+                        x.BookDescription,
 
-                IsAvailable = x.IsAvailable,
-
-                Description = x.BookDescription,
-                IsFavorite = residentId != null &&
-                _context.Favoritebooks.Any(f =>
-                    f.ResidentId == residentId &&
-                    f.BookId == x.BookId)
-
-            })
-
+                    IsFavorite =
+                        residentId.HasValue
+                        &&
+                        _context.Favoritebooks.Any(f =>
+                            f.ResidentId ==
+                                residentId.Value
+                            &&
+                            f.BookId ==
+                                x.BookId)
+                })
             .FirstOrDefaultAsync();
     }
 
     #endregion
 
+
     #region Dropdown
 
-    public async Task<List<SelectListItem>> GetCategoriesAsync()
+    public async Task<List<SelectListItem>>
+        GetCategoriesAsync()
     {
-        var items = await _context.Categories
+        var items =
+            await _context.Categories
+                .AsNoTracking()
+                .OrderBy(x =>
+                    x.CategoryName)
+                .Select(x =>
+                    new SelectListItem
+                    {
+                        Value =
+                            x.CategoryId.ToString(),
 
-            .AsNoTracking()
+                        Text =
+                            x.CategoryName
+                    })
+                .ToListAsync();
 
-            .OrderBy(x => x.CategoryName)
-
-            .Select(x => new SelectListItem
+        items.Insert(
+            0,
+            new SelectListItem
             {
-                Value = x.CategoryId.ToString(),
-
-                Text = x.CategoryName
-            })
-
-            .ToListAsync();
-
-        items.Insert(0, new SelectListItem
-        {
-            Value = "",
-
-            Text = "-- Tất cả thể loại --"
-        });
+                Value = "",
+                Text =
+                    "-- Tất cả thể loại --"
+            });
 
         return items;
     }
 
-    public async Task<List<SelectListItem>> GetAuthorsAsync()
+    public async Task<List<SelectListItem>>
+        GetAuthorsAsync()
     {
-        var items = await _context.Authors
+        var items =
+            await _context.Authors
+                .AsNoTracking()
+                .OrderBy(x =>
+                    x.AuthorName)
+                .Select(x =>
+                    new SelectListItem
+                    {
+                        Value =
+                            x.AuthorId.ToString(),
 
-            .AsNoTracking()
+                        Text =
+                            x.AuthorName
+                    })
+                .ToListAsync();
 
-            .OrderBy(x => x.AuthorName)
-
-            .Select(x => new SelectListItem
+        items.Insert(
+            0,
+            new SelectListItem
             {
-                Value = x.AuthorId.ToString(),
-
-                Text = x.AuthorName
-            })
-
-            .ToListAsync();
-
-        items.Insert(0, new SelectListItem
-        {
-            Value = "",
-
-            Text = "-- Tất cả tác giả --"
-        });
+                Value = "",
+                Text =
+                    "-- Tất cả tác giả --"
+            });
 
         return items;
     }
 
     #endregion
+
+
     #region Related Books
 
-    public async Task<List<BookCardViewModel>> GetRelatedBooksAsync(
-        int bookId)
+    public async Task<List<BookCardViewModel>>
+        GetRelatedBooksAsync(
+            int bookId)
     {
         // ===================================
         // Lấy thông tin sách hiện tại
         // ===================================
 
-        var currentBook = await _context.Books
-
-            .AsNoTracking()
-
-            .Where(x => x.BookId == bookId)
-
-            .Select(x => new
-            {
-                x.CategoryId,
-                x.AuthorId
-            })
-
-            .FirstOrDefaultAsync();
+        var currentBook =
+            await _context.Books
+                .AsNoTracking()
+                .Where(x =>
+                    x.BookId == bookId)
+                .Select(x =>
+                    new
+                    {
+                        x.CategoryId,
+                        x.AuthorId
+                    })
+                .FirstOrDefaultAsync();
 
         if (currentBook == null)
         {
@@ -318,40 +383,42 @@ public class BooksService : IBooksService
         // Cùng thể loại
         // ===================================
 
-        var relatedBooks = await _context.Books
+        var relatedBooks =
+            await _context.Books
+                .AsNoTracking()
+                .Where(x =>
+                    x.BookId != bookId
+                    &&
+                    x.CategoryId ==
+                        currentBook.CategoryId)
+                .OrderByDescending(x =>
+                    x.CreatedAt)
+                .Take(6)
+                .Select(x =>
+                    new BookCardViewModel
+                    {
+                        BookId =
+                            x.BookId,
 
-            .AsNoTracking()
+                        Title =
+                            x.Title,
 
-            .Where(x =>
+                        CoverImage =
+                            x.CoverImage,
 
-                x.BookId != bookId
+                        AuthorName =
+                            x.Author.AuthorName,
 
-                &&
+                        CategoryName =
+                            x.Category.CategoryName,
 
-                x.CategoryId == currentBook.CategoryId)
+                        AvailableQuantity =
+                            x.AvailableQuantity,
 
-            .OrderByDescending(x => x.CreatedAt)
-
-            .Take(6)
-
-            .Select(x => new BookCardViewModel
-            {
-                BookId = x.BookId,
-
-                Title = x.Title,
-
-                CoverImage = x.CoverImage,
-
-                AuthorName = x.Author.AuthorName,
-
-                CategoryName = x.Category.CategoryName,
-
-                AvailableQuantity = x.AvailableQuantity,
-
-                IsAvailable = x.IsAvailable
-            })
-
-            .ToListAsync();
+                        IsAvailable =
+                            x.IsAvailable
+                    })
+                .ToListAsync();
 
         // ===================================
         // Nếu chưa đủ thì lấy cùng tác giả
@@ -359,48 +426,55 @@ public class BooksService : IBooksService
 
         if (relatedBooks.Count < 6)
         {
-            var existedIds = relatedBooks
-                .Select(x => x.BookId)
-                .ToList();
+            var existedIds =
+                relatedBooks
+                    .Select(x =>
+                        x.BookId)
+                    .ToList();
 
             existedIds.Add(bookId);
 
-            var authorBooks = await _context.Books
+            var authorBooks =
+                await _context.Books
+                    .AsNoTracking()
+                    .Where(x =>
+                        x.AuthorId ==
+                            currentBook.AuthorId
+                        &&
+                        !existedIds.Contains(
+                            x.BookId))
+                    .OrderByDescending(x =>
+                        x.CreatedAt)
+                    .Take(
+                        6 - relatedBooks.Count)
+                    .Select(x =>
+                        new BookCardViewModel
+                        {
+                            BookId =
+                                x.BookId,
 
-                .AsNoTracking()
+                            Title =
+                                x.Title,
 
-                .Where(x =>
+                            CoverImage =
+                                x.CoverImage,
 
-                    x.AuthorId == currentBook.AuthorId
+                            AuthorName =
+                                x.Author.AuthorName,
 
-                    &&
+                            CategoryName =
+                                x.Category.CategoryName,
 
-                    !existedIds.Contains(x.BookId))
+                            AvailableQuantity =
+                                x.AvailableQuantity,
 
-                .OrderByDescending(x => x.CreatedAt)
+                            IsAvailable =
+                                x.IsAvailable
+                        })
+                    .ToListAsync();
 
-                .Take(6 - relatedBooks.Count)
-
-                .Select(x => new BookCardViewModel
-                {
-                    BookId = x.BookId,
-
-                    Title = x.Title,
-
-                    CoverImage = x.CoverImage,
-
-                    AuthorName = x.Author.AuthorName,
-
-                    CategoryName = x.Category.CategoryName,
-
-                    AvailableQuantity = x.AvailableQuantity,
-
-                    IsAvailable = x.IsAvailable
-                })
-
-                .ToListAsync();
-
-            relatedBooks.AddRange(authorBooks);
+            relatedBooks.AddRange(
+                authorBooks);
         }
 
         // ===================================
@@ -409,44 +483,52 @@ public class BooksService : IBooksService
 
         if (relatedBooks.Count < 6)
         {
-            var existedIds = relatedBooks
-                .Select(x => x.BookId)
-                .ToList();
+            var existedIds =
+                relatedBooks
+                    .Select(x =>
+                        x.BookId)
+                    .ToList();
 
             existedIds.Add(bookId);
 
-            var newestBooks = await _context.Books
+            var newestBooks =
+                await _context.Books
+                    .AsNoTracking()
+                    .Where(x =>
+                        !existedIds.Contains(
+                            x.BookId))
+                    .OrderByDescending(x =>
+                        x.CreatedAt)
+                    .Take(
+                        6 - relatedBooks.Count)
+                    .Select(x =>
+                        new BookCardViewModel
+                        {
+                            BookId =
+                                x.BookId,
 
-                .AsNoTracking()
+                            Title =
+                                x.Title,
 
-                .Where(x =>
+                            CoverImage =
+                                x.CoverImage,
 
-                    !existedIds.Contains(x.BookId))
+                            AuthorName =
+                                x.Author.AuthorName,
 
-                .OrderByDescending(x => x.CreatedAt)
+                            CategoryName =
+                                x.Category.CategoryName,
 
-                .Take(6 - relatedBooks.Count)
+                            AvailableQuantity =
+                                x.AvailableQuantity,
 
-                .Select(x => new BookCardViewModel
-                {
-                    BookId = x.BookId,
+                            IsAvailable =
+                                x.IsAvailable
+                        })
+                    .ToListAsync();
 
-                    Title = x.Title,
-
-                    CoverImage = x.CoverImage,
-
-                    AuthorName = x.Author.AuthorName,
-
-                    CategoryName = x.Category.CategoryName,
-
-                    AvailableQuantity = x.AvailableQuantity,
-
-                    IsAvailable = x.IsAvailable
-                })
-
-                .ToListAsync();
-
-            relatedBooks.AddRange(newestBooks);
+            relatedBooks.AddRange(
+                newestBooks);
         }
 
         return relatedBooks;

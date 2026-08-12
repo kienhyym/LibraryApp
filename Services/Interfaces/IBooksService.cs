@@ -10,7 +10,7 @@ public interface IBooksService
     #region Book List
 
     Task<BookListViewModel> GetBooksAsync(
-        int accountId,
+        int? accountId,
         BookFilterViewModel filter);
 
     #endregion
@@ -18,8 +18,8 @@ public interface IBooksService
     #region Book Detail
 
     Task<BookDetailViewModel?> GetBookDetailAsync(
-      int accountId,
-      int bookId);
+        int? accountId,
+        int bookId);
 
     #endregion
 
