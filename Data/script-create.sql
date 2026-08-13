@@ -485,9 +485,12 @@ CREATE TABLE BORROWRECORDS
 
     DueDate DATETIME NOT NULL,
 
+    -- Ngày trả toàn bộ phiếu
+    ReturnDate DATETIME NULL,
+
     /*
         1 = Borrowing
-        2 = Returned
+        2 = Completed
         3 = Overdue
     */
     BorrowRecordStatus INT NOT NULL
@@ -540,41 +543,31 @@ CREATE TABLE BORROWRECORDDETAILS
 
     BookId INT NOT NULL,
 
-    ReturnDate DATETIME NULL,
-
     /*
         ReturnStatus:
             NULL = Chưa trả
             1    = Tốt
-            2    = Hư hỏng
-            3    = Mất
+            2    = Mất
+            3    = Hư hỏng
     */
     ReturnStatus INT NULL,
 
     ReturnNote NVARCHAR(500) NULL,
 
     /*
-        Tiền phạt của cuốn sách
+        Tiền phạt của từng cuốn sách
         Đơn vị: VNĐ
-
-        Giá trị hợp lệ:
-            0 -> 10.000.000
     */
     Penalty DECIMAL(18,2) NOT NULL
         CONSTRAINT DF_BORROWRECORDDETAILS_Penalty
         DEFAULT (0),
 
-
-    -- PRIMARY KEY
     CONSTRAINT PK_BORROWRECORDDETAILS
         PRIMARY KEY (BorrowRecordDetailId),
 
-
-    -- FOREIGN KEY
     CONSTRAINT FK_BORROWRECORDDETAILS_BORROWRECORDS
         FOREIGN KEY (BorrowRecordId)
         REFERENCES BORROWRECORDS(BorrowRecordId),
-
 
     CONSTRAINT FK_BORROWRECORDDETAILS_BOOKS
         FOREIGN KEY (BookId)

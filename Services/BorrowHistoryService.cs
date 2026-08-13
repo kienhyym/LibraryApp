@@ -1,4 +1,5 @@
 using LibraryApp.Common;
+using LibraryApp.Enums;
 using LibraryApp.Models;
 using LibraryApp.Services.Interfaces;
 using LibraryApp.ViewModels.BorrowHistory;
@@ -19,14 +20,32 @@ public class BorrowHistoryService : IBorrowHistoryService
         _context = context;
     }
 
+
+    #region Borrow History
+
+
     public async Task<BorrowHistoryViewModel> GetBorrowHistoryAsync(
         int accountId,
         BorrowHistoryFilter filter)
     {
+        // ==========================================
+        // Lấy ResidentId
+        // ==========================================
+
         var residentId = await _context.Residents
-            .Where(x => x.AccountId == accountId)
-            .Select(x => x.ResidentId)
+
+            .Where(x =>
+                x.AccountId == accountId)
+
+            .Select(x =>
+                x.ResidentId)
+
             .FirstOrDefaultAsync();
+
+
+        // ==========================================
+        // Query
+        // ==========================================
 
         var query = _context.Borrowrecords
 
@@ -35,79 +54,130 @@ public class BorrowHistoryService : IBorrowHistoryService
             .Include(x => x.Borrowrecorddetails)
                 .ThenInclude(x => x.Book)
 
-            .Where(x => x.ResidentId == residentId);
+            .Where(x =>
+                x.ResidentId == residentId);
+
+
+        // ==========================================
+        // Filter trạng thái
+        // ==========================================
 
         switch (filter.Status)
         {
             case "borrowing":
 
                 query = query.Where(x =>
-                    x.Borrowrecorddetails.Any(d =>
-                        d.ReturnDate == null));
+                    x.BorrowRecordStatus ==
+                    BorrowRecordStatus.Borrowing);
 
                 break;
+
 
             case "returned":
 
                 query = query.Where(x =>
-                    x.Borrowrecorddetails.All(d =>
-                        d.ReturnDate != null));
+                    x.BorrowRecordStatus ==
+                    BorrowRecordStatus.Completed);
 
                 break;
+
 
             case "overdue":
 
                 query = query.Where(x =>
-                    x.DueDate < DateTime.Now &&
-                    x.Borrowrecorddetails.Any(d =>
-                        d.ReturnDate == null));
+                    x.BorrowRecordStatus ==
+                    BorrowRecordStatus.Overdue);
 
                 break;
         }
 
-        var total = await query.CountAsync();
+
+        // ==========================================
+        // Tổng số phiếu
+        // ==========================================
+
+        var total =
+            await query.CountAsync();
+
+
+        // ==========================================
+        // Phân trang
+        // ==========================================
 
         var records = await query
 
-            .OrderByDescending(x => x.BorrowDate)
+            .OrderByDescending(x =>
+                x.BorrowDate)
 
-            .Skip((filter.Page - 1) * PageSize)
+            .Skip(
+                (filter.Page - 1)
+                * PageSize)
 
             .Take(PageSize)
 
             .ToListAsync();
 
-        var items = records.Select(x => new BorrowRecordViewModel
-        {
-            BorrowRecordId = x.BorrowRecordId,
 
-            BorrowDate = x.BorrowDate,
+        // ==========================================
+        // Mapping ViewModel
+        // ==========================================
 
-            DueDate = x.DueDate,
+        var items = records
 
-            TotalBooks = x.Borrowrecorddetails.Count,
+            .Select(x => new BorrowRecordViewModel
+            {
+                BorrowRecordId =
+                    x.BorrowRecordId,
 
-            Status =
-                x.Borrowrecorddetails.All(d => d.ReturnDate != null)
-                    ? "Đã trả"
-                    : x.DueDate < DateTime.Now
-                        ? "Quá hạn"
-                        : "Đang mượn",
+                BorrowDate =
+                    x.BorrowDate,
 
-            Books = x.Borrowrecorddetails
-                .Select(d => new BorrowHistoryBookViewModel
-                {
-                    BookId = d.BookId,
+                DueDate =
+                    x.DueDate,
 
-                    BookTitle = d.Book.Title,
+                // Ngày trả nằm ở BORROWRECORDS
+                ReturnDate =
+                    x.ReturnDate,
 
-                    CoverImage = d.Book.CoverImage,
+                TotalBooks =
+                    x.Borrowrecorddetails.Count,
 
-                    ReturnDate = d.ReturnDate
-                })
-                .ToList()
+                Status =
+                    GetStatusText(x),
 
-        }).ToList();
+                Books =
+                    x.Borrowrecorddetails
+
+                        .Select(d =>
+                            new BorrowHistoryBookViewModel
+                            {
+                                BookId =
+                                    d.BookId,
+
+                                BookTitle =
+                                    d.Book.Title,
+
+                                CoverImage =
+                                    d.Book.CoverImage,
+
+                                // Ngày trả của toàn bộ phiếu
+                                ReturnDate =
+                                    x.ReturnDate,
+
+                                ReturnStatus =
+                                    d.ReturnStatus
+                            })
+
+                        .ToList()
+
+            })
+
+            .ToList();
+
+
+        // ==========================================
+        // Return
+        // ==========================================
 
         return new BorrowHistoryViewModel
         {
@@ -122,14 +192,35 @@ public class BorrowHistoryService : IBorrowHistoryService
         };
     }
 
+
+    #endregion
+
+
+    #region Borrow Record Detail
+
+
     public async Task<BorrowRecordViewModel?> GetBorrowRecordAsync(
         int accountId,
         int borrowRecordId)
     {
+        // ==========================================
+        // Lấy ResidentId
+        // ==========================================
+
         var residentId = await _context.Residents
-            .Where(x => x.AccountId == accountId)
-            .Select(x => x.ResidentId)
+
+            .Where(x =>
+                x.AccountId == accountId)
+
+            .Select(x =>
+                x.ResidentId)
+
             .FirstOrDefaultAsync();
+
+
+        // ==========================================
+        // Lấy phiếu mượn
+        // ==========================================
 
         var record = await _context.Borrowrecords
 
@@ -139,45 +230,98 @@ public class BorrowHistoryService : IBorrowHistoryService
                 .ThenInclude(x => x.Book)
 
             .FirstOrDefaultAsync(x =>
-                x.BorrowRecordId == borrowRecordId &&
-                x.ResidentId == residentId);
+                x.BorrowRecordId ==
+                    borrowRecordId
+
+                &&
+
+                x.ResidentId ==
+                    residentId);
+
 
         if (record == null)
         {
             return null;
         }
 
+
+        // ==========================================
+        // Mapping
+        // ==========================================
+
         return new BorrowRecordViewModel
         {
-            BorrowRecordId = record.BorrowRecordId,
+            BorrowRecordId =
+                record.BorrowRecordId,
 
-            BorrowDate = record.BorrowDate,
+            BorrowDate =
+                record.BorrowDate,
 
-            DueDate = record.DueDate,
+            DueDate =
+                record.DueDate,
 
-            TotalBooks = record.Borrowrecorddetails.Count,
+            // Ngày trả nằm ở BORROWRECORDS
+            ReturnDate =
+                record.ReturnDate,
+
+            TotalBooks =
+                record.Borrowrecorddetails.Count,
 
             Status =
-                record.Borrowrecorddetails.All(d => d.ReturnDate != null)
-                    ? "Đã trả"
-                    : record.DueDate < DateTime.Now
-                        ? "Quá hạn"
-                        : "Đang mượn",
+                GetStatusText(record),
 
-            Books = record.Borrowrecorddetails
-                .Select(d => new BorrowHistoryBookViewModel
-                {
-                    BookId = d.BookId,
+            Books =
+                record.Borrowrecorddetails
 
-                    BookTitle = d.Book.Title,
+                    .Select(d =>
+                        new BorrowHistoryBookViewModel
+                        {
+                            BookId =
+                                d.BookId,
 
-                    CoverImage = d.Book.CoverImage,
+                            BookTitle =
+                                d.Book.Title,
 
-                    ReturnDate = d.ReturnDate,
+                            CoverImage =
+                                d.Book.CoverImage,
 
-                    ReturnStatus = d.ReturnStatus
-                })
-                .ToList()
+                            // Dùng ReturnDate của phiếu
+                            ReturnDate =
+                                record.ReturnDate,
+
+                            ReturnStatus =
+                                d.ReturnStatus
+                        })
+
+                    .ToList()
         };
     }
+
+
+    #endregion
+
+
+    #region Status
+
+
+    private static string GetStatusText(
+        Borrowrecord record)
+    {
+        return record.BorrowRecordStatus switch
+        {
+            BorrowRecordStatus.Borrowing
+                => "Đang mượn",
+
+            BorrowRecordStatus.Completed
+                => "Đã trả",
+
+            BorrowRecordStatus.Overdue
+                => "Quá hạn",
+
+            _ => "Không xác định"
+        };
+    }
+
+
+    #endregion
 }

@@ -1,3 +1,4 @@
+using LibraryApp.Enums;
 using LibraryApp.Models;
 using LibraryApp.Services.Interfaces;
 using LibraryApp.ViewModels.Profile;
@@ -71,15 +72,16 @@ public class ProfileService : IProfileService
         .CountAsync(x =>
             x.BorrowRecord.ResidentId ==
             resident.ResidentId &&
-            x.ReturnDate == null),
+            x.BorrowRecord.BorrowRecordStatus ==
+                BorrowRecordStatus.Borrowing),
 
             OverdueBooks =
     await _context.Borrowrecorddetails
         .CountAsync(x =>
             x.BorrowRecord.ResidentId ==
             resident.ResidentId &&
-            x.ReturnDate == null &&
-            x.BorrowRecord.DueDate < DateTime.Now)
+            x.BorrowRecord.BorrowRecordStatus ==
+                BorrowRecordStatus.Overdue)
         };
     }
 

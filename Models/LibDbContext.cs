@@ -116,6 +116,7 @@ public partial class LibDbContext : DbContext
             entity.Property(e => e.BorrowRecordStatus).HasDefaultValue(BorrowRecordStatus.Borrowing);
             entity.Property(e => e.DueDate).HasColumnType("datetime");
             entity.Property(e => e.Notes).HasMaxLength(250);
+            entity.Property(e => e.ReturnDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.Personnel).WithMany(p => p.BorrowrecordPersonnel)
                 .HasForeignKey(d => d.PersonnelId)
@@ -139,7 +140,6 @@ public partial class LibDbContext : DbContext
             entity.HasIndex(e => new { e.BorrowRecordId, e.BookId }, "UQ_BORROWRECORDDETAILS_BorrowRecordId_BookId").IsUnique();
 
             entity.Property(e => e.Penalty).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.ReturnDate).HasColumnType("datetime");
             entity.Property(e => e.ReturnNote).HasMaxLength(500);
 
             entity.HasOne(d => d.Book).WithMany(p => p.Borrowrecorddetails)

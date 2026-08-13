@@ -20,47 +20,100 @@ public class BorrowService : IBorrowService
     #region Query
 
     public async Task<PaginatedList<BorrowListViewModel>> GetPagedAsync(
-        string? keyword,
-        int page,
-        int pageSize)
+    string? keyword,
+    BorrowRecordStatus? status,
+    int page,
+    int pageSize)
+{
+    // ==========================================
+    // Cập nhật các phiếu quá hạn
+    // ==========================================
+
+    await UpdateOverdueAsync();
+
+
+    // ==========================================
+    // Query phiếu mượn
+    // ==========================================
+
+    var query = _context.Borrowrecords
+        .AsNoTracking()
+        .Include(x => x.Resident)
+        .Include(x => x.Personnel)
+        .Include(x => x.Borrowrecorddetails)
+        .AsQueryable();
+
+
+    // ==========================================
+    // Tìm kiếm
+    // ==========================================
+
+    if (!string.IsNullOrWhiteSpace(keyword))
     {
-        await UpdateOverdueAsync();
-        var query = _context.Borrowrecords
-            .Include(x => x.Resident)
-            .Include(x => x.Personnel)
-            .Include(x => x.Borrowrecorddetails)
-            .OrderByDescending(x => x.BorrowDate)
-            .Select(x => new BorrowListViewModel
-            {
-                BorrowRecordId = x.BorrowRecordId,
+        keyword = keyword.Trim();
 
-                ResidentName = x.Resident.FullName,
-
-                PersonnelName = x.Personnel.FullName,
-
-                BorrowDate = x.BorrowDate,
-
-                DueDate = x.DueDate,
-
-                BorrowRecordStatus = x.BorrowRecordStatus,
-
-                TotalBooks = x.Borrowrecorddetails.Count
-            });
-
-        if (!string.IsNullOrWhiteSpace(keyword))
-        {
-            keyword = keyword.Trim();
-
-            query = query.Where(x =>
-
-                x.ResidentName.Contains(keyword)
-
-                || x.PersonnelName.Contains(keyword));
-        }
-
-        return await PaginatedList<BorrowListViewModel>
-            .CreateAsync(query, page, pageSize);
+        query = query.Where(x =>
+            x.Resident.FullName.Contains(keyword));
     }
+
+
+    // ==========================================
+    // Lọc theo trạng thái
+    //
+    // 1 = Borrowing
+    // 2 = Completed
+    // 3 = Overdue
+    // ==========================================
+
+    if (status.HasValue)
+    {
+        query = query.Where(x =>
+            x.BorrowRecordStatus == status.Value);
+    }
+
+
+    // ==========================================
+    // Projection
+    // ==========================================
+
+    var result = query
+        .OrderByDescending(x => x.BorrowDate)
+        .Select(x => new BorrowListViewModel
+        {
+            BorrowRecordId =
+                x.BorrowRecordId,
+
+            ResidentName =
+                x.Resident.FullName,
+
+            BorrowDate =
+                x.BorrowDate,
+
+            DueDate =
+                x.DueDate,
+
+            // Ngày trả nằm ở BORROWRECORDS
+            ReturnDate =
+                x.ReturnDate,
+
+            BorrowRecordStatus =
+                x.BorrowRecordStatus,
+
+            TotalBooks =
+                x.Borrowrecorddetails.Count
+        });
+
+
+    // ==========================================
+    // Phân trang
+    // ==========================================
+
+    return await PaginatedList<BorrowListViewModel>
+        .CreateAsync(
+            result,
+            page,
+            pageSize);
+}
 
     public Task<BorrowCreateViewModel> GetCreateModelAsync()
     {
@@ -101,7 +154,7 @@ public class BorrowService : IBorrowService
                 ResidentName = x.Resident.FullName,
 
                 PersonnelName = x.Personnel.FullName,
-                
+
                 ReturnPersonnelName =
                 x.ReturnPersonnel != null
                     ? x.ReturnPersonnel.FullName
@@ -110,7 +163,9 @@ public class BorrowService : IBorrowService
                 BorrowDate = x.BorrowDate,
 
                 DueDate = x.DueDate,
-
+                
+                ReturnDate = x.ReturnDate,
+                
                 BorrowRecordStatus = x.BorrowRecordStatus,
 
                 Notes = x.Notes,
@@ -133,8 +188,6 @@ public class BorrowService : IBorrowService
         CategoryName = d.Book.Category.CategoryName,
 
         AvailableQuantity = d.Book.AvailableQuantity,
-
-        ReturnDate = d.ReturnDate,
 
         ReturnStatus = d.ReturnStatus == null
 
@@ -248,20 +301,18 @@ public class BorrowService : IBorrowService
     #region Validation
 
     public async Task<bool> CanBorrowAsync(
-        int residentId)
+     int residentId)
     {
         const int maxBorrowBooks = 5;
 
-        var borrowingBooks = await _context.Borrowrecorddetails
-            .Include(x => x.BorrowRecord)
-            .CountAsync(x =>
-
-                x.BorrowRecord.ResidentId == residentId
-
-                && x.BorrowRecord.BorrowRecordStatus ==
-                    BorrowRecordStatus.Borrowing
-
-                && x.ReturnDate == null);
+        var borrowingBooks =
+            await _context.Borrowrecorddetails
+                .Include(x => x.BorrowRecord)
+                .CountAsync(x =>
+                    x.BorrowRecord.ResidentId == residentId
+                    &&
+                    x.BorrowRecord.BorrowRecordStatus ==
+                        BorrowRecordStatus.Borrowing);
 
         return borrowingBooks < maxBorrowBooks;
     }
@@ -292,8 +343,8 @@ public class BorrowService : IBorrowService
     }
 
     public async Task<bool> IsBookBorrowingAsync(
-        int residentId,
-        int bookId)
+    int residentId,
+    int bookId)
     {
         return await _context.Borrowrecorddetails
             .Include(x => x.BorrowRecord)
@@ -301,12 +352,14 @@ public class BorrowService : IBorrowService
 
                 x.BookId == bookId
 
-                && x.BorrowRecord.ResidentId == residentId
+                &&
 
-                && x.BorrowRecord.BorrowRecordStatus ==
-                    BorrowRecordStatus.Borrowing
+                x.BorrowRecord.ResidentId == residentId
 
-                && x.ReturnDate == null);
+                &&
+
+                x.BorrowRecord.BorrowRecordStatus ==
+                    BorrowRecordStatus.Borrowing);
     }
 
     #endregion
@@ -446,10 +499,10 @@ public class BorrowService : IBorrowService
 
                 x.BorrowRecord.ResidentId == residentId
 
-                && x.BorrowRecord.BorrowRecordStatus ==
-                    BorrowRecordStatus.Borrowing
+                &&
 
-                && x.ReturnDate == null)
+                x.BorrowRecord.BorrowRecordStatus ==
+                    BorrowRecordStatus.Borrowing)
 
             .Select(x => x.BookId)
 
@@ -498,9 +551,9 @@ public class BorrowService : IBorrowService
     #region Return
 
     public async Task ReturnBooksAsync(
-    int borrowRecordId,
-    List<BorrowReturnItemViewModel> books,
-    int returnPersonnelId)
+        int borrowRecordId,
+        List<BorrowReturnItemViewModel> books,
+        int returnPersonnelId)
     {
         await UpdateOverdueAsync();
 
@@ -533,9 +586,10 @@ public class BorrowService : IBorrowService
         // Kiểm tra nhân viên nhận trả
         // ==========================================
 
-        var personnelExists = await _context.Personnel
-            .AnyAsync(x =>
-                x.PersonnelId == returnPersonnelId);
+        var personnelExists =
+            await _context.Personnel
+                .AnyAsync(x =>
+                    x.PersonnelId == returnPersonnelId);
 
         if (!personnelExists)
         {
@@ -544,12 +598,15 @@ public class BorrowService : IBorrowService
         }
 
         // ==========================================
-        // Kiểm tra số lượng sách gửi lên
-        // phải đúng với toàn bộ chi tiết phiếu
+        // Lấy toàn bộ chi tiết phiếu
         // ==========================================
 
-        var details = borrowRecord.Borrowrecorddetails
-            .ToList();
+        var details =
+            borrowRecord.Borrowrecorddetails.ToList();
+
+        // ==========================================
+        // Bắt buộc phải trả toàn bộ sách
+        // ==========================================
 
         if (books.Count != details.Count)
         {
@@ -575,7 +632,7 @@ public class BorrowService : IBorrowService
         try
         {
             // ==========================================
-            // Xử lý toàn bộ sách
+            // Xử lý từng sách
             // ==========================================
 
             foreach (var detail in details)
@@ -584,9 +641,9 @@ public class BorrowService : IBorrowService
                     x.BorrowRecordDetailId ==
                     detail.BorrowRecordDetailId);
 
-                // ------------------------------
-                // Kiểm tra trạng thái
-                // ------------------------------
+                // ======================================
+                // Kiểm tra ReturnStatus
+                // ======================================
 
                 if (!Enum.IsDefined(
                         typeof(ReturnStatus),
@@ -596,9 +653,9 @@ public class BorrowService : IBorrowService
                         "Tình trạng trả sách không hợp lệ.");
                 }
 
-                // ------------------------------
+                // ======================================
                 // Kiểm tra tiền phạt
-                // ------------------------------
+                // ======================================
 
                 if (item.Penalty < 0 ||
                     item.Penalty > 10_000_000)
@@ -607,10 +664,9 @@ public class BorrowService : IBorrowService
                         "Tiền phạt phải từ 0 đến 10.000.000 VNĐ.");
                 }
 
-                // ------------------------------
-                // Sách trả bình thường
-                // không có tiền phạt
-                // ------------------------------
+                // ======================================
+                // Sách tốt → không phạt
+                // ======================================
 
                 if (item.ReturnStatus ==
                     ReturnStatus.Returned)
@@ -618,12 +674,9 @@ public class BorrowService : IBorrowService
                     item.Penalty = 0;
                 }
 
-                // ------------------------------
+                // ======================================
                 // Cập nhật chi tiết
-                // ------------------------------
-
-                detail.ReturnDate =
-                    DateTime.Now;
+                // ======================================
 
                 detail.ReturnStatus =
                     item.ReturnStatus;
@@ -634,9 +687,9 @@ public class BorrowService : IBorrowService
                 detail.Penalty =
                     item.Penalty;
 
-                // ------------------------------
-                // Cập nhật kho
-                // ------------------------------
+                // ======================================
+                // Cập nhật số lượng sách
+                // ======================================
 
                 if (item.ReturnStatus ==
                     ReturnStatus.Returned)
@@ -645,18 +698,25 @@ public class BorrowService : IBorrowService
                 }
 
                 // Lost / Damaged
-                // không cộng lại kho
+                // Không cộng lại kho
             }
 
             // ==========================================
-            // Hoàn tất toàn bộ phiếu
+            // CẬP NHẬT PHIẾU MƯỢN
             // ==========================================
+
+            borrowRecord.ReturnDate =
+                DateTime.Now;
+
+            borrowRecord.ReturnPersonnelId =
+                returnPersonnelId;
 
             borrowRecord.BorrowRecordStatus =
                 BorrowRecordStatus.Completed;
 
-            borrowRecord.ReturnPersonnelId =
-                returnPersonnelId;
+            // ==========================================
+            // Lưu
+            // ==========================================
 
             await _context.SaveChangesAsync();
 

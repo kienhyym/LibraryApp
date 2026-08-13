@@ -1,4 +1,5 @@
 using LibraryApp.Areas.Admin.ViewModels.Borrow;
+using LibraryApp.Enums;
 using LibraryApp.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,16 +19,19 @@ public class BorrowController : AdminBaseController
 
     public async Task<IActionResult> Index(
         string? keyword,
+        BorrowRecordStatus? status,
         int page = 1)
     {
         const int pageSize = 10;
 
         var model = await _borrowService.GetPagedAsync(
             keyword,
+            status,
             page,
             pageSize);
 
         ViewBag.Keyword = keyword;
+        ViewBag.Status = status;
 
         return View(model);
     }

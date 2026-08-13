@@ -20,8 +20,7 @@
 
         </h4>
 
-        <a asp-action="Create"
-           class="btn btn-primary">
+        <a asp-action="Create" class="btn btn-primary">
 
             <i class="bi bi-plus-circle"></i>
 
@@ -33,21 +32,76 @@
 
     <div class="card-body">
 
-        <form method="get"
-              class="row g-2 mb-3">
+        <form method="get" class="row g-2 mb-3">
+
+            <!-- Từ khóa -->
 
             <div class="col-md-4">
 
-                <input name="keyword"
-                       value="@ViewBag.Keyword"
-                       class="form-control"
-                       placeholder="Tìm cư dân hoặc nhân viên..." />
+                <input name="keyword" value="@ViewBag.Keyword" class="form-control" placeholder="Tìm cư dân" />
 
             </div>
 
+
+            <!-- Trạng thái -->
+
+            <div class="col-md-3">
+
+                <select name="status" class="form-select">
+
+                    <option value="">
+                        -- Tất cả trạng thái --
+                    </option>
+
+                    @if (ViewBag.Status == BorrowRecordStatus.Borrowing)
+                    {
+                        <option value="1" selected>
+                            Đang mượn
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="1">
+                            Đang mượn
+                        </option>
+                    }
+
+                    @if (ViewBag.Status == BorrowRecordStatus.Completed)
+                    {
+                        <option value="2" selected>
+                            Hoàn thành
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="2">
+                            Hoàn thành
+                        </option>
+                    }
+
+                    @if (ViewBag.Status == BorrowRecordStatus.Overdue)
+                    {
+                        <option value="3" selected>
+                            Quá hạn
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="3">
+                            Quá hạn
+                        </option>
+                    }
+
+                </select>
+
+            </div>
+
+
+            <!-- Tìm kiếm -->
+
             <div class="col-auto">
 
-                <button class="btn btn-outline-primary">
+                <button type="submit" class="btn btn-outline-primary">
 
                     <i class="bi bi-search"></i>
 
@@ -57,10 +111,12 @@
 
             </div>
 
+
+            <!-- Làm mới -->
+
             <div class="col-auto">
 
-                <a asp-action="Index"
-                   class="btn btn-outline-secondary">
+                <a asp-action="Index" class="btn btn-outline-secondary">
 
                     Làm mới
 
@@ -90,11 +146,7 @@
 
                         </th>
 
-                        <th>
-
-                            Nhân viên
-
-                        </th>
+                       
 
                         <th width="120">
 
@@ -107,7 +159,11 @@
                             Hạn trả
 
                         </th>
+                        <th width="120">
 
+                            Ngày trả
+
+                        </th>
                         <th width="130">
 
                             Trạng thái
@@ -134,7 +190,7 @@
 
                     @if (Model.Any())
                     {
-                        @foreach (var item in Model)
+                        @foreach (BorrowListViewModel item in Model)
                         {
                             <tr>
 
@@ -150,11 +206,6 @@
 
                                 </td>
 
-                                <td>
-
-                                    @item.PersonnelName
-
-                                </td>
 
                                 <td>
 
@@ -167,7 +218,9 @@
                                     @item.DueDate.ToString("dd/MM/yyyy")
 
                                 </td>
-
+                                <td>
+                                    @(item.ReturnDate?.ToString("dd/MM/yyyy") ?? "-")
+                                </td>
                                 <td>
 
                                     @switch (item.BorrowRecordStatus)
@@ -214,9 +267,7 @@
 
                                 <td>
 
-                                    <a asp-action="Detail"
-                                       asp-route-id="@item.BorrowRecordId"
-                                       class="btn btn-info btn-sm">
+                                    <a asp-action="Detail" asp-route-id="@item.BorrowRecordId" class="btn btn-info btn-sm">
 
                                         <i class="bi bi-eye"></i>
 
@@ -224,8 +275,7 @@
 
                                     @if (item.BorrowRecordStatus == BorrowRecordStatus.Borrowing)
                                     {
-                                        <a asp-action="ReturnBooks"
-                                           asp-route-id="@item.BorrowRecordId"
+                                        <a asp-action="ReturnBooks" asp-route-id="@item.BorrowRecordId"
                                            class="btn btn-success btn-sm">
 
                                             <i class="bi bi-arrow-return-left"></i>
@@ -242,8 +292,7 @@
                     {
                         <tr>
 
-                            <td colspan="8"
-                                class="text-center text-muted">
+                            <td colspan="8" class="text-center text-muted">
 
                                 Không có dữ liệu.
 
@@ -268,9 +317,8 @@
                     {
                         <li class="page-item">
 
-                            <a class="page-link"
-                               asp-route-page="@(Model.PageIndex-1)"
-                               asp-route-keyword="@ViewBag.Keyword">
+                            <a class="page-link" asp-route-page="@(Model.PageIndex - 1)" asp-route-keyword="@ViewBag.Keyword"
+                               asp-route-status="@ViewBag.Status">
 
                                 &laquo;
 
@@ -283,9 +331,8 @@
                     {
                         <li class="page-item @(i == Model.PageIndex ? "active" : "")">
 
-                            <a class="page-link"
-                               asp-route-page="@i"
-                               asp-route-keyword="@ViewBag.Keyword">
+                            <a class="page-link" asp-route-page="@i" asp-route-keyword="@ViewBag.Keyword"
+                               asp-route-status="@ViewBag.Status">
 
                                 @i
 
@@ -298,9 +345,8 @@
                     {
                         <li class="page-item">
 
-                            <a class="page-link"
-                               asp-route-page="@(Model.PageIndex+1)"
-                               asp-route-keyword="@ViewBag.Keyword">
+                            <a class="page-link" asp-route-page="@(Model.PageIndex + 1)" asp-route-keyword="@ViewBag.Keyword"
+                               asp-route-status="@ViewBag.Status">
 
                                 &raquo;
 

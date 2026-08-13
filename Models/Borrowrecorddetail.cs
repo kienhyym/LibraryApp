@@ -12,10 +12,10 @@ public partial class Borrowrecorddetail
 
     public int BookId { get; set; }
 
-    public string? ReturnNote { get; set; }
-    public DateTime? ReturnDate { get; set; }
-
     public ReturnStatus? ReturnStatus { get; set; }
+
+    public string? ReturnNote { get; set; }
+
     public decimal Penalty { get; set; }
 
     public virtual Book Book { get; set; } = null!;

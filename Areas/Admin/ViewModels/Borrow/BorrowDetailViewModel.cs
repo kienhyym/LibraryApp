@@ -21,4 +21,5 @@ public class BorrowDetailViewModel
     public List<BorrowBookItemViewModel> Books { get; set; }
         = [];
     public string? ReturnPersonnelName { get; set; }
+    public DateTime? ReturnDate { get; set; }
 }

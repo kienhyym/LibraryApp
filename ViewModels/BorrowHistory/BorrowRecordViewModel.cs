@@ -8,6 +8,7 @@ public class BorrowRecordViewModel
 
     public DateTime DueDate { get; set; }
 
+    public DateTime? ReturnDate { get; set; }
     public string Status { get; set; } = string.Empty;
 
     public int TotalBooks { get; set; }

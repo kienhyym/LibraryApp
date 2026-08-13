@@ -99,6 +99,16 @@
             <div class="col-md-3 mb-3">
 
                 <label class="form-label fw-bold">
+                    Ngày trả
+                </label>
+
+                <input class="form-control" value="@(Model.ReturnDate?.ToString("dd/MM/yyyy HH:mm") ?? "Chưa trả")"
+                       readonly />
+
+            </div>
+            <div class="col-md-3 mb-3">
+
+                <label class="form-label fw-bold">
 
                     Tổng số sách
 
@@ -203,11 +213,6 @@
                         <th>
                             Ghi chú
                         </th>
-
-                        <th width="130">
-                            Ngày trả
-                        </th>
-
                     </tr>
 
                 </thead>
@@ -316,14 +321,6 @@
                                     : item.ReturnNote)
 
                             </td>
-
-                            <td>
-
-                                @(item.ReturnDate?.ToString("dd/MM/yyyy HH:mm")
-                                    ?? "-")
-
-                            </td>
-
                         </tr>
                     }
 

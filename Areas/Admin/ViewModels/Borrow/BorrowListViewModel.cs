@@ -8,7 +8,7 @@ public class BorrowListViewModel
 
     public string ResidentName { get; set; } = string.Empty;
 
-    public string PersonnelName { get; set; } = string.Empty;
+    public DateTime? ReturnDate { get; set; } 
 
     public DateTime BorrowDate { get; set; }
 

@@ -1,5 +1,6 @@
 using LibraryApp.Areas.Admin.ViewModels.Borrow;
 using LibraryApp.Common;
+using LibraryApp.Enums;
 
 namespace LibraryApp.Services.Interfaces;
 
@@ -9,6 +10,7 @@ public interface IBorrowService
 
     Task<PaginatedList<BorrowListViewModel>> GetPagedAsync(
         string? keyword,
+        BorrowRecordStatus? status,
         int page,
         int pageSize);
 
