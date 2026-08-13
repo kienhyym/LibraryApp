@@ -52,8 +52,9 @@ public interface IBorrowService
     /// Trả sách.
     /// </summary>
     Task ReturnBooksAsync(
-        int borrowRecordId,
-        List<BorrowReturnItemViewModel> books);
+    int borrowRecordId,
+    List<BorrowReturnItemViewModel> books,
+    int returnPersonnelId);
 
     #endregion
 

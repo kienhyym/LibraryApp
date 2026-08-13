@@ -101,6 +101,11 @@ public class BorrowService : IBorrowService
                 ResidentName = x.Resident.FullName,
 
                 PersonnelName = x.Personnel.FullName,
+                
+                ReturnPersonnelName =
+                x.ReturnPersonnel != null
+                    ? x.ReturnPersonnel.FullName
+                    : null,
 
                 BorrowDate = x.BorrowDate,
 
@@ -494,18 +499,20 @@ public class BorrowService : IBorrowService
 
     public async Task ReturnBooksAsync(
     int borrowRecordId,
-    List<BorrowReturnItemViewModel> books)
+    List<BorrowReturnItemViewModel> books,
+    int returnPersonnelId)
     {
         await UpdateOverdueAsync();
 
         if (books == null || books.Count == 0)
         {
             throw new InvalidOperationException(
-                "Không có sách nào được trả.");
+                "Phiếu mượn không có sách.");
         }
 
         var borrowRecord = await _context.Borrowrecords
             .Include(x => x.Borrowrecorddetails)
+                .ThenInclude(x => x.Book)
             .FirstOrDefaultAsync(x =>
                 x.BorrowRecordId == borrowRecordId);
 
@@ -519,7 +526,47 @@ public class BorrowService : IBorrowService
             BorrowRecordStatus.Completed)
         {
             throw new InvalidOperationException(
-                "Phiếu mượn này đã hoàn tất.");
+                "Phiếu mượn này đã được trả.");
+        }
+
+        // ==========================================
+        // Kiểm tra nhân viên nhận trả
+        // ==========================================
+
+        var personnelExists = await _context.Personnel
+            .AnyAsync(x =>
+                x.PersonnelId == returnPersonnelId);
+
+        if (!personnelExists)
+        {
+            throw new InvalidOperationException(
+                "Nhân viên nhận trả không tồn tại.");
+        }
+
+        // ==========================================
+        // Kiểm tra số lượng sách gửi lên
+        // phải đúng với toàn bộ chi tiết phiếu
+        // ==========================================
+
+        var details = borrowRecord.Borrowrecorddetails
+            .ToList();
+
+        if (books.Count != details.Count)
+        {
+            throw new InvalidOperationException(
+                "Phải trả toàn bộ sách trong phiếu mượn.");
+        }
+
+        var detailIds = books
+            .Select(x => x.BorrowRecordDetailId)
+            .ToHashSet();
+
+        if (details.Any(x =>
+            !detailIds.Contains(
+                x.BorrowRecordDetailId)))
+        {
+            throw new InvalidOperationException(
+                "Danh sách sách trả không khớp với phiếu mượn.");
         }
 
         await using var transaction =
@@ -527,53 +574,56 @@ public class BorrowService : IBorrowService
 
         try
         {
-            foreach (var item in books)
+            // ==========================================
+            // Xử lý toàn bộ sách
+            // ==========================================
+
+            foreach (var detail in details)
             {
-                var detail = await _context.Borrowrecorddetails
-                    .Include(x => x.Book)
-                    .FirstOrDefaultAsync(x =>
-                        x.BorrowRecordDetailId ==
-                            item.BorrowRecordDetailId
-                        &&
-                        x.BorrowRecordId ==
-                            borrowRecordId);
+                var item = books.First(x =>
+                    x.BorrowRecordDetailId ==
+                    detail.BorrowRecordDetailId);
 
-                if (detail == null)
+                // ------------------------------
+                // Kiểm tra trạng thái
+                // ------------------------------
+
+                if (!Enum.IsDefined(
+                        typeof(ReturnStatus),
+                        item.ReturnStatus))
                 {
                     throw new InvalidOperationException(
-                        "Chi tiết phiếu mượn không hợp lệ.");
+                        "Tình trạng trả sách không hợp lệ.");
                 }
 
-                // Sách này đã được trả trước đó
-                if (detail.ReturnDate != null)
-                {
-                    continue;
-                }
+                // ------------------------------
+                // Kiểm tra tiền phạt
+                // ------------------------------
 
-                // ==============================
-                // Xử lý tiền phạt
-                // ==============================
-
-                decimal penalty = item.Penalty;
-
-                if (penalty < 0)
+                if (item.Penalty < 0 ||
+                    item.Penalty > 10_000_000)
                 {
                     throw new InvalidOperationException(
-                        "Tiền phạt không được nhỏ hơn 0.");
+                        "Tiền phạt phải từ 0 đến 10.000.000 VNĐ.");
                 }
 
-                // Trả bình thường => không được phạt
+                // ------------------------------
+                // Sách trả bình thường
+                // không có tiền phạt
+                // ------------------------------
+
                 if (item.ReturnStatus ==
                     ReturnStatus.Returned)
                 {
-                    penalty = 0;
+                    item.Penalty = 0;
                 }
 
-                // ==============================
+                // ------------------------------
                 // Cập nhật chi tiết
-                // ==============================
+                // ------------------------------
 
-                detail.ReturnDate = DateTime.Now;
+                detail.ReturnDate =
+                    DateTime.Now;
 
                 detail.ReturnStatus =
                     item.ReturnStatus;
@@ -582,59 +632,31 @@ public class BorrowService : IBorrowService
                     item.ReturnNote?.Trim();
 
                 detail.Penalty =
-                    penalty;
+                    item.Penalty;
 
-                // ==============================
-                // Cập nhật số lượng sách
-                // ==============================
+                // ------------------------------
+                // Cập nhật kho
+                // ------------------------------
 
-                switch (item.ReturnStatus)
+                if (item.ReturnStatus ==
+                    ReturnStatus.Returned)
                 {
-                    case ReturnStatus.Returned:
-
-                        // Sách được trả lại kho
-                        detail.Book.AvailableQuantity++;
-
-                        break;
-
-                    case ReturnStatus.Lost:
-
-                        // Mất sách:
-                        // Không cộng lại tồn kho
-
-                        break;
-
-                    case ReturnStatus.Damaged:
-
-                        // Hư hỏng:
-                        // Theo nghiệp vụ hiện tại của bạn,
-                        // không đưa lại vào số lượng khả dụng.
-
-                        break;
-
-                    default:
-
-                        throw new InvalidOperationException(
-                            "Tình trạng trả sách không hợp lệ.");
+                    detail.Book.AvailableQuantity++;
                 }
+
+                // Lost / Damaged
+                // không cộng lại kho
             }
 
-            // ==============================
-            // Kiểm tra còn sách chưa trả
-            // ==============================
+            // ==========================================
+            // Hoàn tất toàn bộ phiếu
+            // ==========================================
 
-            var hasUnreturnedBooks =
-                await _context.Borrowrecorddetails
-                    .AnyAsync(x =>
-                        x.BorrowRecordId == borrowRecordId
-                        &&
-                        x.ReturnDate == null);
+            borrowRecord.BorrowRecordStatus =
+                BorrowRecordStatus.Completed;
 
-            if (!hasUnreturnedBooks)
-            {
-                borrowRecord.BorrowRecordStatus =
-                    BorrowRecordStatus.Completed;
-            }
+            borrowRecord.ReturnPersonnelId =
+                returnPersonnelId;
 
             await _context.SaveChangesAsync();
 

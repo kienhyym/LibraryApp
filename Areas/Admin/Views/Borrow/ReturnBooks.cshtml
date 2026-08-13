@@ -20,10 +20,12 @@
 
     </div>
 
+
     <div class="card-body">
 
         <form asp-action="ReturnBooks"
-              method="post">
+              method="post"
+              id="returnBookForm">
 
             @Html.AntiForgeryToken()
 
@@ -31,7 +33,10 @@
                    name="borrowRecordId"
                    value="@Model.BorrowRecordId" />
 
-            <!-- Thông tin phiếu -->
+
+            <!-- ===================================== -->
+            <!-- THÔNG TIN PHIẾU -->
+            <!-- ===================================== -->
 
             <div class="row">
 
@@ -47,6 +52,7 @@
 
                 </div>
 
+
                 <div class="col-md-3 mb-3">
 
                     <label class="form-label fw-bold">
@@ -58,6 +64,7 @@
                            readonly />
 
                 </div>
+
 
                 <div class="col-md-3 mb-3">
 
@@ -73,9 +80,24 @@
 
             </div>
 
+
             <hr />
 
-            <!-- Danh sách sách -->
+
+            <!-- ===================================== -->
+            <!-- DANH SÁCH SÁCH -->
+            <!-- ===================================== -->
+
+            <div class="alert alert-info">
+
+                <i class="bi bi-info-circle me-2"></i>
+
+                Vui lòng xử lý tình trạng
+                <strong>tất cả sách</strong>
+                trong phiếu trước khi xác nhận trả.
+
+            </div>
+
 
             <div class="table-responsive">
 
@@ -93,7 +115,7 @@
                                 Tên sách
                             </th>
 
-                            <th style="width: 180px;">
+                            <th style="width: 220px;">
                                 Tác giả
                             </th>
 
@@ -113,13 +135,20 @@
 
                     </thead>
 
+
                     <tbody>
 
-                        @for (int i = 0;
-                              i < Model.Books.Count;
-                              i++)
+                        @for (
+                            int i = 0;
+                            i < Model.Books.Count;
+                            i++)
                         {
+
                             <tr class="return-book-row">
+
+                                <!-- ================================= -->
+                                <!-- Hidden -->
+                                <!-- ================================= -->
 
                                 <td>
 
@@ -130,6 +159,11 @@
                                     <input type="hidden"
                                            name="books[@i].BookId"
                                            value="@Model.Books[i].BookId" />
+
+
+                                    <!-- ================================= -->
+                                    <!-- Return Status -->
+                                    <!-- ================================= -->
 
                                     <select name="books[@i].ReturnStatus"
                                             class="form-select return-status">
@@ -150,13 +184,25 @@
 
                                 </td>
 
+
+                                <!-- ================================= -->
+                                <!-- Book -->
+                                <!-- ================================= -->
+
                                 <td>
 
                                     <div class="fw-semibold">
+
                                         @Model.Books[i].Title
+
                                     </div>
 
                                 </td>
+
+
+                                <!-- ================================= -->
+                                <!-- Authors -->
+                                <!-- ================================= -->
 
                                 <td>
 
@@ -164,11 +210,21 @@
 
                                 </td>
 
+
+                                <!-- ================================= -->
+                                <!-- Category -->
+                                <!-- ================================= -->
+
                                 <td>
 
                                     @Model.Books[i].CategoryName
 
                                 </td>
+
+
+                                <!-- ================================= -->
+                                <!-- Penalty -->
+                                <!-- ================================= -->
 
                                 <td>
 
@@ -179,6 +235,7 @@
                                                class="form-control penalty-input"
                                                value="0"
                                                min="0"
+                                               max="10000000"
                                                step="1000"
                                                readonly />
 
@@ -188,11 +245,22 @@
 
                                     </div>
 
+
                                     <div class="form-text">
-                                        Bình thường: 0 VNĐ
+
+                                        Tối đa:
+                                        <strong>
+                                            10.000.000 VNĐ
+                                        </strong>
+
                                     </div>
 
                                 </td>
+
+
+                                <!-- ================================= -->
+                                <!-- Note -->
+                                <!-- ================================= -->
 
                                 <td>
 
@@ -213,7 +281,10 @@
 
             </div>
 
-            <!-- Tổng tiền phạt -->
+
+            <!-- ===================================== -->
+            <!-- TOTAL PENALTY -->
+            <!-- ===================================== -->
 
             <div class="d-flex justify-content-end mt-3">
 
@@ -236,7 +307,10 @@
 
             </div>
 
-            <!-- Buttons -->
+
+            <!-- ===================================== -->
+            <!-- BUTTON -->
+            <!-- ===================================== -->
 
             <div class="mt-4">
 
@@ -246,9 +320,10 @@
 
                     <i class="bi bi-check-circle me-1"></i>
 
-                    Xác nhận trả sách
+                    Xác nhận trả toàn bộ sách
 
                 </button>
+
 
                 <a asp-action="Detail"
                    asp-route-id="@Model.BorrowRecordId"
@@ -269,9 +344,10 @@
 </div>
 
 
-@section Scripts
-{
+@section Scripts {
+
     <partial name="_ValidationScriptsPartial" />
+
 
     <script>
 
@@ -280,7 +356,8 @@
             function () {
 
                 const form =
-                    document.querySelector("form");
+                    document.getElementById(
+                        "returnBookForm");
 
                 const rows =
                     document.querySelectorAll(
@@ -292,6 +369,13 @@
 
 
                 // =====================================
+                // CONSTANT
+                // =====================================
+
+                const MAX_PENALTY = 10000000;
+
+
+                // =====================================
                 // Tính tổng tiền phạt
                 // =====================================
 
@@ -300,15 +384,26 @@
                     let total = 0;
 
                     document
-                        .querySelectorAll(".penalty-input")
+                        .querySelectorAll(
+                            ".penalty-input")
                         .forEach(function (input) {
 
-                            const value =
-                                parseFloat(input.value) || 0;
+                            let value =
+                                parseFloat(
+                                    input.value) || 0;
+
+                            if (value < 0) {
+                                value = 0;
+                            }
+
+                            if (value > MAX_PENALTY) {
+                                value = MAX_PENALTY;
+                            }
 
                             total += value;
 
                         });
+
 
                     totalPenalty.textContent =
                         total.toLocaleString("vi-VN")
@@ -317,7 +412,7 @@
 
 
                 // =====================================
-                // Xử lý tình trạng
+                // Xử lý từng sách
                 // =====================================
 
                 rows.forEach(function (row) {
@@ -333,7 +428,9 @@
 
                     function updatePenalty() {
 
-                        // 1 = Trả bình thường
+                        // =================================
+                        // Tốt
+                        // =================================
 
                         if (status.value === "1") {
 
@@ -343,8 +440,9 @@
 
                         }
 
-                        // 2 = Mất
-                        // 3 = Hỏng
+                        // =================================
+                        // Mất / Hỏng
+                        // =================================
 
                         else {
 
@@ -352,25 +450,44 @@
 
                         }
 
+
                         calculateTotalPenalty();
+
                     }
 
+
+                    // Status change
 
                     status.addEventListener(
                         "change",
                         updatePenalty);
 
 
+                    // Penalty input
+
                     penalty.addEventListener(
                         "input",
                         function () {
 
-                            if (
+                            let value =
                                 parseFloat(
-                                    penalty.value) < 0
-                            ) {
+                                    penalty.value) || 0;
+
+
+                            if (value < 0) {
+
                                 penalty.value = "0";
+
                             }
+
+
+                            if (value > MAX_PENALTY) {
+
+                                penalty.value =
+                                    MAX_PENALTY;
+
+                            }
+
 
                             calculateTotalPenalty();
 
@@ -383,7 +500,7 @@
 
 
                 // =====================================
-                // Xác nhận trả sách
+                // Submit
                 // =====================================
 
                 form.addEventListener(
@@ -392,13 +509,68 @@
 
                         e.preventDefault();
 
+
+                        // =================================
+                        // Kiểm tra penalty
+                        // =================================
+
+                        let invalidPenalty = false;
+
+
+                        document
+                            .querySelectorAll(
+                                ".penalty-input")
+                            .forEach(function (input) {
+
+                                const value =
+                                    parseFloat(
+                                        input.value) || 0;
+
+
+                                if (
+                                    value < 0 ||
+                                    value > MAX_PENALTY
+                                ) {
+
+                                    invalidPenalty =
+                                        true;
+
+                                }
+
+                            });
+
+
+                        if (invalidPenalty) {
+
+                            Swal.fire({
+
+                                icon: "warning",
+
+                                title: "Tiền phạt không hợp lệ",
+
+                                text:
+                                    "Tiền phạt phải từ 0 đến 10.000.000 VNĐ.",
+
+                                confirmButtonText:
+                                    "Đã hiểu"
+
+                            });
+
+                            return;
+                        }
+
+
+                        // =================================
+                        // Confirm
+                        // =================================
+
                         Swal.fire({
 
                             title:
-                                "Xác nhận trả sách?",
+                                "Xác nhận trả toàn bộ sách?",
 
                             text:
-                                "Sau khi xác nhận, thông tin trả sách sẽ được lưu.",
+                                "Sau khi xác nhận, toàn bộ thông tin trả sách sẽ được lưu và phiếu mượn sẽ hoàn tất.",
 
                             icon:
                                 "question",
@@ -407,7 +579,7 @@
                                 true,
 
                             confirmButtonText:
-                                "Xác nhận",
+                                "Xác nhận trả sách",
 
                             cancelButtonText:
                                 "Hủy",

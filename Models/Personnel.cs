@@ -22,5 +22,7 @@ public partial class Personnel
 
     public virtual Account Account { get; set; } = null!;
 
-    public virtual ICollection<Borrowrecord> Borrowrecords { get; set; } = new List<Borrowrecord>();
+    public virtual ICollection<Borrowrecord> BorrowrecordPersonnel { get; set; } = new List<Borrowrecord>();
+
+    public virtual ICollection<Borrowrecord> BorrowrecordReturnPersonnel { get; set; } = new List<Borrowrecord>();
 }

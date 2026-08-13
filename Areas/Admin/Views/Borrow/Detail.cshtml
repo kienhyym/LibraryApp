@@ -37,7 +37,7 @@
 
         <div class="row">
 
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
 
                 <label class="form-label fw-bold">
 
@@ -49,15 +49,27 @@
 
             </div>
 
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
 
                 <label class="form-label fw-bold">
 
-                    Nhân viên
+                    Nhân viên lập phiếu
 
                 </label>
 
                 <input class="form-control" value="@Model.PersonnelName" readonly />
+
+            </div>
+
+            <div class="col-md-4 mb-3">
+
+                <label class="form-label fw-bold">
+
+                    Nhân viên nhận trả
+
+                </label>
+
+                <input class="form-control" value="@(Model.ReturnPersonnelName ?? "Chưa trả")" readonly />
 
             </div>
 
@@ -84,7 +96,17 @@
                 <input class="form-control" value="@Model.DueDate.ToString("dd/MM/yyyy")" readonly />
 
             </div>
+            <div class="col-md-3 mb-3">
 
+                <label class="form-label fw-bold">
+
+                    Tổng số sách
+
+                </label>
+
+                <input class="form-control" value="@Model.Books.Count" readonly />
+
+            </div>
             <div class="col-md-3 mb-3">
 
                 <label class="form-label fw-bold">
@@ -133,17 +155,7 @@
 
             </div>
 
-            <div class="col-md-3 mb-3">
-
-                <label class="form-label fw-bold">
-
-                    Tổng số sách
-
-                </label>
-
-                <input class="form-control" value="@Model.Books.Count" readonly />
-
-            </div>
+            
 
         </div>
 
@@ -176,7 +188,7 @@
                     <tr>
                         <th>STT</th>
 
-                        <th>Sách</th>
+                        <th width="200">Sách</th>
 
                         <th>Tác giả</th>
 
@@ -185,7 +197,9 @@
                         <th width="150">
                             Trạng thái trả
                         </th>
-
+                        <th width="120">
+                            Tiền phạt
+                        </th>
                         <th>
                             Ghi chú
                         </th>
@@ -199,19 +213,19 @@
                 </thead>
 
                 <tbody>
-@{
+                    @{
 
-    var stt = 1;
+                        var stt = 1;
 
-}
+                    }
                     @foreach (var item in Model.Books)
                     {
                         <tr>
                             <td>
 
-            @(stt++)
+                                @(stt++)
 
-        </td>
+                            </td>
                             <td>
 
                                 @item.Title
@@ -277,7 +291,24 @@
                                 }
 
                             </td>
+                            <td class="text-end">
 
+                                @if (item.Penalty > 0)
+                                {
+                                    <span class="text-danger fw-semibold">
+
+                                        @item.Penalty.ToString("N0") VNĐ
+
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        0 VNĐ
+                                    </span>
+                                }
+
+                            </td>
                             <td>
 
                                 @(string.IsNullOrWhiteSpace(item.ReturnNote)

@@ -473,7 +473,11 @@ CREATE TABLE BORROWRECORDS
 
     ResidentId INT NOT NULL,
 
+    -- Nhân viên lập phiếu mượn
     PersonnelId INT NOT NULL,
+
+    -- Nhân viên nhận sách trả
+    ReturnPersonnelId INT NULL,
 
     BorrowDate DATETIME NOT NULL
         CONSTRAINT DF_BORROWRECORDS_BorrowDate
@@ -492,32 +496,29 @@ CREATE TABLE BORROWRECORDS
 
     Notes NVARCHAR(250) NULL,
 
-
-    -- PRIMARY KEY
     CONSTRAINT PK_BORROWRECORDS
         PRIMARY KEY (BorrowRecordId),
 
-
-    -- FOREIGN KEY
     CONSTRAINT FK_BORROWRECORDS_RESIDENTS
         FOREIGN KEY (ResidentId)
         REFERENCES RESIDENTS(ResidentId),
 
-
+    -- Nhân viên lập phiếu
     CONSTRAINT FK_BORROWRECORDS_PERSONNEL
         FOREIGN KEY (PersonnelId)
         REFERENCES PERSONNEL(PersonnelId),
 
+    -- Nhân viên nhận sách trả
+    CONSTRAINT FK_BORROWRECORDS_RETURNPERSONNEL
+        FOREIGN KEY (ReturnPersonnelId)
+        REFERENCES PERSONNEL(PersonnelId),
 
-    -- CHECK trạng thái
     CONSTRAINT CK_BORROWRECORDS_BorrowRecordStatus
         CHECK
         (
             BorrowRecordStatus IN (1,2,3)
         ),
 
-
-    -- CHECK ngày trả
     CONSTRAINT CK_BORROWRECORDS_DueDate
         CHECK
         (

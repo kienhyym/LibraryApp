@@ -117,14 +117,19 @@ public class BorrowController : AdminBaseController
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ReturnBooks(
-        int borrowRecordId,
-        List<BorrowReturnItemViewModel> books)
+    int borrowRecordId,
+    List<BorrowReturnItemViewModel> books)
     {
         try
         {
+            // Nhân viên đang đăng nhập
+            var returnPersonnelId = int.Parse(
+                User.FindFirst("PersonnelId")!.Value);
+
             await _borrowService.ReturnBooksAsync(
                 borrowRecordId,
-                books);
+                books,
+                returnPersonnelId);
 
             TempData["Success"] =
                 "Trả sách thành công.";

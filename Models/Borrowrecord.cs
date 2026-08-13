@@ -20,9 +20,13 @@ public partial class Borrowrecord
 
     public string? Notes { get; set; }
 
+    public int? ReturnPersonnelId { get; set; }
+
     public virtual ICollection<Borrowrecorddetail> Borrowrecorddetails { get; set; } = new List<Borrowrecorddetail>();
 
     public virtual Personnel Personnel { get; set; } = null!;
 
     public virtual Resident Resident { get; set; } = null!;
+
+    public virtual Personnel? ReturnPersonnel { get; set; }
 }

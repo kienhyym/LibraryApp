@@ -12,6 +12,8 @@ public partial class Favoritebook
     public int BookId { get; set; }
 
     public DateTime CreatedDate { get; set; }
+
     public virtual Book Book { get; set; } = null!;
+
     public virtual Resident Resident { get; set; } = null!;
 }

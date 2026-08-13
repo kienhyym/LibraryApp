@@ -117,7 +117,7 @@ public partial class LibDbContext : DbContext
             entity.Property(e => e.DueDate).HasColumnType("datetime");
             entity.Property(e => e.Notes).HasMaxLength(250);
 
-            entity.HasOne(d => d.Personnel).WithMany(p => p.Borrowrecords)
+            entity.HasOne(d => d.Personnel).WithMany(p => p.BorrowrecordPersonnel)
                 .HasForeignKey(d => d.PersonnelId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_BORROWRECORDS_PERSONNEL");
@@ -126,6 +126,10 @@ public partial class LibDbContext : DbContext
                 .HasForeignKey(d => d.ResidentId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_BORROWRECORDS_RESIDENTS");
+
+            entity.HasOne(d => d.ReturnPersonnel).WithMany(p => p.BorrowrecordReturnPersonnel)
+                .HasForeignKey(d => d.ReturnPersonnelId)
+                .HasConstraintName("FK_BORROWRECORDS_RETURNPERSONNEL");
         });
 
         modelBuilder.Entity<Borrowrecorddetail>(entity =>
