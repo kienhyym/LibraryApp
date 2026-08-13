@@ -85,7 +85,7 @@ public class BorrowService : IBorrowService
             .Include(x => x.Borrowrecorddetails)
                 .ThenInclude(x => x.Book)
 
-            .ThenInclude(x => x.Author)
+            .ThenInclude(x => x.Authors)
 
             .Include(x => x.Borrowrecorddetails)
                 .ThenInclude(x => x.Book)
@@ -119,7 +119,11 @@ public class BorrowService : IBorrowService
 
         Title = d.Book.Title,
 
-        AuthorName = d.Book.Author.AuthorName,
+        AuthorName = string.Join(
+            ", ",
+            d.Book.Authors
+                .OrderBy(a => a.AuthorName)
+                .Select(a => a.AuthorName)),
 
         CategoryName = d.Book.Category.CategoryName,
 
@@ -191,7 +195,7 @@ public class BorrowService : IBorrowService
         keyword = keyword?.Trim();
 
         var query = _context.Books
-            .Include(x => x.Author)
+            .Include(x => x.Authors)
             .Include(x => x.Category)
             .Where(x =>
 
@@ -205,7 +209,8 @@ public class BorrowService : IBorrowService
 
                 x.Title.Contains(keyword)
 
-                || x.Author.AuthorName.Contains(keyword)
+                || x.Authors.Any(a =>
+    a.AuthorName.Contains(keyword))
 
                 || x.Category.CategoryName.Contains(keyword));
         }
@@ -219,7 +224,11 @@ public class BorrowService : IBorrowService
 
                 Title = x.Title,
 
-                AuthorName = x.Author.AuthorName,
+                AuthorName = string.Join(
+                ", ",
+                x.Authors
+                    .OrderBy(a => a.AuthorName)
+                    .Select(a => a.AuthorName)),
 
                 CategoryName = x.Category.CategoryName,
 

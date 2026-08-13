@@ -207,37 +207,33 @@ public class DashboardService : IDashboardService
     private async Task LoadTopAuthors(
     DashboardViewModel model,
     int year)
-    {
-        model.TopAuthors = await _context.Borrowrecorddetails
-
-            .AsNoTracking()
-
-            .Where(x => x.BorrowRecord.BorrowDate.Year == year)
-
-            .GroupBy(x => new
+{
+    model.TopAuthors = await _context.Borrowrecorddetails
+        .AsNoTracking()
+        .Where(x => x.BorrowRecord.BorrowDate.Year == year)
+        .SelectMany(
+            x => x.Book.Authors,
+            (detail, author) => new
             {
-                x.Book.AuthorId,
-                x.Book.Author.AuthorName
+                AuthorId = author.AuthorId,
+                AuthorName = author.AuthorName
             })
-
-            .Select(g => new TopItemViewModel
-            {
-                Id = g.Key.AuthorId,
-
-                Name = g.Key.AuthorName,
-
-                BorrowCount = g.Count()
-            })
-
-            .OrderByDescending(x => x.BorrowCount)
-
-            .ThenBy(x => x.Name)
-
-            .Take(10)
-
-            .ToListAsync();
-    }
-
+        .GroupBy(x => new
+        {
+            x.AuthorId,
+            x.AuthorName
+        })
+        .Select(g => new TopItemViewModel
+        {
+            Id = g.Key.AuthorId,
+            Name = g.Key.AuthorName,
+            BorrowCount = g.Count()
+        })
+        .OrderByDescending(x => x.BorrowCount)
+        .ThenBy(x => x.Name)
+        .Take(10)
+        .ToListAsync();
+}
     #endregion
 
    #region Due Borrows

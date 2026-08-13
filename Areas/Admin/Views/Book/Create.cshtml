@@ -20,9 +20,7 @@
 
     <div class="card-body">
 
-        <form asp-action="Create"
-              method="post"
-              enctype="multipart/form-data">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
 
             <div class="row">
 
@@ -32,15 +30,11 @@
 
                     <div class="mb-3">
 
-                        <label asp-for="Title"
-                               class="form-label"></label>
+                        <label asp-for="Title" class="form-label"></label>
 
-                        <input asp-for="Title"
-                               class="form-control"
-                               placeholder="Nhập tên sách..." />
+                        <input asp-for="Title" class="form-control" placeholder="Nhập tên sách..." />
 
-                        <span asp-validation-for="Title"
-                              class="text-danger"></span>
+                        <span asp-validation-for="Title" class="text-danger"></span>
 
                     </div>
 
@@ -50,22 +44,13 @@
 
                             <div class="mb-3">
 
-                                <label asp-for="AuthorId"
-                                       class="form-label"></label>
+                                <label asp-for="AuthorIds" class="form-label"></label>
 
-                                <select asp-for="AuthorId"
-                                        asp-items="Model.Authors"
-                                        id="AuthorId"
-                                        class="form-select">
-
-                                    <option value="">
-                                        -- Chọn tác giả --
-                                    </option>
-
+                                <select asp-for="AuthorIds" asp-items="Model.Authors" id="AuthorIds" class="form-select"
+                                        multiple>
                                 </select>
 
-                                <span asp-validation-for="AuthorId"
-                                      class="text-danger"></span>
+                                <span asp-validation-for="AuthorIds" class="text-danger"></span>
 
                             </div>
 
@@ -75,12 +60,9 @@
 
                             <div class="mb-3">
 
-                                <label asp-for="CategoryId"
-                                       class="form-label"></label>
+                                <label asp-for="CategoryId" class="form-label"></label>
 
-                                <select asp-for="CategoryId"
-                                        asp-items="Model.Categories"
-                                        id="CategoryId"
+                                <select asp-for="CategoryId" asp-items="Model.Categories" id="CategoryId"
                                         class="form-select">
 
                                     <option value="">
@@ -89,8 +71,7 @@
 
                                 </select>
 
-                                <span asp-validation-for="CategoryId"
-                                      class="text-danger"></span>
+                                <span asp-validation-for="CategoryId" class="text-danger"></span>
 
                             </div>
 
@@ -104,11 +85,9 @@
 
                             <div class="mb-3">
 
-                                <label asp-for="Publisher"
-                                       class="form-label"></label>
+                                <label asp-for="Publisher" class="form-label"></label>
 
-                                <input asp-for="Publisher"
-                                       class="form-control" />
+                                <input asp-for="Publisher" class="form-control" />
 
                             </div>
 
@@ -118,11 +97,9 @@
 
                             <div class="mb-3">
 
-                                <label asp-for="PublicationYear"
-                                       class="form-label"></label>
+                                <label asp-for="PublicationYear" class="form-label"></label>
 
-                                <input asp-for="PublicationYear"
-                                       class="form-control" />
+                                <input asp-for="PublicationYear" class="form-control" />
 
                             </div>
 
@@ -132,25 +109,19 @@
 
                     <div class="mb-3">
 
-                        <label asp-for="Quantity"
-                               class="form-label"></label>
+                        <label asp-for="Quantity" class="form-label"></label>
 
-                        <input asp-for="Quantity"
-                               class="form-control" />
+                        <input asp-for="Quantity" class="form-control" />
 
-                        <span asp-validation-for="Quantity"
-                              class="text-danger"></span>
+                        <span asp-validation-for="Quantity" class="text-danger"></span>
 
                     </div>
 
                     <div class="mb-3">
 
-                        <label asp-for="BookDescription"
-                               class="form-label"></label>
+                        <label asp-for="BookDescription" class="form-label"></label>
 
-                        <textarea asp-for="BookDescription"
-                                  rows="5"
-                                  class="form-control">
+                        <textarea asp-for="BookDescription" rows="5" class="form-control">
                         </textarea>
 
                     </div>
@@ -165,19 +136,13 @@
 
                         <div class="card-body text-center">
 
-                            <img id="previewImage"
-                                 src="~/images/no-image.png"
-                                 class="img-fluid rounded border mb-3"
+                            <img id="previewImage" src="~/images/no-image.png" class="img-fluid rounded border mb-3"
                                  style="height:280px;object-fit:contain;" />
 
-                            <input asp-for="CoverImageFile"
-                                   id="CoverImageFile"
-                                   type="file"
-                                   class="form-control"
+                            <input asp-for="CoverImageFile" id="CoverImageFile" type="file" class="form-control"
                                    accept="image/*" />
 
-                            <span asp-validation-for="CoverImageFile"
-                                  class="text-danger"></span>
+                            <span asp-validation-for="CoverImageFile" class="text-danger"></span>
 
                         </div>
 
@@ -197,8 +162,7 @@
 
             </button>
 
-            <a asp-action="Index"
-               class="btn btn-secondary">
+            <a asp-action="Index" class="btn btn-secondary">
 
                 <i class="bi bi-arrow-left"></i>
 
@@ -212,52 +176,58 @@
 
 </div>
 
-@section Scripts{
+@section Scripts {
 
-<script>
+    <script>
 
-$(function(){
+        $(function () {
 
-    initSelect2(
-        "#AuthorId",
-        "Chọn hoặc tìm tác giả");
+            initSelect2(
+                "#AuthorIds",
+                "Chọn hoặc tìm tác giả");
 
-    initSelect2(
-        "#CategoryId",
-        "Chọn hoặc tìm thể loại");
+            initSelect2(
+                "#CategoryId",
+                "Chọn hoặc tìm thể loại");
 
-    $("#CoverImageFile").change(function(){
+            $("#CoverImageFile").change(function () {
 
-        const file=this.files[0];
+                const file = this.files[0];
 
-        if(!file)
-            return;
+                if (!file)
+                    return;
 
-        const reader=new FileReader();
+                const reader = new FileReader();
 
-        reader.onload=function(e){
+                reader.onload = function (e) {
 
-            $("#previewImage")
-                .attr("src",e.target.result);
+                    $("#previewImage")
+                        .attr("src", e.target.result);
 
-        };
+                };
 
-        reader.readAsDataURL(file);
+                reader.readAsDataURL(file);
 
-    });
+            });
 
-});
+        });
 
-</script>
+    </script>
 
-<partial name="_ValidationScriptsPartial"/>
+    <partial name="_ValidationScriptsPartial" />
 
 }
 
 <style>
-    .select2-container .select2-selection--single {
+    .select2-container .select2-selection--single{
         height: 38px;
         padding: 6px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+    }
+    .select2-container .select2-selection--multiple {
+        min-height: 38px;
+        padding: 0px 12px;
         border: 1px solid #ced4da;
         border-radius: 0.25rem;
     }

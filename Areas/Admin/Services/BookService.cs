@@ -1,12 +1,12 @@
 using LibraryApp.Areas.Admin.ViewModels;
 using LibraryApp.Common;
+using LibraryApp.Helpers;
 using LibraryApp.Models;
 using LibraryApp.Services.Interfaces;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using LibraryApp.Helpers;
 
 namespace LibraryApp.Services;
 
@@ -32,7 +32,8 @@ public class BookService : IBookService
         int pageSize)
     {
         var query = _context.Books
-            .Include(x => x.Author)
+            .AsNoTracking()
+            .Include(x => x.Authors)
             .Include(x => x.Category)
             .AsQueryable();
 
@@ -41,20 +42,26 @@ public class BookService : IBookService
             keyword = keyword.Trim();
 
             query = query.Where(x =>
-                x.Title.Contains(keyword));
+                x.Title.Contains(keyword)
+                ||
+                x.Authors.Any(a =>
+                    a.AuthorName.Contains(keyword)));
         }
 
         var result = query
-
             .OrderByDescending(x => x.CreatedAt)
-
             .Select(x => new BookViewModel
             {
                 BookId = x.BookId,
 
                 Title = x.Title,
 
-                AuthorName = x.Author.AuthorName,
+                AuthorNames = string.Join(
+                    ", ",
+                    x.Authors
+                        .OrderBy(a => a.AuthorName)
+                        .Select(a => a.AuthorName)
+                ),
 
                 CategoryName = x.Category.CategoryName,
 
@@ -68,11 +75,14 @@ public class BookService : IBookService
             });
 
         return await PaginatedList<BookViewModel>
-
-            .CreateAsync(result, page, pageSize);
+            .CreateAsync(
+                result,
+                page,
+                pageSize);
     }
 
     #endregion
+
 
     #region Create Model
 
@@ -84,17 +94,25 @@ public class BookService : IBookService
 
         return model;
     }
+
     #endregion
+
 
     #region Edit Model
 
     public async Task<BookViewModel?> GetEditModelAsync(int id)
     {
         var book = await _context.Books
-            .FirstOrDefaultAsync(x => x.BookId == id);
+
+            .Include(x => x.Authors)
+
+            .FirstOrDefaultAsync(x =>
+                x.BookId == id);
 
         if (book == null)
+        {
             return null;
+        }
 
         var model = new BookViewModel
         {
@@ -102,7 +120,9 @@ public class BookService : IBookService
 
             Title = book.Title,
 
-            AuthorId = book.AuthorId,
+            AuthorIds = book.Authors
+                .Select(x => x.AuthorId)
+                .ToList(),
 
             CategoryId = book.CategoryId,
 
@@ -118,7 +138,9 @@ public class BookService : IBookService
 
             CoverImage = book.CoverImage,
 
-            IsAvailable = book.IsAvailable
+            IsAvailable = book.IsAvailable,
+
+            CreatedAt = book.CreatedAt
         };
 
         await LoadDropdownDataAsync(model);
@@ -127,6 +149,7 @@ public class BookService : IBookService
     }
 
     #endregion
+
 
     #region Get By Id
 
@@ -137,19 +160,54 @@ public class BookService : IBookService
 
     #endregion
 
+
     #region Create
 
     public async Task CreateAsync(BookViewModel model)
     {
+        // ==========================================
+        // Kiểm tra tác giả
+        // ==========================================
+
+        var authorIds = model.AuthorIds
+            .Distinct()
+            .ToList();
+
+        if (authorIds.Count == 0)
+        {
+            throw new InvalidOperationException(
+                "Vui lòng chọn ít nhất một tác giả.");
+        }
+
+        // ==========================================
+        // Lấy Authors từ database
+        // ==========================================
+
+        var authors = await _context.Authors
+            .Where(x => authorIds.Contains(x.AuthorId))
+            .ToListAsync();
+
+        if (authors.Count != authorIds.Count)
+        {
+            throw new InvalidOperationException(
+                "Một hoặc nhiều tác giả không tồn tại.");
+        }
+
+        // ==========================================
+        // Lưu ảnh
+        // ==========================================
+
         var imagePath = await SaveImageAsync(
-     model.CoverImageFile,
-     model.Title);
+            model.CoverImageFile,
+            model.Title);
+
+        // ==========================================
+        // Tạo Book
+        // ==========================================
 
         var book = new Book
         {
             Title = model.Title.Trim(),
-
-            AuthorId = model.AuthorId,
 
             CategoryId = model.CategoryId,
 
@@ -161,11 +219,14 @@ public class BookService : IBookService
 
             AvailableQuantity = model.Quantity,
 
-            BookDescription = model.BookDescription?.Trim(),
+            BookDescription =
+                model.BookDescription?.Trim(),
 
             CoverImage = imagePath,
 
-            IsAvailable = true
+            IsAvailable = model.Quantity > 0,
+
+            Authors = authors
         };
 
         _context.Books.Add(book);
@@ -175,31 +236,72 @@ public class BookService : IBookService
 
     #endregion
 
+
     #region Update
 
     public async Task UpdateAsync(BookViewModel model)
     {
+        // ==========================================
+        // Lấy Book + Authors hiện tại
+        // ==========================================
+
         var book = await _context.Books
-            .FirstOrDefaultAsync(x => x.BookId == model.BookId);
+
+            .Include(x => x.Authors)
+
+            .FirstOrDefaultAsync(x =>
+                x.BookId == model.BookId);
 
         if (book == null)
-            throw new Exception("Không tìm thấy sách.");
+        {
+            throw new Exception(
+                "Không tìm thấy sách.");
+        }
 
-        // Lưu số lượng cũ
+        // ==========================================
+        // Kiểm tra Authors
+        // ==========================================
+
+        var authorIds = model.AuthorIds
+            .Distinct()
+            .ToList();
+
+        if (authorIds.Count == 0)
+        {
+            throw new InvalidOperationException(
+                "Vui lòng chọn ít nhất một tác giả.");
+        }
+
+        var authors = await _context.Authors
+            .Where(x =>
+                authorIds.Contains(x.AuthorId))
+            .ToListAsync();
+
+        if (authors.Count != authorIds.Count)
+        {
+            throw new InvalidOperationException(
+                "Một hoặc nhiều tác giả không tồn tại.");
+        }
+
+        // ==========================================
+        // Cập nhật số lượng
+        // ==========================================
+
         var oldQuantity = book.Quantity;
+
         var newQuantity = model.Quantity;
 
-        // Nếu tăng số lượng
         if (newQuantity > oldQuantity)
         {
-            var increase = newQuantity - oldQuantity;
+            var increase =
+                newQuantity - oldQuantity;
 
             book.AvailableQuantity += increase;
         }
-        // Nếu giảm số lượng
         else if (newQuantity < oldQuantity)
         {
-            var decrease = oldQuantity - newQuantity;
+            var decrease =
+                oldQuantity - newQuantity;
 
             if (book.AvailableQuantity < decrease)
             {
@@ -210,26 +312,50 @@ public class BookService : IBookService
             book.AvailableQuantity -= decrease;
         }
 
-        // Cập nhật thông tin
-        book.Title = model.Title.Trim();
+        // ==========================================
+        // Cập nhật thông tin Book
+        // ==========================================
 
-        book.AuthorId = model.AuthorId;
+        book.Title =
+            model.Title.Trim();
 
-        book.CategoryId = model.CategoryId;
+        book.CategoryId =
+            model.CategoryId;
 
-        book.Publisher = model.Publisher?.Trim();
+        book.Publisher =
+            model.Publisher?.Trim();
 
-        book.PublicationYear = model.PublicationYear;
+        book.PublicationYear =
+            model.PublicationYear;
 
-        book.Quantity = newQuantity;
+        book.Quantity =
+            newQuantity;
 
-        book.BookDescription = model.BookDescription?.Trim();
+        book.BookDescription =
+            model.BookDescription?.Trim();
 
+        book.IsAvailable =
+            book.AvailableQuantity > 0;
+
+        // ==========================================
+        // Cập nhật Authors
+        // ==========================================
+
+        book.Authors.Clear();
+
+        foreach (var author in authors)
+        {
+            book.Authors.Add(author);
+        }
+
+        // ==========================================
         // Nếu chọn ảnh mới
+        // ==========================================
+
         if (model.CoverImageFile != null)
         {
-            // Xóa ảnh cũ
-            if (!string.IsNullOrWhiteSpace(book.CoverImage))
+            if (!string.IsNullOrWhiteSpace(
+                    book.CoverImage))
             {
                 var oldImagePath = Path.Combine(
                     _environment.WebRootPath,
@@ -241,11 +367,10 @@ public class BookService : IBookService
                 }
             }
 
-            // Lưu ảnh mới
-           book.CoverImage =
-    await SaveImageAsync(
-        model.CoverImageFile,
-        model.Title);
+            book.CoverImage =
+                await SaveImageAsync(
+                    model.CoverImageFile,
+                    model.Title);
         }
 
         await _context.SaveChangesAsync();
@@ -253,18 +378,31 @@ public class BookService : IBookService
 
     #endregion
 
+
     #region Delete
 
     public async Task DeleteAsync(int id)
     {
         var book = await _context.Books
-            .FirstOrDefaultAsync(x => x.BookId == id);
+
+            .Include(x => x.Authors)
+
+            .FirstOrDefaultAsync(x =>
+                x.BookId == id);
 
         if (book == null)
+        {
             return;
+        }
 
-        var borrowed = await _context.Borrowrecorddetails
-            .AnyAsync(x => x.BookId == id);
+        // ==========================================
+        // Không cho xóa sách đã từng được mượn
+        // ==========================================
+
+        var borrowed =
+            await _context.Borrowrecorddetails
+                .AnyAsync(x =>
+                    x.BookId == id);
 
         if (borrowed)
         {
@@ -272,8 +410,12 @@ public class BookService : IBookService
                 "Sách đã có phiếu mượn, không thể xóa.");
         }
 
+        // ==========================================
         // Xóa ảnh
-        if (!string.IsNullOrWhiteSpace(book.CoverImage))
+        // ==========================================
+
+        if (!string.IsNullOrWhiteSpace(
+                book.CoverImage))
         {
             var imagePath = Path.Combine(
                 _environment.WebRootPath,
@@ -285,6 +427,13 @@ public class BookService : IBookService
             }
         }
 
+        // ==========================================
+        // Xóa Book
+        //
+        // BOOKAUTHORS sẽ được xóa tự động
+        // nhờ ON DELETE CASCADE
+        // ==========================================
+
         _context.Books.Remove(book);
 
         await _context.SaveChangesAsync();
@@ -292,15 +441,19 @@ public class BookService : IBookService
 
     #endregion
 
+
     #region Validation
 
-    public async Task<bool> BookExistsByTitleAsync(string title)
+    public async Task<bool> BookExistsByTitleAsync(
+        string title)
     {
         title = title.Trim();
 
         return await _context.Books
-            .AnyAsync(x => x.Title == title);
+            .AnyAsync(x =>
+                x.Title == title);
     }
+
 
     public async Task<bool> BookExistsByTitleForUpdateAsync(
         string title,
@@ -316,50 +469,70 @@ public class BookService : IBookService
 
     #endregion
 
+
     #region Dropdown
 
-    private async Task<List<SelectListItem>> GetAuthorSelectListAsync()
+    private async Task<List<SelectListItem>>
+        GetAuthorSelectListAsync()
     {
         return await _context.Authors
 
-            .OrderBy(x => x.AuthorName)
+            .AsNoTracking()
 
-            .Select(x => new SelectListItem
-            {
-                Value = x.AuthorId.ToString(),
+            .OrderBy(x =>
+                x.AuthorName)
 
-                Text = x.AuthorName
-            })
+            .Select(x =>
+                new SelectListItem
+                {
+                    Value =
+                        x.AuthorId.ToString(),
+
+                    Text =
+                        x.AuthorName
+                })
 
             .ToListAsync();
     }
 
-    private async Task<List<SelectListItem>> GetCategorySelectListAsync()
+
+    private async Task<List<SelectListItem>>
+        GetCategorySelectListAsync()
     {
         return await _context.Categories
 
-            .OrderBy(x => x.CategoryName)
+            .AsNoTracking()
 
-            .Select(x => new SelectListItem
-            {
-                Value = x.CategoryId.ToString(),
+            .OrderBy(x =>
+                x.CategoryName)
 
-                Text = x.CategoryName
-            })
+            .Select(x =>
+                new SelectListItem
+                {
+                    Value =
+                        x.CategoryId.ToString(),
+
+                    Text =
+                        x.CategoryName
+                })
 
             .ToListAsync();
     }
 
     #endregion
 
+
     #region Upload Image
 
     private async Task<string?> SaveImageAsync(
-    IFormFile? file,
-    string bookTitle)
+        IFormFile? file,
+        string bookTitle)
     {
-        if (file == null || file.Length == 0)
+        if (file == null ||
+            file.Length == 0)
+        {
             return null;
+        }
 
         var folder = Path.Combine(
             _environment.WebRootPath,
@@ -371,14 +544,20 @@ public class BookService : IBookService
             Directory.CreateDirectory(folder);
         }
 
-        var slug = SlugHelper.Generate(bookTitle);
+        var slug =
+            SlugHelper.Generate(bookTitle);
 
         var fileName =
-            $"{slug}_{Guid.NewGuid():N}{Path.GetExtension(file.FileName).ToLower()}";
+            $"{slug}_{Guid.NewGuid():N}" +
+            $"{Path.GetExtension(file.FileName).ToLower()}";
 
-        var path = Path.Combine(folder, fileName);
+        var path =
+            Path.Combine(folder, fileName);
 
-        using var stream = new FileStream(path, FileMode.Create);
+        using var stream =
+            new FileStream(
+                path,
+                FileMode.Create);
 
         await file.CopyToAsync(stream);
 
@@ -387,10 +566,18 @@ public class BookService : IBookService
 
     #endregion
 
-    public async Task LoadDropdownDataAsync(BookViewModel model)
-    {
-        model.Authors = await GetAuthorSelectListAsync();
 
-        model.Categories = await GetCategorySelectListAsync();
+    #region Dropdown Data
+
+    public async Task LoadDropdownDataAsync(
+        BookViewModel model)
+    {
+        model.Authors =
+            await GetAuthorSelectListAsync();
+
+        model.Categories =
+            await GetCategorySelectListAsync();
     }
+
+    #endregion
 }

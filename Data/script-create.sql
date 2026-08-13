@@ -2,7 +2,7 @@
 ==========================================================
 LIBRARY MANAGEMENT SYSTEM
 Database Script
-Version : 1.0
+Version : 2.0
 Author  : Nguyễn Đình Kiên
 Database: LibDB
 ==========================================================
@@ -30,26 +30,35 @@ MÔ TẢ:
 
 6. BOOKS
    - Sách
+   - Một sách có thể có nhiều tác giả
 
-7. BORROWRECORDS
+7. BOOKAUTHORS
+   - Bảng trung gian giữa BOOKS và AUTHORS
+   - Quan hệ N-N:
+       Một sách có nhiều tác giả
+       Một tác giả có nhiều sách
+
+8. BORROWRECORDS
    - Phiếu mượn
    - BorrowRecordStatus:
        1 = Borrowing
        2 = Returned
        3 = Overdue
 
-8. BORROWRECORDDETAILS
+9. BORROWRECORDDETAILS
    - Chi tiết phiếu mượn
    - ReturnStatus:
        1 = Good
        2 = Damaged
        3 = Lost
+   - Penalty: tiền phạt
 
-9. EMAIL_VERIFICATIONS
-   - OTP xác thực email
+10. EMAIL_VERIFICATIONS
+    - OTP xác thực email
 
-10. FAVORITEBOOK
+11. FAVORITEBOOK
     - Sách yêu thích của cư dân
+
 ==========================================================
 */
 
@@ -219,18 +228,22 @@ CREATE TABLE PERSONNEL
 
     PersonnelAddress NVARCHAR(255) NULL,
 
+
     -- PRIMARY KEY
     CONSTRAINT PK_PERSONNEL
         PRIMARY KEY (PersonnelId),
+
 
     -- Mỗi tài khoản chỉ thuộc một nhân viên
     CONSTRAINT UQ_PERSONNEL_AccountId
         UNIQUE (AccountId),
 
+
     -- FOREIGN KEY
     CONSTRAINT FK_PERSONNEL_ACCOUNTS
         FOREIGN KEY (AccountId)
         REFERENCES ACCOUNTS(AccountId),
+
 
     -- CHECK
     CONSTRAINT CK_PERSONNEL_Gender
@@ -315,8 +328,6 @@ CREATE TABLE BOOKS
 
     CategoryId INT NOT NULL,
 
-    AuthorId INT NOT NULL,
-
     Publisher NVARCHAR(150) NULL,
 
     PublicationYear INT NULL,
@@ -352,10 +363,6 @@ CREATE TABLE BOOKS
         FOREIGN KEY (CategoryId)
         REFERENCES CATEGORIES(CategoryId),
 
-    CONSTRAINT FK_BOOKS_AUTHORS
-        FOREIGN KEY (AuthorId)
-        REFERENCES AUTHORS(AuthorId),
-
 
     -- CHECK số lượng
     CONSTRAINT CK_BOOKS_Quantity
@@ -383,7 +390,81 @@ GO
 
 
 -- ======================================================
--- 9. BẢNG BORROWRECORDS
+-- 9. BẢNG BOOKAUTHORS
+-- ======================================================
+/*
+    Quan hệ N-N giữa BOOKS và AUTHORS.
+
+    Một sách:
+        có thể có nhiều tác giả.
+
+    Một tác giả:
+        có thể viết nhiều sách.
+
+    Ví dụ:
+
+        BookId = 1
+        AuthorId = 2
+        AuthorId = 5
+        AuthorId = 8
+
+    nghĩa là sách 1 có 3 tác giả.
+
+    Đồng thời:
+
+        AuthorId = 2
+        BookId = 1
+        BookId = 7
+        BookId = 12
+
+    nghĩa là tác giả 2 có 3 sách.
+*/
+
+CREATE TABLE BOOKAUTHORS
+(
+    BookId INT NOT NULL,
+
+    AuthorId INT NOT NULL,
+
+
+    -- PRIMARY KEY KÉP
+    CONSTRAINT PK_BOOKAUTHORS
+        PRIMARY KEY (BookId, AuthorId),
+
+
+    -- FOREIGN KEY tới BOOKS
+    CONSTRAINT FK_BOOKAUTHORS_BOOKS
+        FOREIGN KEY (BookId)
+        REFERENCES BOOKS(BookId)
+        ON DELETE CASCADE,
+
+
+    -- FOREIGN KEY tới AUTHORS
+    CONSTRAINT FK_BOOKAUTHORS_AUTHORS
+        FOREIGN KEY (AuthorId)
+        REFERENCES AUTHORS(AuthorId)
+        ON DELETE CASCADE
+);
+GO
+
+
+-- ======================================================
+-- INDEX CHO BOOKAUTHORS
+-- ======================================================
+/*
+    PK(BookId, AuthorId) đã hỗ trợ tìm theo BookId.
+
+    Index này hỗ trợ chiều ngược lại:
+        Author -> Books
+*/
+
+CREATE INDEX IX_BOOKAUTHORS_AuthorId
+ON BOOKAUTHORS(AuthorId);
+GO
+
+
+-- ======================================================
+-- 10. BẢNG BORROWRECORDS
 -- ======================================================
 
 CREATE TABLE BORROWRECORDS
@@ -422,6 +503,7 @@ CREATE TABLE BORROWRECORDS
         FOREIGN KEY (ResidentId)
         REFERENCES RESIDENTS(ResidentId),
 
+
     CONSTRAINT FK_BORROWRECORDS_PERSONNEL
         FOREIGN KEY (PersonnelId)
         REFERENCES PERSONNEL(PersonnelId),
@@ -446,7 +528,7 @@ GO
 
 
 -- ======================================================
--- 10. BẢNG BORROWRECORDDETAILS
+-- 11. BẢNG BORROWRECORDDETAILS
 -- ======================================================
 
 CREATE TABLE BORROWRECORDDETAILS
@@ -473,23 +555,30 @@ CREATE TABLE BORROWRECORDDETAILS
     /*
         Tiền phạt của cuốn sách
         Đơn vị: VNĐ
+
+        Giá trị hợp lệ:
+            0 -> 10.000.000
     */
     Penalty DECIMAL(18,2) NOT NULL
         CONSTRAINT DF_BORROWRECORDDETAILS_Penalty
         DEFAULT (0),
 
+
     -- PRIMARY KEY
     CONSTRAINT PK_BORROWRECORDDETAILS
         PRIMARY KEY (BorrowRecordDetailId),
+
 
     -- FOREIGN KEY
     CONSTRAINT FK_BORROWRECORDDETAILS_BORROWRECORDS
         FOREIGN KEY (BorrowRecordId)
         REFERENCES BORROWRECORDS(BorrowRecordId),
 
+
     CONSTRAINT FK_BORROWRECORDDETAILS_BOOKS
         FOREIGN KEY (BookId)
         REFERENCES BOOKS(BookId),
+
 
     -- CHECK trạng thái trả
     CONSTRAINT CK_BORROWRECORDDETAILS_ReturnStatus
@@ -499,12 +588,15 @@ CREATE TABLE BORROWRECORDDETAILS
             OR ReturnStatus IN (1,2,3)
         ),
 
+
     -- CHECK tiền phạt
     CONSTRAINT CK_BORROWRECORDDETAILS_Penalty
         CHECK
         (
             Penalty >= 0
+            AND Penalty <= 10000000
         ),
+
 
     -- Một sách chỉ xuất hiện một lần
     -- trong cùng một phiếu mượn
@@ -515,7 +607,7 @@ GO
 
 
 -- ======================================================
--- 11. BẢNG EMAIL_VERIFICATIONS
+-- 12. BẢNG EMAIL_VERIFICATIONS
 -- ======================================================
 
 CREATE TABLE EMAIL_VERIFICATIONS
@@ -545,7 +637,7 @@ GO
 
 
 -- ======================================================
--- 12. BẢNG FAVORITEBOOK
+-- 13. BẢNG FAVORITEBOOK
 -- ======================================================
 
 CREATE TABLE FAVORITEBOOK
@@ -571,6 +663,7 @@ CREATE TABLE FAVORITEBOOK
         FOREIGN KEY (ResidentId)
         REFERENCES RESIDENTS(ResidentId),
 
+
     CONSTRAINT FK_FAVORITEBOOK_BOOK
         FOREIGN KEY (BookId)
         REFERENCES BOOKS(BookId),
@@ -585,11 +678,13 @@ GO
 
 
 -- ======================================================
--- 13. HOÀN TẤT
+-- 14. HOÀN TẤT
 -- ======================================================
 
 PRINT '==============================================';
 PRINT 'LibDB database created successfully.';
 PRINT 'All tables and constraints have been created.';
+PRINT 'BOOKS <-> AUTHORS is now N-N.';
+PRINT 'BOOKAUTHORS table has been created.';
 PRINT '==============================================';
 GO

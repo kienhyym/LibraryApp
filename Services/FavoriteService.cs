@@ -124,7 +124,11 @@ public class FavoriteService : IFavoriteService
 
                 CoverImage = x.Book.CoverImage,
 
-                AuthorName = x.Book.Author.AuthorName,
+                AuthorNames = string.Join(
+                ", ",
+                x.Book.Authors
+                    .OrderBy(a => a.AuthorName)
+                    .Select(a => a.AuthorName)),
 
                 CategoryName = x.Book.Category.CategoryName,
 

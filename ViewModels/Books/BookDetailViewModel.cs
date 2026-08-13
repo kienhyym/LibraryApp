@@ -8,7 +8,7 @@ public class BookDetailViewModel
 
     public string? CoverImage { get; set; }
 
-    public string AuthorName { get; set; } = string.Empty;
+    public string AuthorNames { get; set; } = string.Empty;
 
     public string CategoryName { get; set; } = string.Empty;
 
@@ -23,7 +23,5 @@ public class BookDetailViewModel
     public bool IsAvailable { get; set; }
 
     public string? Description { get; set; }
-
-    public string? ShelfLocation { get; set; }
     public bool IsFavorite { get; set; }
 }

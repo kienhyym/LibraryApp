@@ -84,15 +84,26 @@ public partial class LibDbContext : DbContext
             entity.Property(e => e.Publisher).HasMaxLength(150);
             entity.Property(e => e.Title).HasMaxLength(200);
 
-            entity.HasOne(d => d.Author).WithMany(p => p.Books)
-                .HasForeignKey(d => d.AuthorId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_BOOKS_AUTHORS");
-
             entity.HasOne(d => d.Category).WithMany(p => p.Books)
                 .HasForeignKey(d => d.CategoryId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_BOOKS_CATEGORIES");
+
+            entity.HasMany(d => d.Authors).WithMany(p => p.Books)
+                .UsingEntity<Dictionary<string, object>>(
+                    "Bookauthor",
+                    r => r.HasOne<Author>().WithMany()
+                        .HasForeignKey("AuthorId")
+                        .HasConstraintName("FK_BOOKAUTHORS_AUTHORS"),
+                    l => l.HasOne<Book>().WithMany()
+                        .HasForeignKey("BookId")
+                        .HasConstraintName("FK_BOOKAUTHORS_BOOKS"),
+                    j =>
+                    {
+                        j.HasKey("BookId", "AuthorId");
+                        j.ToTable("BOOKAUTHORS");
+                        j.HasIndex(new[] { "AuthorId" }, "IX_BOOKAUTHORS_AuthorId");
+                    });
         });
 
         modelBuilder.Entity<Borrowrecord>(entity =>

@@ -62,7 +62,11 @@ public class HomeService : IHomeService
 
                 Title = x.Title,
 
-                AuthorName = x.Author.AuthorName,
+                AuthorNames = string.Join(
+                ", ",
+                x.Authors
+                    .OrderBy(a => a.AuthorName)
+                    .Select(a => a.AuthorName)),
 
                 CategoryName = x.Category.CategoryName,
 
@@ -110,7 +114,11 @@ public class HomeService : IHomeService
 
                     Title = x.Title,
 
-                    AuthorName = x.Author.AuthorName,
+                    AuthorNames = string.Join(
+                        ", ",
+                        x.Authors
+                            .OrderBy(a => a.AuthorName)
+                            .Select(a => a.AuthorName)),
 
                     CategoryName = x.Category.CategoryName,
 
@@ -119,7 +127,7 @@ public class HomeService : IHomeService
                     AvailableQuantity = x.AvailableQuantity,
 
                     IsAvailable = x.IsAvailable,
-                    
+
                     IsFavorite = favoriteBookIds.Contains(x.BookId)
                 })
 
@@ -188,7 +196,8 @@ public class HomeService : IHomeService
 
                 ||
 
-                x.Author.AuthorName.Contains(keyword)
+                x.Authors.Any(a =>
+                a.AuthorName.Contains(keyword))
 
                 ||
 
@@ -205,7 +214,11 @@ public class HomeService : IHomeService
 
                 Title = x.Title,
 
-                AuthorName = x.Author.AuthorName,
+                AuthorNames = string.Join(
+                    ", ",
+                    x.Authors
+                        .OrderBy(a => a.AuthorName)
+                        .Select(a => a.AuthorName)),
 
                 CategoryName = x.Category.CategoryName,
 

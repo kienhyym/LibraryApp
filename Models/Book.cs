@@ -11,8 +11,6 @@ public partial class Book
 
     public int CategoryId { get; set; }
 
-    public int AuthorId { get; set; }
-
     public string? Publisher { get; set; }
 
     public int? PublicationYear { get; set; }
@@ -29,10 +27,11 @@ public partial class Book
 
     public DateTime CreatedAt { get; set; }
 
-    public virtual Author Author { get; set; } = null!;
-    
+    public virtual ICollection<Borrowrecorddetail> Borrowrecorddetails { get; set; } = new List<Borrowrecorddetail>();
+
     public virtual Category Category { get; set; } = null!;
 
-    public virtual ICollection<Borrowrecorddetail> Borrowrecorddetails { get; set; } = new List<Borrowrecorddetail>();
     public virtual ICollection<Favoritebook> Favoritebooks { get; set; } = new List<Favoritebook>();
+
+    public virtual ICollection<Author> Authors { get; set; } = new List<Author>();
 }

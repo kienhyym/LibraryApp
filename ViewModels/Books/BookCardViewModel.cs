@@ -6,8 +6,7 @@ public class BookCardViewModel
 
     public string Title { get; set; } = string.Empty;
 
-    public string AuthorName { get; set; } = string.Empty;
-
+    public string AuthorNames { get; set; } = string.Empty;
     public string CategoryName { get; set; } = string.Empty;
 
     public string? CoverImage { get; set; }
@@ -16,5 +15,5 @@ public class BookCardViewModel
 
     public bool IsAvailable { get; set; }
     public bool IsFavorite { get; set; }
-    
+
 }
