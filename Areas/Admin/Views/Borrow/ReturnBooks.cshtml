@@ -23,15 +23,11 @@
 
     <div class="card-body">
 
-        <form asp-action="ReturnBooks"
-              method="post"
-              id="returnBookForm">
+        <form asp-action="ReturnBooks" method="post" id="returnBookForm">
 
             @Html.AntiForgeryToken()
 
-            <input type="hidden"
-                   name="borrowRecordId"
-                   value="@Model.BorrowRecordId" />
+            <input type="hidden" name="borrowRecordId" value="@Model.BorrowRecordId" />
 
 
             <!-- ===================================== -->
@@ -46,9 +42,7 @@
                         Cư dân
                     </label>
 
-                    <input class="form-control"
-                           value="@Model.ResidentName"
-                           readonly />
+                    <input class="form-control" value="@Model.ResidentName" readonly />
 
                 </div>
 
@@ -59,9 +53,7 @@
                         Ngày mượn
                     </label>
 
-                    <input class="form-control"
-                           value="@Model.BorrowDate.ToString("dd/MM/yyyy")"
-                           readonly />
+                    <input class="form-control" value="@Model.BorrowDate.ToString("dd/MM/yyyy")" readonly />
 
                 </div>
 
@@ -72,9 +64,7 @@
                         Hạn trả
                     </label>
 
-                    <input class="form-control"
-                           value="@Model.DueDate.ToString("dd/MM/yyyy")"
-                           readonly />
+                    <input class="form-control" value="@Model.DueDate.ToString("dd/MM/yyyy")" readonly />
 
                 </div>
 
@@ -152,32 +142,28 @@
 
                                 <td>
 
-                                    <input type="hidden"
-                                           name="books[@i].BorrowRecordDetailId"
+                                    <input type="hidden" name="books[@i].BorrowRecordDetailId"
                                            value="@Model.Books[i].BorrowRecordDetailId" />
 
-                                    <input type="hidden"
-                                           name="books[@i].BookId"
-                                           value="@Model.Books[i].BookId" />
+                                    <input type="hidden" name="books[@i].BookId" value="@Model.Books[i].BookId" />
 
 
                                     <!-- ================================= -->
                                     <!-- Return Status -->
                                     <!-- ================================= -->
 
-                                    <select name="books[@i].ReturnStatus"
-                                            class="form-select return-status">
+                                    <select name="books[@i].ReturnStatus" class="form-select return-status">
 
                                         <option value="1">
-                                            Tốt
+
+                                            Nhận sách
+
                                         </option>
 
                                         <option value="2">
-                                            Mất sách
-                                        </option>
 
-                                        <option value="3">
-                                            Sách hỏng
+                                            Không nhận sách
+
                                         </option>
 
                                     </select>
@@ -230,14 +216,8 @@
 
                                     <div class="input-group">
 
-                                        <input type="number"
-                                               name="books[@i].Penalty"
-                                               class="form-control penalty-input"
-                                               value="0"
-                                               min="0"
-                                               max="10000000"
-                                               step="1000"
-                                               readonly />
+                                        <input type="number" name="books[@i].Penalty" class="form-control penalty-input"
+                                               value="0" min="0" max="10000000" step="1000" readonly />
 
                                         <span class="input-group-text">
                                             VNĐ
@@ -264,10 +244,7 @@
 
                                 <td>
 
-                                    <input type="text"
-                                           class="form-control"
-                                           name="books[@i].ReturnNote"
-                                           maxlength="500"
+                                    <input type="text" class="form-control" name="books[@i].ReturnNote" maxlength="500"
                                            placeholder="Ghi chú thêm..." />
 
                                 </td>
@@ -296,8 +273,7 @@
                         Tổng tiền phạt:
                     </strong>
 
-                    <span id="totalPenalty"
-                          class="fw-bold text-danger">
+                    <span id="totalPenalty" class="fw-bold text-danger">
 
                         0 VNĐ
 
@@ -314,9 +290,7 @@
 
             <div class="mt-4">
 
-                <button id="btnReturn"
-                        type="submit"
-                        class="btn btn-success">
+                <button id="btnReturn" type="submit" class="btn btn-success">
 
                     <i class="bi bi-check-circle me-1"></i>
 
@@ -325,9 +299,7 @@
                 </button>
 
 
-                <a asp-action="Detail"
-                   asp-route-id="@Model.BorrowRecordId"
-                   class="btn btn-secondary">
+                <a asp-action="Detail" asp-route-id="@Model.BorrowRecordId" class="btn btn-secondary">
 
                     <i class="bi bi-arrow-left me-1"></i>
 
@@ -429,7 +401,7 @@
                     function updatePenalty() {
 
                         // =================================
-                        // Tốt
+                        // Nhận sách
                         // =================================
 
                         if (status.value === "1") {
@@ -441,18 +413,14 @@
                         }
 
                         // =================================
-                        // Mất / Hỏng
+                        // Không nhận sách
                         // =================================
 
-                        else {
+                        else if (status.value === "2") {
 
                             penalty.readOnly = false;
-
                         }
-
-
                         calculateTotalPenalty();
-
                     }
 
 

@@ -261,34 +261,20 @@
                                 }
                                 else
                                 {
-                                    switch (item.ReturnStatus)
+                                    @switch (item.ReturnStatus)
                                     {
-                                        case ReturnStatus.Returned:
+                                        case ReturnStatus.Received:
 
                                             <span class="badge bg-success">
-
-                                                Đã trả
-
+                                                Nhận sách
                                             </span>
 
                                             break;
 
-                                        case ReturnStatus.Lost:
+                                        case ReturnStatus.NotReceived:
 
                                             <span class="badge bg-danger">
-
-                                                Mất sách
-
-                                            </span>
-
-                                            break;
-
-                                        case ReturnStatus.Damaged:
-
-                                            <span class="badge bg-warning text-dark">
-
-                                                Sách hỏng
-
+                                                Không nhận sách
                                             </span>
 
                                             break;

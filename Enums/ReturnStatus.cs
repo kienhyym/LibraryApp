@@ -1,10 +1,12 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace LibraryApp.Enums;
 
 public enum ReturnStatus
 {
-    Returned = 1,
+    [Display(Name = "Nhận sách")]
+    Received = 1,
 
-    Lost = 2,
-
-    Damaged = 3
+    [Display(Name = "Không nhận sách")]
+    NotReceived = 2
 }

@@ -9,9 +9,7 @@
 
     <nav class="mb-4">
 
-        <a asp-controller="Home"
-           asp-action="Index"
-           class="text-decoration-none">
+        <a asp-controller="Home" asp-action="Index" class="text-decoration-none">
 
             Trang chủ
 
@@ -19,9 +17,7 @@
 
         <span class="mx-2">/</span>
 
-        <a asp-controller="BorrowHistory"
-           asp-action="Index"
-           class="text-decoration-none">
+        <a asp-controller="BorrowHistory" asp-action="Index" class="text-decoration-none">
 
             Lịch sử mượn
 
@@ -189,8 +185,9 @@
                     <div class="col-md-2 text-center">
 
                         <img src="@(string.IsNullOrWhiteSpace(book.CoverImage)
-                                         ? "/uploads/books/no-book.png"
-                                         : book.CoverImage)" class="img-fluid rounded shadow-sm" style="height:120px;object-fit:contain;" />
+                                                                      ? "/uploads/books/no-book.png"
+                                                                      : book.CoverImage)" class="img-fluid rounded shadow-sm"
+                             style="height:120px;object-fit:contain;" />
 
                     </div>
 
@@ -252,40 +249,20 @@
                         }
                         else
                         {
-                            switch (book.ReturnStatus)
+                            @switch (book.ReturnStatus)
                             {
-                                case ReturnStatus.Returned:
+                                case ReturnStatus.Received:
 
                                     <span class="badge bg-success">
-
-                                        <i class="bi bi-check-circle-fill me-1"></i>
-
-                                        Đã trả
-
+                                        Nhận sách
                                     </span>
 
                                     break;
 
-                                case ReturnStatus.Damaged:
-
-                                    <span class="badge bg-warning text-dark">
-
-                                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
-
-                                        Hỏng
-
-                                    </span>
-
-                                    break;
-
-                                case ReturnStatus.Lost:
+                                case ReturnStatus.NotReceived:
 
                                     <span class="badge bg-danger">
-
-                                        <i class="bi bi-x-circle-fill me-1"></i>
-
-                                        Mất
-
+                                        Không nhận sách
                                     </span>
 
                                     break;

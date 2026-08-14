@@ -24,96 +24,96 @@ public class BorrowService : IBorrowService
     BorrowRecordStatus? status,
     int page,
     int pageSize)
-{
-    // ==========================================
-    // Cập nhật các phiếu quá hạn
-    // ==========================================
-
-    await UpdateOverdueAsync();
-
-
-    // ==========================================
-    // Query phiếu mượn
-    // ==========================================
-
-    var query = _context.Borrowrecords
-        .AsNoTracking()
-        .Include(x => x.Resident)
-        .Include(x => x.Personnel)
-        .Include(x => x.Borrowrecorddetails)
-        .AsQueryable();
-
-
-    // ==========================================
-    // Tìm kiếm
-    // ==========================================
-
-    if (!string.IsNullOrWhiteSpace(keyword))
     {
-        keyword = keyword.Trim();
+        // ==========================================
+        // Cập nhật các phiếu quá hạn
+        // ==========================================
 
-        query = query.Where(x =>
-            x.Resident.FullName.Contains(keyword));
-    }
-
-
-    // ==========================================
-    // Lọc theo trạng thái
-    //
-    // 1 = Borrowing
-    // 2 = Completed
-    // 3 = Overdue
-    // ==========================================
-
-    if (status.HasValue)
-    {
-        query = query.Where(x =>
-            x.BorrowRecordStatus == status.Value);
-    }
+        await UpdateOverdueAsync();
 
 
-    // ==========================================
-    // Projection
-    // ==========================================
+        // ==========================================
+        // Query phiếu mượn
+        // ==========================================
 
-    var result = query
-        .OrderByDescending(x => x.BorrowDate)
-        .Select(x => new BorrowListViewModel
+        var query = _context.Borrowrecords
+            .AsNoTracking()
+            .Include(x => x.Resident)
+            .Include(x => x.Personnel)
+            .Include(x => x.Borrowrecorddetails)
+            .AsQueryable();
+
+
+        // ==========================================
+        // Tìm kiếm
+        // ==========================================
+
+        if (!string.IsNullOrWhiteSpace(keyword))
         {
-            BorrowRecordId =
-                x.BorrowRecordId,
+            keyword = keyword.Trim();
 
-            ResidentName =
-                x.Resident.FullName,
-
-            BorrowDate =
-                x.BorrowDate,
-
-            DueDate =
-                x.DueDate,
-
-            // Ngày trả nằm ở BORROWRECORDS
-            ReturnDate =
-                x.ReturnDate,
-
-            BorrowRecordStatus =
-                x.BorrowRecordStatus,
-
-            TotalBooks =
-                x.Borrowrecorddetails.Count
-        });
+            query = query.Where(x =>
+                x.Resident.FullName.Contains(keyword));
+        }
 
 
-    // ==========================================
-    // Phân trang
-    // ==========================================
+        // ==========================================
+        // Lọc theo trạng thái
+        //
+        // 1 = Borrowing
+        // 2 = Completed
+        // 3 = Overdue
+        // ==========================================
 
-    return await PaginatedList<BorrowListViewModel>
-        .CreateAsync(
-            result,
-            page,
-            pageSize);
-}
+        if (status.HasValue)
+        {
+            query = query.Where(x =>
+                x.BorrowRecordStatus == status.Value);
+        }
+
+
+        // ==========================================
+        // Projection
+        // ==========================================
+
+        var result = query
+            .OrderByDescending(x => x.BorrowDate)
+            .Select(x => new BorrowListViewModel
+            {
+                BorrowRecordId =
+                    x.BorrowRecordId,
+
+                ResidentName =
+                    x.Resident.FullName,
+
+                BorrowDate =
+                    x.BorrowDate,
+
+                DueDate =
+                    x.DueDate,
+
+                // Ngày trả nằm ở BORROWRECORDS
+                ReturnDate =
+                    x.ReturnDate,
+
+                BorrowRecordStatus =
+                    x.BorrowRecordStatus,
+
+                TotalBooks =
+                    x.Borrowrecorddetails.Count
+            });
+
+
+        // ==========================================
+        // Phân trang
+        // ==========================================
+
+        return await PaginatedList<BorrowListViewModel>
+            .CreateAsync(
+                result,
+                page,
+                pageSize);
+    }
 
     public Task<BorrowCreateViewModel> GetCreateModelAsync()
     {
@@ -163,9 +163,9 @@ public class BorrowService : IBorrowService
                 BorrowDate = x.BorrowDate,
 
                 DueDate = x.DueDate,
-                
+
                 ReturnDate = x.ReturnDate,
-                
+
                 BorrowRecordStatus = x.BorrowRecordStatus,
 
                 Notes = x.Notes,
@@ -557,11 +557,19 @@ public class BorrowService : IBorrowService
     {
         await UpdateOverdueAsync();
 
+        // ==========================================
+        // Kiểm tra dữ liệu đầu vào
+        // ==========================================
+
         if (books == null || books.Count == 0)
         {
             throw new InvalidOperationException(
                 "Phiếu mượn không có sách.");
         }
+
+        // ==========================================
+        // Lấy phiếu mượn
+        // ==========================================
 
         var borrowRecord = await _context.Borrowrecords
             .Include(x => x.Borrowrecorddetails)
@@ -574,6 +582,10 @@ public class BorrowService : IBorrowService
             throw new InvalidOperationException(
                 "Không tìm thấy phiếu mượn.");
         }
+
+        // ==========================================
+        // Không cho trả lại phiếu đã hoàn thành
+        // ==========================================
 
         if (borrowRecord.BorrowRecordStatus ==
             BorrowRecordStatus.Completed)
@@ -598,14 +610,14 @@ public class BorrowService : IBorrowService
         }
 
         // ==========================================
-        // Lấy toàn bộ chi tiết phiếu
+        // Toàn bộ sách trong phiếu
         // ==========================================
 
         var details =
             borrowRecord.Borrowrecorddetails.ToList();
 
         // ==========================================
-        // Bắt buộc phải trả toàn bộ sách
+        // Bắt buộc trả toàn bộ phiếu
         // ==========================================
 
         if (books.Count != details.Count)
@@ -619,22 +631,21 @@ public class BorrowService : IBorrowService
             .ToHashSet();
 
         if (details.Any(x =>
-            !detailIds.Contains(
-                x.BorrowRecordDetailId)))
+            !detailIds.Contains(x.BorrowRecordDetailId)))
         {
             throw new InvalidOperationException(
                 "Danh sách sách trả không khớp với phiếu mượn.");
         }
+
+        // ==========================================
+        // Transaction
+        // ==========================================
 
         await using var transaction =
             await _context.Database.BeginTransactionAsync();
 
         try
         {
-            // ==========================================
-            // Xử lý từng sách
-            // ==========================================
-
             foreach (var detail in details)
             {
                 var item = books.First(x =>
@@ -642,15 +653,17 @@ public class BorrowService : IBorrowService
                     detail.BorrowRecordDetailId);
 
                 // ======================================
-                // Kiểm tra ReturnStatus
+                // Chỉ cho phép:
+                //
+                // 1 = Received
+                // 2 = NotReceived
                 // ======================================
 
-                if (!Enum.IsDefined(
-                        typeof(ReturnStatus),
-                        item.ReturnStatus))
+                if (item.ReturnStatus != ReturnStatus.Received &&
+                    item.ReturnStatus != ReturnStatus.NotReceived)
                 {
                     throw new InvalidOperationException(
-                        "Tình trạng trả sách không hợp lệ.");
+                        "Tình trạng nhận sách không hợp lệ.");
                 }
 
                 // ======================================
@@ -665,44 +678,50 @@ public class BorrowService : IBorrowService
                 }
 
                 // ======================================
-                // Sách tốt → không phạt
+                // Nhận sách
+                // → Không phạt
+                // → Cộng lại kho
                 // ======================================
 
                 if (item.ReturnStatus ==
-                    ReturnStatus.Returned)
+                    ReturnStatus.Received)
                 {
                     item.Penalty = 0;
+
+                    detail.Book.AvailableQuantity++;
                 }
 
                 // ======================================
-                // Cập nhật chi tiết
+                // Không nhận sách
+                // → Không cộng lại kho
+                // → Có thể phạt
+                // ======================================
+
+                if (item.ReturnStatus ==
+                    ReturnStatus.NotReceived)
+                {
+                    // Không tăng AvailableQuantity
+                    // Penalty giữ nguyên giá trị nhập
+                }
+
+                // ======================================
+                // Lưu trạng thái chi tiết
                 // ======================================
 
                 detail.ReturnStatus =
                     item.ReturnStatus;
 
                 detail.ReturnNote =
-                    item.ReturnNote?.Trim();
+                    string.IsNullOrWhiteSpace(item.ReturnNote)
+                        ? null
+                        : item.ReturnNote.Trim();
 
                 detail.Penalty =
                     item.Penalty;
-
-                // ======================================
-                // Cập nhật số lượng sách
-                // ======================================
-
-                if (item.ReturnStatus ==
-                    ReturnStatus.Returned)
-                {
-                    detail.Book.AvailableQuantity++;
-                }
-
-                // Lost / Damaged
-                // Không cộng lại kho
             }
 
             // ==========================================
-            // CẬP NHẬT PHIẾU MƯỢN
+            // Cập nhật phiếu mượn
             // ==========================================
 
             borrowRecord.ReturnDate =
@@ -715,7 +734,7 @@ public class BorrowService : IBorrowService
                 BorrowRecordStatus.Completed;
 
             // ==========================================
-            // Lưu
+            // Lưu Database
             // ==========================================
 
             await _context.SaveChangesAsync();

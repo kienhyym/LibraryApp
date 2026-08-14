@@ -48,9 +48,8 @@ MÔ TẢ:
 9. BORROWRECORDDETAILS
    - Chi tiết phiếu mượn
    - ReturnStatus:
-       1 = Good
-       2 = Damaged
-       3 = Lost
+    1 = "Nhận sách"
+    2 = "Không nhận sách"
    - Penalty: tiền phạt
 
 10. EMAIL_VERIFICATIONS
@@ -575,11 +574,22 @@ CREATE TABLE BORROWRECORDDETAILS
 
 
     -- CHECK trạng thái trả
+    /*
+
+    ReturnStatus:
+
+        NULL = Chưa trả
+
+        1    = Nhận sách
+
+        2    = Không nhận sách
+
+*/
     CONSTRAINT CK_BORROWRECORDDETAILS_ReturnStatus
         CHECK
         (
             ReturnStatus IS NULL
-            OR ReturnStatus IN (1,2,3)
+            OR ReturnStatus IN (1,2)
         ),
 
 
