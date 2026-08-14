@@ -21,7 +21,11 @@
 
             <!-- ĐANG MƯỢN -->
 
-            <div class="borrow-status-card borrowing">
+            <a asp-area="Admin"
+               asp-controller="Borrow"
+               asp-action="Index"
+               asp-route-status="1"
+               class="borrow-status-card borrowing text-decoration-none">
 
                 <div class="d-flex align-items-center">
 
@@ -53,12 +57,16 @@
 
                 </div>
 
-            </div>
+            </a>
 
 
             <!-- QUÁ HẠN -->
 
-            <div class="borrow-status-card overdue">
+            <a asp-area="Admin"
+               asp-controller="Borrow"
+               asp-action="Index"
+               asp-route-status="3"
+               class="borrow-status-card overdue text-decoration-none">
 
                 <div class="d-flex align-items-center">
 
@@ -90,7 +98,7 @@
 
                 </div>
 
-            </div>
+            </a>
 
         </div>
 
@@ -104,10 +112,6 @@
     .dashboard-main-card {
         height: 100%;
     }
-
-    /*
-        Hai ô chia đều phần thân card.
-    */
 
     .borrow-status-wrapper {
 
@@ -141,6 +145,8 @@
 
         transition: all .2s ease;
 
+        cursor: pointer;
+
     }
 
     .borrow-status-card:hover {
@@ -160,6 +166,12 @@
     .borrow-status-card.overdue {
 
         border-left: 4px solid #dc3545;
+
+    }
+
+    .borrow-status-card:hover .fs-4 {
+
+        text-decoration: underline;
 
     }
 

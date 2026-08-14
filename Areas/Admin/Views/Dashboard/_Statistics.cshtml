@@ -19,14 +19,20 @@
 
         <div class="row row-cols-2 row-cols-md-3 g-3">
 
+
             <!-- Tổng sách -->
 
             <div class="col">
 
-                <div class="dashboard-stat-card">
+                <a asp-area="Admin"
+                   asp-controller="Book"
+                   asp-action="Index"
+                   class="dashboard-stat-card text-decoration-none">
 
                     <div class="stat-icon bg-primary-subtle text-primary">
+
                         <i class="bi bi-book"></i>
+
                     </div>
 
                     <div class="mt-3">
@@ -35,13 +41,13 @@
                             Tổng đầu sách
                         </div>
 
-                        <div class="fs-3 fw-bold">
+                        <div class="fs-3 fw-bold text-dark">
                             @Model.TotalBooks
                         </div>
 
                     </div>
 
-                </div>
+                </a>
 
             </div>
 
@@ -50,10 +56,15 @@
 
             <div class="col">
 
-                <div class="dashboard-stat-card">
+                <a asp-area="Admin"
+                   asp-controller="Author"
+                   asp-action="Index"
+                   class="dashboard-stat-card text-decoration-none">
 
                     <div class="stat-icon bg-success-subtle text-success">
+
                         <i class="bi bi-person-vcard"></i>
+
                     </div>
 
                     <div class="mt-3">
@@ -62,13 +73,13 @@
                             Tổng tác giả
                         </div>
 
-                        <div class="fs-3 fw-bold">
+                        <div class="fs-3 fw-bold text-dark">
                             @Model.TotalAuthors
                         </div>
 
                     </div>
 
-                </div>
+                </a>
 
             </div>
 
@@ -77,10 +88,15 @@
 
             <div class="col">
 
-                <div class="dashboard-stat-card">
+                <a asp-area="Admin"
+                   asp-controller="Category"
+                   asp-action="Index"
+                   class="dashboard-stat-card text-decoration-none">
 
                     <div class="stat-icon bg-warning-subtle text-warning">
+
                         <i class="bi bi-tags"></i>
+
                     </div>
 
                     <div class="mt-3">
@@ -89,13 +105,13 @@
                             Tổng thể loại
                         </div>
 
-                        <div class="fs-3 fw-bold">
+                        <div class="fs-3 fw-bold text-dark">
                             @Model.TotalCategories
                         </div>
 
                     </div>
 
-                </div>
+                </a>
 
             </div>
 
@@ -104,10 +120,15 @@
 
             <div class="col">
 
-                <div class="dashboard-stat-card">
+                <a asp-area="Admin"
+                   asp-controller="Resident"
+                   asp-action="Index"
+                   class="dashboard-stat-card text-decoration-none">
 
                     <div class="stat-icon bg-info-subtle text-info">
+
                         <i class="bi bi-people"></i>
+
                     </div>
 
                     <div class="mt-3">
@@ -116,13 +137,13 @@
                             Tổng cư dân
                         </div>
 
-                        <div class="fs-3 fw-bold">
+                        <div class="fs-3 fw-bold text-dark">
                             @Model.TotalResidents
                         </div>
 
                     </div>
 
-                </div>
+                </a>
 
             </div>
 
@@ -131,10 +152,15 @@
 
             <div class="col">
 
-                <div class="dashboard-stat-card">
+                <a asp-area="Admin"
+                   asp-controller="Borrow"
+                   asp-action="Index"
+                   class="dashboard-stat-card text-decoration-none">
 
                     <div class="stat-icon bg-secondary-subtle text-secondary">
+
                         <i class="bi bi-journal-text"></i>
+
                     </div>
 
                     <div class="mt-3">
@@ -143,15 +169,16 @@
                             Tổng phiếu mượn
                         </div>
 
-                        <div class="fs-3 fw-bold">
+                        <div class="fs-3 fw-bold text-dark">
                             @Model.TotalBorrowRecords
                         </div>
 
                     </div>
 
-                </div>
+                </a>
 
             </div>
+
 
         </div>
 
@@ -168,6 +195,8 @@
 
     .dashboard-stat-card {
 
+        display: block;
+
         height: 100%;
 
         padding: 18px;
@@ -180,6 +209,8 @@
 
         transition: all .2s ease;
 
+        cursor: pointer;
+
     }
 
     .dashboard-stat-card:hover {
@@ -187,6 +218,14 @@
         transform: translateY(-3px);
 
         box-shadow: 0 .35rem 1rem rgba(0, 0, 0, .08);
+
+        border-color: #dee2e6;
+
+    }
+
+    .dashboard-stat-card:hover .fs-3 {
+
+        text-decoration: underline;
 
     }
 
